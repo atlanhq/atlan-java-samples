@@ -1,0 +1,56 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+plugins {
+    id 'java'
+    id "jvm-test-suite"
+    id "io.freefair.lombok" version "6.3.0"
+    id "com.diffplug.spotless" version "6.4.0"
+}
+
+group 'com.atlan.samples'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral {
+        mavenContent {
+            releasesOnly()
+        }
+    }
+}
+
+dependencies {
+    implementation group: "com.atlan", name: "atlan-java", "version": "0.4.0"
+    implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation platform('software.amazon.awssdk:bom:2.18.21')
+    implementation 'software.amazon.awssdk:s3:2.18.24'
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
+    implementation group: 'org.testng', name: 'testng', version: '7.4.0'
+    runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+}
+
+lombok {
+    version = "1.18.24"
+}
+
+delombok {
+    // empty format option, otherwise the default is to use pretty formatting which overrides
+    // options Lombok config options and does not add generated annotations.
+    format = [:]
+}
+
+spotless {
+    java {
+        palantirJavaFormat("2.9.0")
+        removeUnusedImports()
+        licenseHeaderFile('LICENSE_HEADER')
+    }
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+}
