@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-4.0 -->
 <!-- Copyright 2023 Atlan Pte. Ltd. -->
 
+[![Build](https://github.com/atlanhq/atlan-java-samples/workflows/Merge/badge.svg)](https://github.com/atlanhq/atlan-java-samples/actions/workflows/merge.yml?query=workflow%3AMerge)
+[![JavaDocs](https://img.shields.io/badge/javadocs-passing-success)](https://atlanhq.github.io/atlan-java-samples/)
+[![Development](https://img.shields.io/nexus/s/com.atlan/atlan-java-samples?label=development&server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/snapshots/com/atlan/atlan-java-samples/)
+<!--[![CodeQL](https://github.com/atlanhq/atlan-java-samples/workflows/CodeQL/badge.svg)](https://github.com/atlanhq/atlan-java-samples/actions/workflows/codeql-analysis.yml) -->
+
 # Atlan Java Samples
 
 This repository houses samples of using the [Atlan Java SDK](https://developer.atlan.com/sdks/java/).
