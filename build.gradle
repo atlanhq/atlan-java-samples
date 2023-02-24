@@ -1,15 +1,64 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+    }
+}
+
 plugins {
     id 'java'
     id "jvm-test-suite"
+    id "maven-publish"
+    id "signing"
     id "io.freefair.lombok" version "6.3.0"
     id "com.diffplug.spotless" version "6.4.0"
-    id "maven-publish"
+    id "net.ltgt.errorprone" version "2.0.2"
     id "org.ajoberstar.git-publish" version "3.0.1"
 }
 
-group 'com.atlan.samples'
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+group 'com.atlan'
 version '1.0-SNAPSHOT'
+
+tasks.withType(JavaCompile) {
+    options.release = project.targetCompatibility.majorVersion as Integer
+
+    options.compilerArgs << "-Xlint:all" << "-Xlint:-options" << "-Xlint:-processing"
+    options.encoding = "UTF-8"
+
+    options.errorprone {
+        // Some methods in autogen'd files (defined via overrides) lack a summary. Should be trivial
+        // to fix by adding the missing summaries.
+        disable("MissingSummary")
+
+        // This check is disabled because multiple nested classes may have the same name in a given
+        // file. (In particular the EqualsAndHashCode from Lombok will create this in many places.)
+        disable("SameNameButDifferent")
+
+        // This check is disabled because of how we have object-based inheritance setup, and the
+        // inability of Lombok to generate Overrides on its generated builder-related methods.
+        disable("MissingOverride")
+
+        // This check is disabled because of how Lombok works with SuperBuilder and the
+        // AtlanObject base class not actually containing any members, yet Lombok requiring
+        // the annotation here for all inherited classes to work.
+        disable("UnusedVariable")
+
+        // Disable checks in generated code since Lombok does some things that error-prone
+        // may not like (and may even cause error-prone itself to fail out with exceptions
+        // during its analysis process). For example, combining @SuperBuilder and @Singular
+        // annotations...
+        disableWarningsInGeneratedCode = true
+    }
+}
+
+compileJava {
+    options.compilerArgs << "-Werror"
+}
 
 repositories {
     mavenCentral {
@@ -20,6 +69,8 @@ repositories {
 }
 
 dependencies {
+    errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
+    errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
     implementation group: "com.atlan", name: "atlan-java", "version": "0.4.0"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
@@ -29,6 +80,18 @@ dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
     implementation group: 'org.testng', name: 'testng', version: '7.4.0'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": POM_NAME,
+                "Implementation-Version": VERSION_NAME,
+                "Implementation-Vendor": VENDOR_NAME,
+                "Bundle-SymbolicName": POM_ARTIFACT_ID,
+                "Export-Package": "com.atlan.*")
+
+        archiveVersion = VERSION_NAME
+    }
 }
 
 lombok {
@@ -41,19 +104,13 @@ delombok {
     format = [:]
 }
 
+apply from: "deploy.gradle"
+
 spotless {
     java {
         palantirJavaFormat("2.9.0")
         removeUnusedImports()
         licenseHeaderFile('LICENSE_HEADER')
-    }
-}
-
-task buildZip(type: Zip) {
-    from compileJava
-    from processResources
-    into('lib') {
-        from configurations.runtimeClasspath
     }
 }
 
@@ -68,3 +125,12 @@ gitPublish {
         }
     }
 }
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+}
+
