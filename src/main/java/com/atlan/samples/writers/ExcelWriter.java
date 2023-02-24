@@ -289,7 +289,7 @@ public class ExcelWriter {
      */
     public void addDataCell(Row row, int index, long value) {
         Cell cell = row.createCell(index, CellType.NUMERIC);
-        cell.setCellValue(value);
+        cell.setCellValue((double) value);
         cell.setCellStyle(dataStyle);
     }
 

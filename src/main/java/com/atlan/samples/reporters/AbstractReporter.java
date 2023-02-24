@@ -10,6 +10,7 @@ import com.atlan.model.assets.*;
 import com.atlan.model.relations.Reference;
 import com.atlan.util.StringUtils;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,7 +83,7 @@ public abstract class AbstractReporter {
     }
 
     protected void setFilenameWithPrefix(Map<String, String> event, String prefix) {
-        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
+        String timestamp = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
         String filename = event.getOrDefault("FILE_PREFIX", prefix);
         if (filename.endsWith(".xls") || filename.endsWith(".xlsx")) {
             filename = filename.substring(0, filename.lastIndexOf(".xls"));
