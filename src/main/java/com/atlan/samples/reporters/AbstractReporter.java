@@ -23,22 +23,22 @@ import software.amazon.awssdk.regions.Region;
 @Slf4j
 public abstract class AbstractReporter {
 
-    static final Query beGlossaryAsset =
+    protected static final Query beGlossaryAsset =
             beOneOfTypes(List.of(Glossary.TYPE_NAME, GlossaryCategory.TYPE_NAME, GlossaryTerm.TYPE_NAME));
-    static final Query beTableLevel =
+    protected static final Query beTableLevel =
             beOneOfTypes(List.of(Table.TYPE_NAME, View.TYPE_NAME, MaterializedView.TYPE_NAME));
 
     // BI assets that connect to underlying data sources via lineage
-    static final Query beBIAsset = beOneOfTypes(
+    protected static final Query beBIAsset = beOneOfTypes(
             List.of(LookerView.TYPE_NAME, PowerBITable.TYPE_NAME, TableauDatasource.TYPE_NAME, SigmaDataset.TYPE_NAME));
-    static final Query beBIDashboard = beOneOfTypes(List.of(
+    protected static final Query beBIDashboard = beOneOfTypes(List.of(
             LookerDashboard.TYPE_NAME, PowerBIDashboard.TYPE_NAME, TableauDashboard.TYPE_NAME, SigmaPage.TYPE_NAME));
 
-    static final List<String> TLA_ATTRIBUTES =
+    protected static final List<String> TLA_ATTRIBUTES =
             List.of("connectorName", "databaseName", "schemaName", "name", "rowCount", "sizeBytes");
 
-    static final double BYTES_IN_GB = 1073741824.0;
-    static final String TIMESTAMP_FORMAT = "uuuuMMdd-HHmmss-SSS";
+    protected static final double BYTES_IN_GB = 1073741824.0;
+    protected static final String TIMESTAMP_FORMAT = "uuuuMMdd-HHmmss-SSS";
 
     private int _batchSize = 50;
     private String _delimiter = "|";
