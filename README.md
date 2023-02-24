@@ -12,8 +12,8 @@ This repository houses samples of using the [Atlan Java SDK](https://developer.a
 
 Currently, these cover:
 
-- [Loaders](docs/loaders.md) — import metadata into Atlan, both net-new and by enriching existing assets
-- [Reporters](docs/reporters.md) — extract or report on metadata in Atlan
+- [Loaders](https://github.com/atlanhq/atlan-java-samples/wiki/Loaders) — import metadata into Atlan, both net-new and by enriching existing assets
+- [Reporters](https://github.com/atlanhq/atlan-java-samples/wiki/Reporters) — extract or report on metadata in Atlan
 
 These are based on common functionality to read and write from Excel files (based on [Apache POI](https://poi.apache.org/)),
 and to integrate with AWS S3 to enable them to run as Lambda functions.
