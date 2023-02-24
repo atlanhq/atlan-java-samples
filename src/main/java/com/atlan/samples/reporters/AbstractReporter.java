@@ -2,9 +2,6 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.reporters;
 
-import static com.atlan.util.QueryFactory.*;
-
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.Atlan;
 import com.atlan.model.assets.*;
 import com.atlan.model.relations.Reference;
@@ -15,7 +12,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.regions.Region;
@@ -23,22 +19,8 @@ import software.amazon.awssdk.regions.Region;
 @Slf4j
 public abstract class AbstractReporter {
 
-    protected static final Query beGlossaryAsset =
-            beOneOfTypes(List.of(Glossary.TYPE_NAME, GlossaryCategory.TYPE_NAME, GlossaryTerm.TYPE_NAME));
-    protected static final Query beTableLevel =
-            beOneOfTypes(List.of(Table.TYPE_NAME, View.TYPE_NAME, MaterializedView.TYPE_NAME));
-
-    // BI assets that connect to underlying data sources via lineage
-    protected static final Query beBIAsset = beOneOfTypes(
-            List.of(LookerView.TYPE_NAME, PowerBITable.TYPE_NAME, TableauDatasource.TYPE_NAME, SigmaDataset.TYPE_NAME));
-    protected static final Query beBIDashboard = beOneOfTypes(List.of(
-            LookerDashboard.TYPE_NAME, PowerBIDashboard.TYPE_NAME, TableauDashboard.TYPE_NAME, SigmaPage.TYPE_NAME));
-
-    protected static final List<String> TLA_ATTRIBUTES =
-            List.of("connectorName", "databaseName", "schemaName", "name", "rowCount", "sizeBytes");
-
-    protected static final double BYTES_IN_GB = 1073741824.0;
-    protected static final String TIMESTAMP_FORMAT = "uuuuMMdd-HHmmss-SSS";
+    public static final double BYTES_IN_GB = 1073741824.0;
+    public static final String TIMESTAMP_FORMAT = "uuuuMMdd-HHmmss-SSS";
 
     private int _batchSize = 50;
     private String _delimiter = "|";
@@ -92,7 +74,7 @@ public abstract class AbstractReporter {
         setFilename(filename);
     }
 
-    static String getFormattedDateTime(Long ts) {
+    protected static String getFormattedDateTime(Long ts) {
         if (ts != null && ts > 0L) {
             return ZonedDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneOffset.UTC)
                     .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -101,11 +83,11 @@ public abstract class AbstractReporter {
         }
     }
 
-    static String getAssetLink(String guid) {
+    protected static String getAssetLink(String guid) {
         return Atlan.getBaseUrlSafe() + "/assets/" + guid + "/overview";
     }
 
-    static String getDescription(Asset asset) {
+    protected static String getDescription(Asset asset) {
         String description = asset.getUserDescription();
         if (description == null || description.length() == 0) {
             description = asset.getDescription();
@@ -113,15 +95,15 @@ public abstract class AbstractReporter {
         return description == null ? "" : description;
     }
 
-    static String getUserOwners(Asset asset) {
+    protected static String getUserOwners(Asset asset) {
         return getCommaSeparatedList(asset.getOwnerUsers());
     }
 
-    static String getGroupOwners(Asset asset) {
+    protected static String getGroupOwners(Asset asset) {
         return getCommaSeparatedList(asset.getOwnerGroups());
     }
 
-    static <T extends Reference> int getCount(Collection<T> collection) {
+    protected static <T extends Reference> int getCount(Collection<T> collection) {
         if (collection == null) {
             return 0;
         } else {
@@ -129,7 +111,7 @@ public abstract class AbstractReporter {
         }
     }
 
-    static String getREADME(Asset asset) {
+    protected static String getREADME(Asset asset) {
         Readme readme = asset.getReadme();
         if (readme != null) {
             String content = readme.getDescription();
@@ -145,11 +127,11 @@ public abstract class AbstractReporter {
         return "";
     }
 
-    static String getClassifications(Asset asset) {
+    protected static String getClassifications(Asset asset) {
         return getCommaSeparatedList(asset.getClassificationNames());
     }
 
-    static String getCommaSeparatedList(Collection<String> items) {
+    protected static String getCommaSeparatedList(Collection<String> items) {
         if (items == null) {
             return "";
         } else {
