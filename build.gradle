@@ -4,6 +4,7 @@ plugins {
     id "jvm-test-suite"
     id "io.freefair.lombok" version "6.3.0"
     id "com.diffplug.spotless" version "6.4.0"
+    id "org.ajoberstar.git-publish" version "3.0.1"
 }
 
 group 'com.atlan.samples'
@@ -52,5 +53,17 @@ task buildZip(type: Zip) {
     from processResources
     into('lib') {
         from configurations.runtimeClasspath
+    }
+}
+
+gitPublish {
+    repoUri = 'https://github.com/atlanhq/atlan-java-samples.git'
+    branch = 'gh-pages'
+    sign = false // disable commit signing
+
+    contents {
+        from(javadoc) {
+            into '.'
+        }
     }
 }

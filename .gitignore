@@ -12,5 +12,8 @@
 .gradle/
 build/
 
+# MacOS
+**/.DS_Store
+
 # Generated reports
 enrichment-report*.xlsx
