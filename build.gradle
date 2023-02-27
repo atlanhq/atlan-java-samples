@@ -78,6 +78,7 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.18.21')
     implementation 'software.amazon.awssdk:s3:2.18.24'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
+    implementation 'io.swagger.parser.v3:swagger-parser:2.1.12'
     implementation group: 'org.testng', name: 'testng', version: '7.4.0'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 }
