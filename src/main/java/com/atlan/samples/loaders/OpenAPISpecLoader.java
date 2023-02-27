@@ -11,7 +11,7 @@ import com.atlan.model.assets.*;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
-import com.atlan.samples.readers.SpecReader;
+import com.atlan.samples.readers.OpenAPISpecReader;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import java.util.*;
@@ -21,13 +21,13 @@ import lombok.extern.slf4j.Slf4j;
  * Loads API assets into Atlan from an OpenAPI spec.
  */
 @Slf4j
-public class SpecLoader extends AbstractLoader implements RequestHandler<Map<String, String>, String> {
+public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<Map<String, String>, String> {
 
     private String _specUrl = null;
     private String _apiName = null;
 
     public static void main(String[] args) {
-        SpecLoader sl = new SpecLoader();
+        OpenAPISpecLoader sl = new OpenAPISpecLoader();
         sl.handleRequest(System.getenv(), null);
     }
 
@@ -72,7 +72,7 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
 
         log.info("Loading definitions from: {}", _specUrl);
 
-        SpecReader parser = new SpecReader(_specUrl);
+        OpenAPISpecReader parser = new OpenAPISpecReader(_specUrl);
 
         String connectionQualifiedName = null;
         log.info("Looking for existing API connection named: {}", _apiName);

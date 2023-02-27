@@ -9,7 +9,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser;
 /**
  * Utility class for parsing and reading the contents of an OpenAPI spec file, using the Swagger parser.
  */
-public class SpecReader {
+public class OpenAPISpecReader {
 
     private final OpenAPI spec;
     private final boolean hasInfo;
@@ -22,7 +22,7 @@ public class SpecReader {
      *
      * @param url location of the OpenAPI spec
      */
-    public SpecReader(String url) {
+    public OpenAPISpecReader(String url) {
         spec = new OpenAPIV3Parser().read(url);
         hasInfo = spec.getInfo() != null;
         hasContact = hasInfo && spec.getInfo().getContact() != null;
