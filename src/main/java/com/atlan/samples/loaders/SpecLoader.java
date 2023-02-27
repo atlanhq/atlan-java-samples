@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -12,9 +14,8 @@ import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.samples.readers.SpecReader;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Loads API assets into Atlan from an OpenAPI spec.
@@ -56,15 +57,16 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
 
         log.info("Retrieving configuration and context...");
         if (context != null && context.getClientContext() != null) {
-            log.debug(
-                    " ... client environment: {}",
-                    context.getClientContext().getEnvironment());
+            log.debug(" ... client environment: {}", context.getClientContext().getEnvironment());
             log.debug(" ... client custom: {}", context.getClientContext().getCustom());
         }
         parseParametersFromEvent(event);
 
         if (_apiName == null || _specUrl == null) {
-            log.error("Missing key inputs — must have both API_SPEC_URL ({}) and API_NAME ({}) defined.", _apiName, _specUrl);
+            log.error(
+                    "Missing key inputs — must have both API_SPEC_URL ({}) and API_NAME ({}) defined.",
+                    _apiName,
+                    _specUrl);
             System.exit(1);
         }
 
@@ -84,8 +86,8 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
         } catch (NotFoundException e) {
             try {
                 log.info("... none found, creating a new API connection...");
-                Connection connectionToCreate = Connection
-                        .creator(_apiName, AtlanConnectorType.API, List.of(RoleCache.getIdForName("$admin")), null, null)
+                Connection connectionToCreate = Connection.creator(
+                                _apiName, AtlanConnectorType.API, List.of(RoleCache.getIdForName("$admin")), null, null)
                         .build();
                 AssetMutationResponse response = connectionToCreate.upsert();
                 if (response != null && response.getCreatedAssets().size() == 1) {
@@ -116,8 +118,7 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
 
         String specQualifiedName = null;
         try {
-            APISpec specToCreate = APISpec
-                    .creator(parser.getTitle(), connectionQualifiedName)
+            APISpec specToCreate = APISpec.creator(parser.getTitle(), connectionQualifiedName)
                     .sourceURL(_specUrl)
                     .apiSpecType(parser.getOpenAPIVersion())
                     .description(parser.getDescription())
@@ -170,8 +171,7 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
                 if (pathDetails.getDelete() != null) {
                     operations.add("DELETE");
                 }
-                APIPath path = APIPath
-                        .creator(pathUrl, specQualifiedName)
+                APIPath path = APIPath.creator(pathUrl, specQualifiedName)
                         .apiPathRawURI(pathUrl)
                         .apiPathSummary(pathDetails.getSummary())
                         .apiPathAvailableOperations(operations)
@@ -195,5 +195,4 @@ public class SpecLoader extends AbstractLoader implements RequestHandler<Map<Str
             }
         }
     }
-
 }

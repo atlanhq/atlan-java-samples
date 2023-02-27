@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.readers;
 
 import io.swagger.v3.oas.models.OpenAPI;
@@ -144,5 +146,4 @@ public class SpecReader {
     public Paths getPaths() {
         return spec.getPaths();
     }
-
 }

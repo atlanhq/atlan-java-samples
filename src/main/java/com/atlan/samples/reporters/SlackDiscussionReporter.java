@@ -98,7 +98,8 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
         Query query = CompoundQuery.builder()
                 .must(beActive())
                 .must(beOfType(Link.TYPE_NAME))
-                .build()._toQuery();
+                .build()
+                ._toQuery();
         IndexSearchRequest request = IndexSearchRequest.builder()
                 .dsl(IndexSearchDSL.builder()
                         .from(0)
