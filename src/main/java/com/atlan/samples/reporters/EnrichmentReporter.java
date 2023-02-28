@@ -16,7 +16,6 @@ import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.search.*;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
-import com.atlan.util.QueryFactory;
 import java.io.IOException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +33,19 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     private enum FilterType {
         BY_GROUP,
-        BY_CLASSIFICATION
+        BY_CLASSIFICATION,
+        BY_PREFIX
     }
 
     private static FilterType FILTER_TYPE = null;
     private static List<String> CLASSIFICATION_LIST = null;
+    private static String PREFIX = null;
+    private static boolean INCLUDE_FIELD_LEVEL = false;
+    private static boolean DIRECT_CLASSIFICATIONS_ONLY = false;
 
-    private static final Map<String, String> glossaryGuidToName = new HashMap<>();
     private static final Map<String, String> categoryGuidToPath = new HashMap<>();
+    private static final Map<String, Glossary> glossaryGuidToDetails = new HashMap<>();
+    private static final Map<String, GlossaryTerm> termGuidToDetails = new HashMap<>();
     private static final Map<String, String> processed = new HashMap<>();
 
     static final List<String> ENRICHMENT_ATTRIBUTES = List.of(
@@ -66,7 +70,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             "readme",
             "classificationNames",
             "links",
-            "connectorName");
+            "connectorName",
+            "meanings");
 
     private static final List<String> assetTypes = List.of(
             Table.TYPE_NAME,
@@ -160,6 +165,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         if (!event.containsKey("FILTER_BY")) {
             event.put("FILTER_BY", "GROUP");
         }
+        if (!event.containsKey("DELIMITER")) {
+            event.put("DELIMITER", ",");
+        }
         er.handleRequest(event, null);
     }
 
@@ -171,13 +179,24 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             String filterBy = event.getOrDefault("FILTER_BY", "GROUP");
             if (filterBy.toUpperCase().equals("GROUP")) {
                 FILTER_TYPE = FilterType.BY_GROUP;
-            } else {
+            } else if (filterBy.toUpperCase().equals("CLASSIFICATION")) {
                 FILTER_TYPE = FilterType.BY_CLASSIFICATION;
+            } else {
+                FILTER_TYPE = FilterType.BY_PREFIX;
             }
             String classification = event.getOrDefault("CLASSIFICATION", null);
             if (classification != null && classification.length() > 0) {
                 CLASSIFICATION_LIST = List.of(classification);
             }
+            String prefix = event.getOrDefault("PREFIX", null);
+            if (prefix != null && prefix.length() > 0) {
+                PREFIX = prefix;
+            }
+            String includeFieldLevel = event.getOrDefault("INCLUDE_FIELD_LEVEL", "false");
+            INCLUDE_FIELD_LEVEL = includeFieldLevel.toUpperCase().equals("TRUE");
+            String directClassificationsOnly = event.getOrDefault("DIRECT_CLASSIFICATIONS_ONLY", "false");
+            DIRECT_CLASSIFICATIONS_ONLY =
+                    directClassificationsOnly.toUpperCase().equals("TRUE");
         }
     }
 
@@ -201,6 +220,10 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
             ExcelWriter xlsx = new ExcelWriter();
 
+            // Before anything else, cache the glossaries and terms (for x-ref purposes)
+            cacheGlossaries();
+            cacheTerms();
+
             Sheet assets = xlsx.createSheet("Asset enrichment");
             autoSizeSheets.add("Asset enrichment");
             xlsx.addHeader(assets, ASSET_ENRICHMENT);
@@ -209,7 +232,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             Sheet glossaries = xlsx.createSheet("Glossary enrichment");
             autoSizeSheets.add("Glossary enrichment");
             xlsx.addHeader(glossaries, GLOSSARY_ENRICHMENT);
-            findGlossaries(xlsx, glossaries);
+            getGlossaries(xlsx, glossaries);
 
             Sheet categories = xlsx.createSheet("Category enrichment");
             autoSizeSheets.add("Category enrichment");
@@ -219,7 +242,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             Sheet terms = xlsx.createSheet("Term enrichment");
             autoSizeSheets.add("Term enrichment");
             xlsx.addHeader(terms, TERM_ENRICHMENT);
-            findTerms(xlsx, terms);
+            getTerms(xlsx, terms);
 
             // If a bucket was provided, we'll write out to S3
             if (getBucket() != null) {
@@ -243,13 +266,86 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return getFilename();
     }
 
+    void cacheGlossaries() throws AtlanException {
+        log.info("Finding glossaries...");
+        Query query = CompoundQuery.builder()
+                .must(beActive())
+                .must(beOfType(Glossary.TYPE_NAME))
+                .build()
+                ._toQuery();
+        IndexSearchRequest request = IndexSearchRequest.builder()
+                .dsl(IndexSearchDSL.builder()
+                        .from(0)
+                        .size(getBatchSize())
+                        .query(query)
+                        .sortOption(Sort.by(KeywordFields.NAME))
+                        .build())
+                .attributes(ENRICHMENT_ATTRIBUTES)
+                .relationAttributes(RELATION_ATTRIBUTES)
+                .build();
+        IndexSearchResponse response = request.search();
+        List<Asset> results = response.getAssets();
+        while (results != null) {
+            for (Asset result : results) {
+                if (result instanceof Glossary) {
+                    glossaryGuidToDetails.put(result.getGuid(), (Glossary) result);
+                }
+            }
+            response = response.getNextPage();
+            results = response.getAssets();
+        }
+    }
+
+    void cacheTerms() throws AtlanException {
+        log.info("Finding terms...");
+        Query query = CompoundQuery.builder()
+                .must(beActive())
+                .must(beOfType(GlossaryTerm.TYPE_NAME))
+                .build()
+                ._toQuery();
+        IndexSearchRequest request = IndexSearchRequest.builder()
+                .dsl(IndexSearchDSL.builder()
+                        .from(0)
+                        .size(getBatchSize())
+                        .query(query)
+                        .sortOption(Sort.by(KeywordFields.NAME))
+                        .build())
+                .attributes(ENRICHMENT_ATTRIBUTES)
+                .attribute("anchor")
+                .attribute("categories")
+                .attribute("seeAlso")
+                .attribute("preferredTerms")
+                .attribute("synonyms")
+                .attribute("antonyms")
+                .attribute("translatedTerms")
+                .attribute("validValuesFor")
+                .attribute("classifies")
+                .relationAttributes(RELATION_ATTRIBUTES)
+                .build();
+        IndexSearchResponse response = request.search();
+        List<Asset> results = response.getAssets();
+        while (results != null) {
+            for (Asset result : results) {
+                if (result instanceof GlossaryTerm) {
+                    termGuidToDetails.put(result.getGuid(), (GlossaryTerm) result);
+                }
+            }
+            response = response.getNextPage();
+            results = response.getAssets();
+        }
+    }
+
     void getAssets(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
-        CompoundQuery.CompoundQueryBuilder builder =
-                CompoundQuery.builder().must(beActive()).must(beOneOfTypes(assetTypes));
+        CompoundQuery.CompoundQueryBuilder builder = CompoundQuery.builder().must(beActive());
+        if (!INCLUDE_FIELD_LEVEL) {
+            builder = builder.must(beOneOfTypes(assetTypes));
+        }
         if (FILTER_TYPE == FilterType.BY_GROUP) {
             builder = builder.must(have(KeywordFields.OWNER_GROUPS).present());
-        } else {
-            builder = builder.must(QueryFactory.beClassifiedByAtLeastOneOf(CLASSIFICATION_LIST));
+        } else if (FILTER_TYPE == FilterType.BY_CLASSIFICATION) {
+            builder = builder.must(beClassifiedByAtLeastOneOf(CLASSIFICATION_LIST));
+        } else if (FILTER_TYPE == FilterType.BY_PREFIX) {
+            builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
         }
         Query query = builder.build()._toQuery();
         IndexSearchRequest request = IndexSearchRequest.builder()
@@ -274,12 +370,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     List<Asset> childAssets = getChildAssets(result);
                     long descriptionCounts = 0;
                     for (Asset child : childAssets) {
-                        descriptionCounts += (child.getUserDescription() != null
-                                                && child.getUserDescription().length() > 0)
-                                        || (child.getDescription() != null
-                                                && child.getDescription().length() > 0)
-                                ? 1
-                                : 0;
+                        String childDesc = getDescription(child);
+                        descriptionCounts += childDesc.length() > 0 ? 1 : 0;
                     }
                     xlsx.appendRow(
                             sheet,
@@ -288,9 +380,10 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                                     DataCell.of(result.getQualifiedName()),
                                     DataCell.of(result.getTypeName()),
                                     DataCell.of(result.getName()),
-                                    DataCell.of(getDescription(result)),
-                                    DataCell.of(getUserOwners(result)),
-                                    DataCell.of(getGroupOwners(result)),
+                                    DataCell.of(result.getDescription()),
+                                    DataCell.of(result.getUserDescription()),
+                                    DataCell.of(getUserOwners(result, getDelimiter())),
+                                    DataCell.of(getGroupOwners(result, getDelimiter())),
                                     DataCell.of(result.getCertificateStatus()),
                                     DataCell.of(result.getCertificateStatusMessage()),
                                     DataCell.of(result.getCertificateUpdatedBy()),
@@ -305,8 +398,12 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                                     DataCell.of(result.getUpdatedBy()),
                                     DataCell.of(getFormattedDateTime(result.getUpdateTime())),
                                     DataCell.of(getREADME(result)),
+                                    DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)),
                                     DataCell.of(getCount(result.getLinks())),
-                                    DataCell.of(getClassifications(result)),
+                                    DataCell.of(
+                                            DIRECT_CLASSIFICATIONS_ONLY
+                                                    ? getDirectClassifications(result, getDelimiter())
+                                                    : getClassifications(result, getDelimiter())),
                                     DataCell.of(childAssets.size()),
                                     DataCell.of(descriptionCounts),
                                     DataCell.of(getAssetLink(guid))));
@@ -319,57 +416,32 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         }
     }
 
-    void findGlossaries(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
-        log.info("Finding glossaries...");
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(Glossary.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
-                        .size(getBatchSize())
-                        .query(query)
-                        .sortOption(Sort.by(KeywordFields.NAME))
-                        .build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .relationAttributes(RELATION_ATTRIBUTES)
-                .build();
-        IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof Glossary) {
-                    Glossary glossary = (Glossary) result;
-                    glossaryGuidToName.put(glossary.getGuid(), glossary.getName());
-                    xlsx.appendRow(
-                            sheet,
-                            List.of(
-                                    DataCell.of(glossary.getName()),
-                                    DataCell.of(getDescription(glossary)),
-                                    DataCell.of(getUserOwners(glossary)),
-                                    DataCell.of(getGroupOwners(glossary)),
-                                    DataCell.of(glossary.getCertificateStatus()),
-                                    DataCell.of(glossary.getCertificateStatusMessage()),
-                                    DataCell.of(glossary.getCertificateUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(glossary.getCertificateUpdatedAt())),
-                                    DataCell.of(glossary.getAnnouncementType()),
-                                    DataCell.of(glossary.getAnnouncementTitle()),
-                                    DataCell.of(glossary.getAnnouncementMessage()),
-                                    DataCell.of(glossary.getAnnouncementUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(glossary.getAnnouncementUpdatedAt())),
-                                    DataCell.of(glossary.getCreatedBy()),
-                                    DataCell.of(getFormattedDateTime(glossary.getCreateTime())),
-                                    DataCell.of(glossary.getUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(glossary.getUpdateTime())),
-                                    DataCell.of(getREADME(glossary)),
-                                    DataCell.of(getCount(glossary.getLinks())),
-                                    DataCell.of(getAssetLink(glossary.getGuid()))));
-                }
-            }
-            response = response.getNextPage();
-            results = response.getAssets();
+    void getGlossaries(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
+        for (Glossary glossary : glossaryGuidToDetails.values()) {
+            xlsx.appendRow(
+                    sheet,
+                    List.of(
+                            DataCell.of(glossary.getName()),
+                            DataCell.of(glossary.getDescription()),
+                            DataCell.of(glossary.getUserDescription()),
+                            DataCell.of(getUserOwners(glossary, getDelimiter())),
+                            DataCell.of(getGroupOwners(glossary, getDelimiter())),
+                            DataCell.of(glossary.getCertificateStatus()),
+                            DataCell.of(glossary.getCertificateStatusMessage()),
+                            DataCell.of(glossary.getCertificateUpdatedBy()),
+                            DataCell.of(getFormattedDateTime(glossary.getCertificateUpdatedAt())),
+                            DataCell.of(glossary.getAnnouncementType()),
+                            DataCell.of(glossary.getAnnouncementTitle()),
+                            DataCell.of(glossary.getAnnouncementMessage()),
+                            DataCell.of(glossary.getAnnouncementUpdatedBy()),
+                            DataCell.of(getFormattedDateTime(glossary.getAnnouncementUpdatedAt())),
+                            DataCell.of(glossary.getCreatedBy()),
+                            DataCell.of(getFormattedDateTime(glossary.getCreateTime())),
+                            DataCell.of(glossary.getUpdatedBy()),
+                            DataCell.of(getFormattedDateTime(glossary.getUpdateTime())),
+                            DataCell.of(getREADME(glossary)),
+                            DataCell.of(getCount(glossary.getLinks())),
+                            DataCell.of(getAssetLink(glossary.getGuid()))));
         }
     }
 
@@ -407,15 +479,16 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         for (GlossaryCategory category : categoryGuidToDetails.values()) {
             String categoryPath = getCategoryPath(category, categoryGuidToDetails);
             categoryGuidToPath.put(category.getGuid(), categoryPath);
+            Glossary glossary = glossaryGuidToDetails.get(category.getAnchor().getGuid());
             xlsx.appendRow(
                     sheet,
                     List.of(
-                            DataCell.of(
-                                    glossaryGuidToName.get(category.getAnchor().getGuid())),
+                            DataCell.of(glossary == null ? "" : glossary.getName()),
                             DataCell.of(categoryPath),
-                            DataCell.of(getDescription(category)),
-                            DataCell.of(getUserOwners(category)),
-                            DataCell.of(getGroupOwners(category)),
+                            DataCell.of(category.getDescription()),
+                            DataCell.of(category.getUserDescription()),
+                            DataCell.of(getUserOwners(category, getDelimiter())),
+                            DataCell.of(getGroupOwners(category, getDelimiter())),
                             DataCell.of(category.getCertificateStatus()),
                             DataCell.of(category.getCertificateStatusMessage()),
                             DataCell.of(category.getCertificateUpdatedBy()),
@@ -445,56 +518,24 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         }
     }
 
-    void findTerms(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
-        log.info("Finding terms...");
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GlossaryTerm.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
-                        .size(getBatchSize())
-                        .query(query)
-                        .sortOption(Sort.by(KeywordFields.NAME))
-                        .build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .attribute("anchor")
-                .attribute("categories")
-                .attribute("seeAlso")
-                .attribute("preferredTerms")
-                .attribute("synonyms")
-                .attribute("antonyms")
-                .attribute("translatedTerms")
-                .attribute("validValuesFor")
-                .attribute("classifies")
-                .relationAttributes(RELATION_ATTRIBUTES)
-                .build();
-        IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        Map<String, GlossaryTerm> termGuidToDetails = new HashMap<>();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof GlossaryTerm) {
-                    termGuidToDetails.put(result.getGuid(), (GlossaryTerm) result);
-                }
-            }
-            response = response.getNextPage();
-            results = response.getAssets();
-        }
+    void getTerms(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         for (GlossaryTerm term : termGuidToDetails.values()) {
+            Glossary glossary = glossaryGuidToDetails.get(term.getAnchor().getGuid());
             xlsx.appendRow(
                     sheet,
                     List.of(
-                            DataCell.of(glossaryGuidToName.get(term.getAnchor().getGuid())),
+                            DataCell.of(glossary == null ? "" : glossary.getName()),
                             DataCell.of(term.getName()),
-                            DataCell.of(getDescription(term)),
+                            DataCell.of(term.getDescription()),
+                            DataCell.of(term.getUserDescription()),
                             DataCell.of(getCategories(term)),
-                            DataCell.of(getUserOwners(term)),
-                            DataCell.of(getGroupOwners(term)),
+                            DataCell.of(getUserOwners(term, getDelimiter())),
+                            DataCell.of(getGroupOwners(term, getDelimiter())),
                             DataCell.of(term.getCertificateStatus()),
-                            DataCell.of(getClassifications(term)),
+                            DataCell.of(
+                                    DIRECT_CLASSIFICATIONS_ONLY
+                                            ? getDirectClassifications(term, getDelimiter())
+                                            : getClassifications(term, getDelimiter())),
                             DataCell.of(term.getCertificateStatusMessage()),
                             DataCell.of(term.getCertificateUpdatedBy()),
                             DataCell.of(getFormattedDateTime(term.getCertificateUpdatedAt())),
@@ -520,7 +561,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         }
     }
 
-    static String getCategories(GlossaryTerm term) {
+    String getCategories(GlossaryTerm term) {
         Set<GlossaryCategory> categories = term.getCategories();
         List<String> categoryPaths = new ArrayList<>(categories.size());
         for (GlossaryCategory category : categories) {
@@ -529,19 +570,20 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 categoryPaths.add(path);
             }
         }
-        return getCommaSeparatedList(categoryPaths);
+        return getDelimitedList(categoryPaths, getDelimiter());
     }
 
-    static String getTerms(Set<GlossaryTerm> terms, Map<String, GlossaryTerm> guidMap) {
+    String getTerms(Set<GlossaryTerm> terms, Map<String, GlossaryTerm> guidMap) {
         List<String> qualifiedTerms = new ArrayList<>(terms.size());
         for (GlossaryTerm term : terms) {
             GlossaryTerm related = guidMap.getOrDefault(term.getGuid(), null);
             if (related != null) {
-                qualifiedTerms.add(related.getName() + "@"
-                        + glossaryGuidToName.get(related.getAnchor().getGuid()));
+                Glossary glossary =
+                        glossaryGuidToDetails.get(related.getAnchor().getGuid());
+                qualifiedTerms.add(related.getName() + "@" + (glossary == null ? "" : glossary.getName()));
             }
         }
-        return getCommaSeparatedList(qualifiedTerms);
+        return getDelimitedList(qualifiedTerms, getDelimiter());
     }
 
     /**
@@ -733,6 +775,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Type", "Type of asset");
         map.put("Name", "Name of the asset");
         map.put("Description", "Explanation of the asset");
+        map.put("User Description", "Explanation of the asset, as provided by a user in the UI");
         map.put("User Owners", "Comma-separated list of the usernames who are owners of this asset");
         map.put("Group Owners", "Comma-separated list of the group names who are owners of this asset");
         map.put("Certification", "Certificate associated with this asset, one of: Verified, Draft, Deprecated");
@@ -749,6 +792,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Updated By", "User who last updated this asset");
         map.put("Updated At", "Date and time when the asset was last updated");
         map.put("README", "README contents for this asset (as HTML)");
+        map.put("Assigned Terms", "Terms that have been linked to the asset");
         map.put("Resources", "Count of resources (links) associated with the asset");
         map.put(
                 "Classifications",
@@ -765,6 +809,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("Glossary Name", "Name of the glossary");
         map.put("Description", "Explanation of the glossary's contained terminology");
+        map.put("User Description", "Explanation of the glossary's meaning, as provided by a user in the UI");
         map.put("User Owners", "Comma-separated list of the usernames who are owners of this glossary");
         map.put("Group Owners", "Comma-separated list of the group names who are owners of this glossary");
         map.put("Certification", "Certificate associated with this glossary, one of: Verified, Draft, Deprecated");
@@ -791,6 +836,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Glossary Name", "Name of the glossary in which the category exists");
         map.put("Category Path", "Path of the category, separated by '@'");
         map.put("Description", "Explanation of the category's meaning");
+        map.put("User Description", "Explanation of the category's meaning, as provided by a user in the UI");
         map.put("User Owners", "Comma-separated list of the usernames who are owners of this term");
         map.put("Group Owners", "Comma-separated list of the group names who are owners of this term");
         map.put("Certification", "Certificate associated with this term, one of: Verified, Draft, Deprecated");
@@ -817,6 +863,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Glossary Name", "Name of the glossary in which the term exists");
         map.put("Term Name*", "Name of the term, which cannot include '@'");
         map.put("Description", "Explanation of the term's meaning");
+        map.put("User Description", "Explanation of the term's meaning, as provided by a user in the UI");
         map.put("Categories", "Comma-separated list of categories the term is organized within");
         map.put("User Owners", "Comma-separated list of the usernames who are owners of this term");
         map.put("Group Owners", "Comma-separated list of the group names who are owners of this term");
