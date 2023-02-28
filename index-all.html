@@ -543,10 +543,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/AssetDetails.html#getClassifications()">getClassifications()</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getClassifications(com.atlan.model.assets.Asset)">getClassifications(Asset)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getCommaSeparatedList(java.util.Collection)">getCommaSeparatedList(Collection&lt;String&gt;)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
-<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getClassifications(com.atlan.model.assets.Asset,java.lang.String)">getClassifications(Asset, String)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
+<dd>
+<div class="block">Retrieve a comma-separated list of all classifications assigned to the provided asset,
+ whether directly or through propagation.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/AccountDetails.html#getConnectionQualifiedName()">getConnectionQualifiedName()</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/AccountDetails.html" title="class in com.atlan.samples.loaders.models">AccountDetails</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/BucketDetails.html#getConnectionQualifiedName()">getConnectionQualifiedName()</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/BucketDetails.html" title="class in com.atlan.samples.loaders.models">BucketDetails</a></dt>
@@ -577,6 +578,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/writers/ExcelWriter.DataCell.html#getDecValue()">getDecValue()</a></span> - Method in class com.atlan.samples.writers.<a href="com/atlan/samples/writers/ExcelWriter.DataCell.html" title="class in com.atlan.samples.writers">ExcelWriter.DataCell</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getDelimitedList(java.util.Collection,java.lang.String)">getDelimitedList(Collection&lt;String&gt;, String)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
+<dd>
+<div class="block">Retrieve a list of multiple values as a single string, separated by the provided delimiter.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/AbstractLoader.html#getDelimiter()">getDelimiter()</a></span> - Method in class com.atlan.samples.loaders.<a href="com/atlan/samples/loaders/AbstractLoader.html" title="class in com.atlan.samples.loaders">AbstractLoader</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getDelimiter()">getDelimiter()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
@@ -589,6 +594,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getDescription(com.atlan.model.assets.Asset)">getDescription(Asset)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getDirectClassifications(com.atlan.model.assets.Asset,java.lang.String)">getDirectClassifications(Asset, String)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
+<dd>
+<div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) classifications
+ to the provided asset.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/readers/OpenAPISpecReader.html#getExternalDocsDescription()">getExternalDocsDescription()</a></span> - Method in class com.atlan.samples.readers.<a href="com/atlan/samples/readers/OpenAPISpecReader.html" title="class in com.atlan.samples.readers">OpenAPISpecReader</a></dt>
 <dd>
 <div class="block">Retrieve the description of the external docs defined for the OpenAPI spec.</div>
@@ -645,7 +655,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Build up details about the asset on the provided row.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getGroupOwners(com.atlan.model.assets.Asset)">getGroupOwners(Asset)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getGroupOwners(com.atlan.model.assets.Asset,java.lang.String)">getGroupOwners(Asset, String)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/AccountDetails.html#getIdentity()">getIdentity()</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/AccountDetails.html" title="class in com.atlan.samples.loaders.models">AccountDetails</a></dt>
 <dd>
@@ -865,7 +875,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Retrieve only the type name from the provided SQL type string.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getUserOwners(com.atlan.model.assets.Asset)">getUserOwners(Asset)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AbstractReporter.html#getUserOwners(com.atlan.model.assets.Asset,java.lang.String)">getUserOwners(Asset, String)</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AbstractReporter.html" title="class in com.atlan.samples.reporters">AbstractReporter</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/readers/OpenAPISpecReader.html#getVersion()">getVersion()</a></span> - Method in class com.atlan.samples.readers.<a href="com/atlan/samples/readers/OpenAPISpecReader.html" title="class in com.atlan.samples.readers">OpenAPISpecReader</a></dt>
 <dd>
