@@ -4,6 +4,7 @@ package com.atlan.samples.reporters;
 
 import com.atlan.Atlan;
 import com.atlan.model.assets.*;
+import com.atlan.model.core.Classification;
 import com.atlan.model.relations.Reference;
 import com.atlan.util.StringUtils;
 import java.time.Instant;
@@ -11,8 +12,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.regions.Region;
 
@@ -95,12 +95,12 @@ public abstract class AbstractReporter {
         return description == null ? "" : description;
     }
 
-    protected static String getUserOwners(Asset asset) {
-        return getCommaSeparatedList(asset.getOwnerUsers());
+    protected static String getUserOwners(Asset asset, String delimiter) {
+        return getDelimitedList(asset.getOwnerUsers(), delimiter);
     }
 
-    protected static String getGroupOwners(Asset asset) {
-        return getCommaSeparatedList(asset.getOwnerGroups());
+    protected static String getGroupOwners(Asset asset, String delimiter) {
+        return getDelimitedList(asset.getOwnerGroups(), delimiter);
     }
 
     protected static <T extends Reference> int getCount(Collection<T> collection) {
@@ -127,15 +127,54 @@ public abstract class AbstractReporter {
         return "";
     }
 
-    protected static String getClassifications(Asset asset) {
-        return getCommaSeparatedList(asset.getClassificationNames());
+    /**
+     * Retrieve a comma-separated list of all classifications assigned to the provided asset,
+     * whether directly or through propagation.
+     *
+     * @param asset for which to find classifications
+     * @param delimiter the separator to use between multiple values
+     * @return comma-separated list of the classifications
+     */
+    protected static String getClassifications(Asset asset, String delimiter) {
+        return getDelimitedList(asset.getClassificationNames(), delimiter);
     }
 
-    protected static String getCommaSeparatedList(Collection<String> items) {
+    /**
+     * Retrieve a comma-separated list of only the directly-assigned (not propagated) classifications
+     * to the provided asset.
+     *
+     * @param asset for which to find direct classifications
+     * @param delimiter the separator to use between multiple values
+     * @return comma-separated list of the direct classifications
+     */
+    protected static String getDirectClassifications(Asset asset, String delimiter) {
+        Set<String> classificationNames = new TreeSet<>();
+        if (asset != null) {
+            Set<Classification> classifications = asset.getClassifications();
+            if (classifications != null) {
+                for (Classification classification : classifications) {
+                    String classifiedEntity = classification.getEntityGuid();
+                    if (asset.getGuid().equals(classifiedEntity)) {
+                        classificationNames.add(classification.getTypeName());
+                    }
+                }
+            }
+        }
+        return getDelimitedList(classificationNames, delimiter);
+    }
+
+    /**
+     * Retrieve a list of multiple values as a single string, separated by the provided delimiter.
+     *
+     * @param items to combine into a single string
+     * @param delimiter to use to separate each item
+     * @return a single string of all items separated by the delimiter
+     */
+    protected static String getDelimitedList(Collection<String> items, String delimiter) {
         if (items == null) {
             return "";
         } else {
-            return String.join(",", items);
+            return String.join(delimiter, items);
         }
     }
 
