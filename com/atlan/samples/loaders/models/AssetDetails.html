@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":10,"i8":10,"i9":10,"i10":10,"i11":9,"i12":6,"i13":9,"i14":10,"i15":10,"i16":9,"i17":10,"i18":10,"i19":10};
+var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":10,"i8":10,"i9":10,"i10":10,"i11":9,"i12":6,"i13":9,"i14":9,"i15":10,"i16":10,"i17":9,"i18":10,"i19":10,"i20":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,7 +132,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="AccountDetails.html" title="class in com.atlan.samples.loaders.models">AccountDetails</a></code>, <code><a href="BucketDetails.html" title="class in com.atlan.samples.loaders.models">BucketDetails</a></code>, <code><a href="ColumnDetails.html" title="class in com.atlan.samples.loaders.models">ColumnDetails</a></code>, <code><a href="ConnectionDetails.html" title="class in com.atlan.samples.loaders.models">ConnectionDetails</a></code>, <code><a href="ContainerDetails.html" title="class in com.atlan.samples.loaders.models">ContainerDetails</a></code>, <code><a href="DatabaseDetails.html" title="class in com.atlan.samples.loaders.models">DatabaseDetails</a></code>, <code><a href="LineageDetails.html" title="class in com.atlan.samples.loaders.models">LineageDetails</a></code>, <code><a href="ObjectDetails.html" title="class in com.atlan.samples.loaders.models">ObjectDetails</a></code>, <code><a href="SchemaDetails.html" title="class in com.atlan.samples.loaders.models">SchemaDetails</a></code></dd>
+<dd><code><a href="AccountDetails.html" title="class in com.atlan.samples.loaders.models">AccountDetails</a></code>, <code><a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a></code>, <code><a href="BucketDetails.html" title="class in com.atlan.samples.loaders.models">BucketDetails</a></code>, <code><a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a></code>, <code><a href="ColumnDetails.html" title="class in com.atlan.samples.loaders.models">ColumnDetails</a></code>, <code><a href="ConnectionDetails.html" title="class in com.atlan.samples.loaders.models">ConnectionDetails</a></code>, <code><a href="ContainerDetails.html" title="class in com.atlan.samples.loaders.models">ContainerDetails</a></code>, <code><a href="DatabaseDetails.html" title="class in com.atlan.samples.loaders.models">DatabaseDetails</a></code>, <code><a href="GlossaryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">GlossaryEnrichmentDetails</a></code>, <code><a href="LineageDetails.html" title="class in com.atlan.samples.loaders.models">LineageDetails</a></code>, <code><a href="ObjectDetails.html" title="class in com.atlan.samples.loaders.models">ObjectDetails</a></code>, <code><a href="SchemaDetails.html" title="class in com.atlan.samples.loaders.models">SchemaDetails</a></code>, <code><a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a></code></dd>
 </dl>
 <hr>
 <pre>public abstract class <span class="typeNameLabel">AssetDetails</span>
@@ -289,16 +289,24 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i14" class="altColor">
+<td class="colFirst"><code>protected static java.util.List&lt;java.lang.String&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMultiValuedList(java.lang.String,java.lang.String)">getMultiValuedList</a></span>&#8203;(java.lang.String&nbsp;candidate,
+                  java.lang.String&nbsp;delim)</code></th>
+<td class="colLast">
+<div class="block">Retrieve a list of multiple values from the provided cell contents.</div>
+</td>
+</tr>
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOwnerGroups()">getOwnerGroups</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOwnerUsers()">getOwnerUsers</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>protected static java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRequiredEmptyFields(java.util.Map,java.util.Collection)">getRequiredEmptyFields</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
                       java.util.Collection&lt;java.lang.String&gt;&nbsp;requiredEmptyFields)</code></th>
@@ -307,17 +315,17 @@ extends java.lang.Object</pre>
  this row is for some other kind of asset.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isStub()">isStub</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
@@ -415,6 +423,24 @@ extends java.lang.Object</pre>
 <dd><code>candidate</code> - to translate to a boolean</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the boolean equivalent</dd>
+</dl>
+</li>
+</ul>
+<a id="getMultiValuedList(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMultiValuedList</h4>
+<pre class="methodSignature">protected static&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getMultiValuedList&#8203;(java.lang.String&nbsp;candidate,
+                                                                     java.lang.String&nbsp;delim)</pre>
+<div class="block">Retrieve a list of multiple values from the provided cell contents.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>candidate</code> - contents of a cell that could contain multiple values</dd>
+<dd><code>delim</code> - delimiter between values</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of the contents of the cell, divided into single values, or an empty list</dd>
 </dl>
 </li>
 </ul>
