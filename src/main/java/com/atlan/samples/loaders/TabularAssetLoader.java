@@ -19,7 +19,11 @@ public class TabularAssetLoader extends AbstractLoader implements RequestHandler
 
     public static void main(String[] args) {
         TabularAssetLoader al = new TabularAssetLoader();
-        al.handleRequest(System.getenv(), null);
+        Map<String, String> event = new HashMap<>(System.getenv());
+        if (!event.containsKey("FILENAME")) {
+            event.put("FILENAME", "atlan-documentation-template.xlsx");
+        }
+        al.handleRequest(event, null);
     }
 
     /**

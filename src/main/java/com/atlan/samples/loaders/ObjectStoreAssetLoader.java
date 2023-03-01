@@ -20,7 +20,11 @@ public class ObjectStoreAssetLoader extends AbstractLoader implements RequestHan
 
     public static void main(String[] args) {
         ObjectStoreAssetLoader osal = new ObjectStoreAssetLoader();
-        osal.handleRequest(System.getenv(), null);
+        Map<String, String> event = new HashMap<>(System.getenv());
+        if (!event.containsKey("FILENAME")) {
+            event.put("FILENAME", "atlan-documentation-template.xlsx");
+        }
+        osal.handleRequest(event, null);
     }
 
     /**

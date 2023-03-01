@@ -31,6 +31,9 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 
     options.errorprone {
+        // Yes, it does behave in strange ways, but nonetheless is still useful...
+        disable("StringSplitter")
+
         // Some methods in autogen'd files (defined via overrides) lack a summary. Should be trivial
         // to fix by adding the missing summaries.
         disable("MissingSummary")
@@ -66,12 +69,18 @@ repositories {
             releasesOnly()
         }
     }
+    maven {
+        url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
 }
 
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
-    implementation group: "com.atlan", name: "atlan-java", "version": "0.4.0"
+    implementation group: "com.atlan", name: "atlan-java", "version": "0.4.1-SNAPSHOT"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
