@@ -119,8 +119,8 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                 GlossaryCategory.GlossaryCategoryBuilder<?, ?> builder = null;
                 if (!categoryCache.containsKey(details.getIdentity())) {
                     try {
-                        GlossaryCategory found =
-                                GlossaryCategory.findByNameFast(categoryName, glossary.getQualifiedName(), List.of("anchor"));
+                        GlossaryCategory found = GlossaryCategory.findByNameFast(
+                                categoryName, glossary.getQualifiedName(), List.of("anchor"));
                         builder = found.trimToRequired().guid(found.getGuid());
                     } catch (NotFoundException e) {
                         builder =

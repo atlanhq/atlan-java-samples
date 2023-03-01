@@ -163,7 +163,8 @@ public class TermEnrichmentDetails extends AssetDetails {
                 String termName = details.getName();
                 GlossaryTerm.GlossaryTermBuilder<?, ?> builder = null;
                 try {
-                    GlossaryTerm found = GlossaryTerm.findByNameFast(termName, glossary.getQualifiedName(), List.of("anchor"));
+                    GlossaryTerm found =
+                            GlossaryTerm.findByNameFast(termName, glossary.getQualifiedName(), List.of("anchor"));
                     builder = found.trimToRequired().guid(found.getGuid());
                 } catch (NotFoundException e) {
                     builder = GlossaryTerm.creator(termName, glossary.getGuid(), glossary.getQualifiedName());
