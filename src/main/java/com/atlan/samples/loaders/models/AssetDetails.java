@@ -90,28 +90,19 @@ public abstract class AssetDetails {
         builder.description(row.get(COL_DESCRIPTION))
                 .certificateStatusMessage(row.get(COL_CERT_MESSAGE))
                 .announcementTitle(row.get(COL_ANN_TITLE))
-                .announcementMessage(row.get(COL_ANN_MESSAGE));
+                .announcementMessage(row.get(COL_ANN_MESSAGE))
+                .ownerUsers(getMultiValuedList(row.get(COL_OWN_USERS), delim))
+                .ownerGroups(getMultiValuedList(row.get(COL_OWN_GROUPS), delim))
+                .classifications(getMultiValuedList(row.get(COL_CLASSIFICATIONS), delim));
 
         String certificate = row.get(COL_CERTIFICATE);
         String announcement = row.get(COL_ANNOUNCEMENT);
-        String users = row.get(COL_OWN_USERS);
-        String groups = row.get(COL_OWN_GROUPS);
-        String classifications = row.get(COL_CLASSIFICATIONS);
 
         if (certificate.length() > 0) {
             builder.certificate(AtlanCertificateStatus.fromValue(certificate));
         }
         if (announcement.length() > 0) {
             builder.announcementType(AtlanAnnouncementType.fromValue(announcement));
-        }
-        if (users.length() > 0) {
-            builder.ownerUsers(Arrays.asList(users.split(Pattern.quote(delim))));
-        }
-        if (groups.length() > 0) {
-            builder.ownerGroups(Arrays.asList(groups.split(Pattern.quote(delim))));
-        }
-        if (classifications.length() > 0) {
-            builder.classifications(Arrays.asList(classifications.split(Pattern.quote(delim))));
         }
         return builder;
     }
@@ -130,6 +121,20 @@ public abstract class AssetDetails {
             String upper = candidate.toUpperCase();
             return upper.equals("X") || upper.equals("Y") || upper.equals("YES") || upper.equals("TRUE");
         }
+    }
+
+    /**
+     * Retrieve a list of multiple values from the provided cell contents.
+     *
+     * @param candidate contents of a cell that could contain multiple values
+     * @param delim delimiter between values
+     * @return a list of the contents of the cell, divided into single values, or an empty list
+     */
+    protected static List<String> getMultiValuedList(String candidate, String delim) {
+        if (candidate != null && candidate.length() > 0) {
+            return Arrays.asList(candidate.split(Pattern.quote(delim)));
+        }
+        return Collections.emptyList();
     }
 
     /**

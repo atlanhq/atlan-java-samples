@@ -18,7 +18,11 @@ public class LineageLoader extends AbstractLoader implements RequestHandler<Map<
 
     public static void main(String[] args) {
         LineageLoader ll = new LineageLoader();
-        ll.handleRequest(System.getenv(), null);
+        Map<String, String> event = new HashMap<>(System.getenv());
+        if (!event.containsKey("FILENAME")) {
+            event.put("FILENAME", "atlan-documentation-template.xlsx");
+        }
+        ll.handleRequest(event, null);
     }
 
     /**
