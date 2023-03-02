@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.reporters;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -10,10 +12,10 @@ import com.atlan.model.admin.GroupResponse;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +102,9 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
         map.put("Last Name", "Last name of the user.");
         map.put("Email", "Email address of the user.");
         map.put("Verified", "When true, the user's email has been verified.");
-        map.put("Enabled", "When true, the user is enabled and allowed to log in to Atlan. When false, the user will be prevented from logging in to Atlan.");
+        map.put(
+                "Enabled",
+                "When true, the user is enabled and allowed to log in to Atlan. When false, the user will be prevented from logging in to Atlan.");
         map.put("Role", "User roles, including login roles and custom roles emerging from persona associations.");
         map.put("Logins", "Number of successful logins by the user account.");
         map.put("Last Login", "Timestamp of the last successful login for the user.");
@@ -111,31 +115,33 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
 
     void addUserDetailRecords(ExcelWriter xlsx, Sheet sheet, List<AtlanUser> users) throws AtlanException {
 
-        //iterate on user list and write rows in the report
+        // iterate on user list and write rows in the report
         for (AtlanUser user : users) {
             if (user != null) {
 
-                //convert user's last login timestamp to local timezone
+                // convert user's last login timestamp to local timezone
                 Long userLastLoginTime = user.getLastLoginTime();
                 String reportLastLoginTime = "";
                 if (userLastLoginTime != null && userLastLoginTime > 0) {
-                    LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(userLastLoginTime), ZoneOffset.UTC);
+                    LocalDateTime ldt =
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(userLastLoginTime), ZoneOffset.UTC);
                     reportLastLoginTime = ldt.format(DateTimeFormatter.ISO_DATE_TIME);
                 }
 
-                //format user roles
+                // format user roles
                 List<String> roles = user.getRoles();
                 roles.remove("default-roles-default");
-                String reportRoles = String.join("|", roles).replace("$","");
+                String reportRoles = String.join("|", roles).replace("$", "");
 
-                //gather details of user groups
+                // gather details of user groups
                 List<String> groupNames = Collections.emptyList();
                 try {
                     GroupResponse groupResponse = user.fetchGroups();
                     if (groupResponse != null) {
                         List<AtlanGroup> groupList = groupResponse.getRecords();
                         if (groupList != null) {
-                            groupNames = groupList.stream().map(AtlanGroup::getAlias).collect(Collectors.toList());
+                            groupNames =
+                                    groupList.stream().map(AtlanGroup::getAlias).collect(Collectors.toList());
                         }
                     }
                 } catch (AtlanException e) {
@@ -143,20 +149,23 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
                 }
                 String reportGroupNames = String.join("|", groupNames);
 
-                //gather details of user personas
+                // gather details of user personas
                 List<String> personaNames = Collections.emptyList();
                 try {
                     SortedSet<AtlanUser.Persona> userPersonas = user.getPersonas();
                     if (userPersonas != null) {
-                        personaNames = userPersonas.stream().map(AtlanUser.Persona::getDisplayName).collect(Collectors.toList());
+                        personaNames = userPersonas.stream()
+                                .map(AtlanUser.Persona::getDisplayName)
+                                .collect(Collectors.toList());
                     }
                 } catch (Exception e) {
                     log.warn("Failed to retrieve persona details for user {}.", user.getUsername(), e);
                 }
                 String reportPersonaNames = String.join("|", personaNames);
 
-                //write row
-                xlsx.appendRow(sheet,
+                // write row
+                xlsx.appendRow(
+                        sheet,
                         List.of(
                                 ExcelWriter.DataCell.of(user.getId()),
                                 ExcelWriter.DataCell.of(user.getUsername()),
