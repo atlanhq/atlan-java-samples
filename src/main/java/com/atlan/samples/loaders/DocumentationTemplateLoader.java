@@ -21,12 +21,12 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
     private static final String LINEAGE_SHEET = "Lineage";
 
     public static void main(String[] args) {
-        TabularAssetLoader al = new TabularAssetLoader();
+        DocumentationTemplateLoader dtl = new DocumentationTemplateLoader();
         Map<String, String> event = new HashMap<>(System.getenv());
         if (!event.containsKey("FILENAME")) {
             event.put("FILENAME", "atlan-documentation-template.xlsx");
         }
-        al.handleRequest(event, null);
+        dtl.handleRequest(event, null);
     }
 
     /**
