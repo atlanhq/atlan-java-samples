@@ -40,7 +40,7 @@ public class LineageDetails extends AssetDetails {
     public static final String COL_SQL_CODE = "SQL / CODE";
     public static final String COL_PROCESS_URL = "PROCESS URL";
 
-    private static final Pattern CONNECTION_QN_PREFIX = Pattern.compile("default/[a-z0-9]+/[0-9]{10}");
+    private static final Pattern CONNECTION_QN_PREFIX = Pattern.compile("default/[a-z0-9]+/[0-9]{10}/.*");
 
     private static final List<String> REQUIRED =
             List.of(COL_S_ASSET_TYPE, COL_S_ASSET, COL_ORCHESTRATOR, COL_PROCESS_ID, COL_T_ASSET, COL_T_ASSET_TYPE);
@@ -285,6 +285,7 @@ public class LineageDetails extends AssetDetails {
                         .ownerUsers(ownerUsers)
                         .ownerGroups(ownerGroups)
                         .sql(sqlCode)
+                        .code(sqlCode)
                         .sourceURL(processUrl);
                 LineageProcess process = builder.build();
                 if (!classificationNames.isEmpty()) {

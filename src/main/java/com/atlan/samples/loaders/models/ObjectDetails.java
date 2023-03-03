@@ -89,7 +89,7 @@ public class ObjectDetails extends AssetDetails {
                         .contentType(row.get(COL_CONTENT_TYPE));
                 String size = row.get(COL_OBJECT_SIZE);
                 try {
-                    builder = builder.size(Long.parseLong(size));
+                    builder = builder.size(Double.valueOf(size).longValue());
                 } catch (NumberFormatException e) {
                     log.error("Unable to translate provided object size to a number: {}", size, e);
                 }
