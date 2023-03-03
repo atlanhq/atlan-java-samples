@@ -303,8 +303,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                     case S3:
                         S3Bucket s3f = S3Bucket.retrieveByQualifiedName(bucketQualifiedName);
                         long s3c = s3f.getObjects().size();
-                        S3Bucket s3u =
-                                s3f.trimToRequired().s3ObjectCount(s3c).build();
+                        S3Bucket s3u = s3f.trimToRequired().s3ObjectCount(s3c).build();
                         bucketsToUpdate.add(s3u);
                         break;
                     case GCS:
