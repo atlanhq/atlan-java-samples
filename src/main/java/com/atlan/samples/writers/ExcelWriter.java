@@ -75,19 +75,21 @@ public class ExcelWriter {
                     int maxLength = 0;
                     for (int j = 0; j < rowCount; j++) {
                         Cell cell = worksheet.getRow(j).getCell(i);
-                        switch (cell.getCellType()) {
-                            case BOOLEAN:
-                                maxLength = Math.max(maxLength, 5);
-                                break;
-                            case NUMERIC:
-                                String tmp = "" + cell.getNumericCellValue();
-                                maxLength = Math.max(maxLength, tmp.length());
-                                break;
-                            case STRING:
-                            default:
-                                maxLength = Math.max(
-                                        maxLength, cell.getStringCellValue().length());
-                                break;
+                        if (cell != null) {
+                            switch (cell.getCellType()) {
+                                case BOOLEAN:
+                                    maxLength = Math.max(maxLength, 5);
+                                    break;
+                                case NUMERIC:
+                                    String tmp = "" + cell.getNumericCellValue();
+                                    maxLength = Math.max(maxLength, tmp.length());
+                                    break;
+                                case STRING:
+                                default:
+                                    maxLength = Math.max(
+                                            maxLength, cell.getStringCellValue().length());
+                                    break;
+                            }
                         }
                     }
                     // Note: maximum size allowed by the library is 255x256, so don't attempt to create

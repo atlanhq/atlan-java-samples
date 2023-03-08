@@ -10,14 +10,18 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.Atlan;
+import com.atlan.cache.CustomMetadataCache;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.search.*;
+import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -25,11 +29,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Slf4j
 public class EnrichmentReporter extends AbstractReporter implements RequestHandler<Map<String, String>, String> {
 
-    private static final LinkedHashMap<String, String> ASSET_ENRICHMENT = createAssetEnrichmentHeader();
-    private static final LinkedHashMap<String, String> GLOSSARY_ENRICHMENT = createGlossaryEnrichmentHeader();
-    private static final LinkedHashMap<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
-    private static final LinkedHashMap<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
-    private static final Set<String> autoSizeSheets = new HashSet<>();
+    private static final String CM_DELIMITER = "|";
+
+    private static LinkedHashMap<String, List<String>> CM_ATTRIBUTE_ORDER;
+    private static LinkedHashMap<String, String> CM_ATTRIBUTE_HEADERS;
+    private static Set<String> CM_ATTRIBUTES_FOR_SEARCH;
+    private static Set<String> autoSizeSheets = new HashSet<>();
 
     private enum FilterType {
         BY_GROUP,
@@ -218,6 +223,14 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
             parseParametersFromEvent(event);
 
+            // Can only cache custom metadata-related heading information after we have access to
+            // an environment
+            getOrderedCustomMetadata();
+            LinkedHashMap<String, String> ASSET_ENRICHMENT = createAssetEnrichmentHeader();
+            LinkedHashMap<String, String> GLOSSARY_ENRICHMENT = createGlossaryEnrichmentHeader();
+            LinkedHashMap<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
+            LinkedHashMap<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
+
             ExcelWriter xlsx = new ExcelWriter();
 
             // Before anything else, cache the glossaries and terms (for x-ref purposes)
@@ -281,6 +294,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
+                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
                 .relationAttributes(RELATION_ATTRIBUTES)
                 .build();
         IndexSearchResponse response = request.search();
@@ -311,6 +325,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
+                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
                 .attribute("anchor")
                 .attribute("categories")
                 .attribute("seeAlso")
@@ -357,6 +372,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
                 .attributes(childRelationships)
+                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
                 .relationAttribute("description")
                 .relationAttribute("userDescription")
                 .build();
@@ -373,40 +389,40 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         String childDesc = getDescription(child);
                         descriptionCounts += childDesc.length() > 0 ? 1 : 0;
                     }
-                    xlsx.appendRow(
-                            sheet,
-                            List.of(
-                                    DataCell.of(result.getConnectorType()),
-                                    DataCell.of(result.getQualifiedName()),
-                                    DataCell.of(result.getTypeName()),
-                                    DataCell.of(result.getName()),
-                                    DataCell.of(result.getDescription()),
-                                    DataCell.of(result.getUserDescription()),
-                                    DataCell.of(getUserOwners(result, getDelimiter())),
-                                    DataCell.of(getGroupOwners(result, getDelimiter())),
-                                    DataCell.of(result.getCertificateStatus()),
-                                    DataCell.of(result.getCertificateStatusMessage()),
-                                    DataCell.of(result.getCertificateUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())),
-                                    DataCell.of(result.getAnnouncementType()),
-                                    DataCell.of(result.getAnnouncementTitle()),
-                                    DataCell.of(result.getAnnouncementMessage()),
-                                    DataCell.of(result.getAnnouncementUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())),
-                                    DataCell.of(result.getCreatedBy()),
-                                    DataCell.of(getFormattedDateTime(result.getCreateTime())),
-                                    DataCell.of(result.getUpdatedBy()),
-                                    DataCell.of(getFormattedDateTime(result.getUpdateTime())),
-                                    DataCell.of(getREADME(result)),
-                                    DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)),
-                                    DataCell.of(getCount(result.getLinks())),
-                                    DataCell.of(
-                                            DIRECT_CLASSIFICATIONS_ONLY
-                                                    ? getDirectClassifications(result, getDelimiter())
-                                                    : getClassifications(result, getDelimiter())),
-                                    DataCell.of(childAssets.size()),
-                                    DataCell.of(descriptionCounts),
-                                    DataCell.of(getAssetLink(guid))));
+                    List<DataCell> row = new ArrayList<>();
+                    row.add(DataCell.of(result.getConnectorType()));
+                    row.add(DataCell.of(result.getQualifiedName()));
+                    row.add(DataCell.of(result.getTypeName()));
+                    row.add(DataCell.of(result.getName()));
+                    row.add(DataCell.of(result.getDescription()));
+                    row.add(DataCell.of(result.getUserDescription()));
+                    row.add(DataCell.of(getUserOwners(result, getDelimiter())));
+                    row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
+                    row.add(DataCell.of(result.getCertificateStatus()));
+                    row.add(DataCell.of(result.getCertificateStatusMessage()));
+                    row.add(DataCell.of(result.getCertificateUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
+                    row.add(DataCell.of(result.getAnnouncementType()));
+                    row.add(DataCell.of(result.getAnnouncementTitle()));
+                    row.add(DataCell.of(result.getAnnouncementMessage()));
+                    row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
+                    row.add(DataCell.of(result.getCreatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
+                    row.add(DataCell.of(result.getUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
+                    row.add(DataCell.of(getREADME(result)));
+                    row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
+                    row.add(DataCell.of(getCount(result.getLinks())));
+                    row.add(DataCell.of(
+                            DIRECT_CLASSIFICATIONS_ONLY
+                                    ? getDirectClassifications(result, getDelimiter())
+                                    : getClassifications(result, getDelimiter())));
+                    row.add(DataCell.of(childAssets.size()));
+                    row.add(DataCell.of(descriptionCounts));
+                    row.add(DataCell.of(getAssetLink(guid)));
+                    addCustomMetadata(row, result);
+                    xlsx.appendRow(sheet, row);
                     processed.put(guid, result.getQualifiedName());
                 }
             }
@@ -418,30 +434,30 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     void getGlossaries(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         for (Glossary glossary : glossaryGuidToDetails.values()) {
-            xlsx.appendRow(
-                    sheet,
-                    List.of(
-                            DataCell.of(glossary.getName()),
-                            DataCell.of(glossary.getDescription()),
-                            DataCell.of(glossary.getUserDescription()),
-                            DataCell.of(getUserOwners(glossary, getDelimiter())),
-                            DataCell.of(getGroupOwners(glossary, getDelimiter())),
-                            DataCell.of(glossary.getCertificateStatus()),
-                            DataCell.of(glossary.getCertificateStatusMessage()),
-                            DataCell.of(glossary.getCertificateUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(glossary.getCertificateUpdatedAt())),
-                            DataCell.of(glossary.getAnnouncementType()),
-                            DataCell.of(glossary.getAnnouncementTitle()),
-                            DataCell.of(glossary.getAnnouncementMessage()),
-                            DataCell.of(glossary.getAnnouncementUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(glossary.getAnnouncementUpdatedAt())),
-                            DataCell.of(glossary.getCreatedBy()),
-                            DataCell.of(getFormattedDateTime(glossary.getCreateTime())),
-                            DataCell.of(glossary.getUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(glossary.getUpdateTime())),
-                            DataCell.of(getREADME(glossary)),
-                            DataCell.of(getCount(glossary.getLinks())),
-                            DataCell.of(getAssetLink(glossary.getGuid()))));
+            List<DataCell> row = new ArrayList<>();
+            row.add(DataCell.of(glossary.getName()));
+            row.add(DataCell.of(glossary.getDescription()));
+            row.add(DataCell.of(glossary.getUserDescription()));
+            row.add(DataCell.of(getUserOwners(glossary, getDelimiter())));
+            row.add(DataCell.of(getGroupOwners(glossary, getDelimiter())));
+            row.add(DataCell.of(glossary.getCertificateStatus()));
+            row.add(DataCell.of(glossary.getCertificateStatusMessage()));
+            row.add(DataCell.of(glossary.getCertificateUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(glossary.getCertificateUpdatedAt())));
+            row.add(DataCell.of(glossary.getAnnouncementType()));
+            row.add(DataCell.of(glossary.getAnnouncementTitle()));
+            row.add(DataCell.of(glossary.getAnnouncementMessage()));
+            row.add(DataCell.of(glossary.getAnnouncementUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(glossary.getAnnouncementUpdatedAt())));
+            row.add(DataCell.of(glossary.getCreatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(glossary.getCreateTime())));
+            row.add(DataCell.of(glossary.getUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(glossary.getUpdateTime())));
+            row.add(DataCell.of(getREADME(glossary)));
+            row.add(DataCell.of(getCount(glossary.getLinks())));
+            row.add(DataCell.of(getAssetLink(glossary.getGuid())));
+            addCustomMetadata(row, glossary);
+            xlsx.appendRow(sheet, row);
         }
     }
 
@@ -460,6 +476,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
+                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
                 .attribute("anchor")
                 .attribute("parentCategory")
                 .relationAttributes(RELATION_ATTRIBUTES)
@@ -480,31 +497,31 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             String categoryPath = getCategoryPath(category, categoryGuidToDetails);
             categoryGuidToPath.put(category.getGuid(), categoryPath);
             Glossary glossary = glossaryGuidToDetails.get(category.getAnchor().getGuid());
-            xlsx.appendRow(
-                    sheet,
-                    List.of(
-                            DataCell.of(glossary == null ? "" : glossary.getName()),
-                            DataCell.of(categoryPath),
-                            DataCell.of(category.getDescription()),
-                            DataCell.of(category.getUserDescription()),
-                            DataCell.of(getUserOwners(category, getDelimiter())),
-                            DataCell.of(getGroupOwners(category, getDelimiter())),
-                            DataCell.of(category.getCertificateStatus()),
-                            DataCell.of(category.getCertificateStatusMessage()),
-                            DataCell.of(category.getCertificateUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(category.getCertificateUpdatedAt())),
-                            DataCell.of(category.getAnnouncementType()),
-                            DataCell.of(category.getAnnouncementTitle()),
-                            DataCell.of(category.getAnnouncementMessage()),
-                            DataCell.of(category.getAnnouncementUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(category.getAnnouncementUpdatedAt())),
-                            DataCell.of(category.getCreatedBy()),
-                            DataCell.of(getFormattedDateTime(category.getCreateTime())),
-                            DataCell.of(category.getUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(category.getUpdateTime())),
-                            DataCell.of(getREADME(category)),
-                            DataCell.of(getCount(category.getLinks())),
-                            DataCell.of(getAssetLink(category.getGuid()))));
+            List<DataCell> row = new ArrayList<>();
+            row.add(DataCell.of(glossary == null ? "" : glossary.getName()));
+            row.add(DataCell.of(categoryPath));
+            row.add(DataCell.of(category.getDescription()));
+            row.add(DataCell.of(category.getUserDescription()));
+            row.add(DataCell.of(getUserOwners(category, getDelimiter())));
+            row.add(DataCell.of(getGroupOwners(category, getDelimiter())));
+            row.add(DataCell.of(category.getCertificateStatus()));
+            row.add(DataCell.of(category.getCertificateStatusMessage()));
+            row.add(DataCell.of(category.getCertificateUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(category.getCertificateUpdatedAt())));
+            row.add(DataCell.of(category.getAnnouncementType()));
+            row.add(DataCell.of(category.getAnnouncementTitle()));
+            row.add(DataCell.of(category.getAnnouncementMessage()));
+            row.add(DataCell.of(category.getAnnouncementUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(category.getAnnouncementUpdatedAt())));
+            row.add(DataCell.of(category.getCreatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(category.getCreateTime())));
+            row.add(DataCell.of(category.getUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(category.getUpdateTime())));
+            row.add(DataCell.of(getREADME(category)));
+            row.add(DataCell.of(getCount(category.getLinks())));
+            row.add(DataCell.of(getAssetLink(category.getGuid())));
+            addCustomMetadata(row, category);
+            xlsx.appendRow(sheet, row);
         }
     }
 
@@ -521,43 +538,43 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     void getTerms(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         for (GlossaryTerm term : termGuidToDetails.values()) {
             Glossary glossary = glossaryGuidToDetails.get(term.getAnchor().getGuid());
-            xlsx.appendRow(
-                    sheet,
-                    List.of(
-                            DataCell.of(glossary == null ? "" : glossary.getName()),
-                            DataCell.of(term.getName()),
-                            DataCell.of(term.getDescription()),
-                            DataCell.of(term.getUserDescription()),
-                            DataCell.of(getCategories(term)),
-                            DataCell.of(getUserOwners(term, getDelimiter())),
-                            DataCell.of(getGroupOwners(term, getDelimiter())),
-                            DataCell.of(term.getCertificateStatus()),
-                            DataCell.of(
-                                    DIRECT_CLASSIFICATIONS_ONLY
-                                            ? getDirectClassifications(term, getDelimiter())
-                                            : getClassifications(term, getDelimiter())),
-                            DataCell.of(term.getCertificateStatusMessage()),
-                            DataCell.of(term.getCertificateUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(term.getCertificateUpdatedAt())),
-                            DataCell.of(term.getAnnouncementType()),
-                            DataCell.of(term.getAnnouncementTitle()),
-                            DataCell.of(term.getAnnouncementMessage()),
-                            DataCell.of(term.getAnnouncementUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(term.getAnnouncementUpdatedAt())),
-                            DataCell.of(term.getCreatedBy()),
-                            DataCell.of(getFormattedDateTime(term.getCreateTime())),
-                            DataCell.of(term.getUpdatedBy()),
-                            DataCell.of(getFormattedDateTime(term.getUpdateTime())),
-                            DataCell.of(getREADME(term)),
-                            DataCell.of(getTerms(term.getSeeAlso(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getPreferredTerms(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getSynonyms(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getAntonyms(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getTranslatedTerms(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getValidValuesFor(), termGuidToDetails)),
-                            DataCell.of(getTerms(term.getClassifies(), termGuidToDetails)),
-                            DataCell.of(getCount(term.getLinks())),
-                            DataCell.of(getAssetLink(term.getGuid()))));
+            List<DataCell> row = new ArrayList<>();
+            row.add(DataCell.of(glossary == null ? "" : glossary.getName()));
+            row.add(DataCell.of(term.getName()));
+            row.add(DataCell.of(term.getDescription()));
+            row.add(DataCell.of(term.getUserDescription()));
+            row.add(DataCell.of(getCategories(term)));
+            row.add(DataCell.of(getUserOwners(term, getDelimiter())));
+            row.add(DataCell.of(getGroupOwners(term, getDelimiter())));
+            row.add(DataCell.of(term.getCertificateStatus()));
+            row.add(DataCell.of(
+                    DIRECT_CLASSIFICATIONS_ONLY
+                            ? getDirectClassifications(term, getDelimiter())
+                            : getClassifications(term, getDelimiter())));
+            row.add(DataCell.of(term.getCertificateStatusMessage()));
+            row.add(DataCell.of(term.getCertificateUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(term.getCertificateUpdatedAt())));
+            row.add(DataCell.of(term.getAnnouncementType()));
+            row.add(DataCell.of(term.getAnnouncementTitle()));
+            row.add(DataCell.of(term.getAnnouncementMessage()));
+            row.add(DataCell.of(term.getAnnouncementUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(term.getAnnouncementUpdatedAt())));
+            row.add(DataCell.of(term.getCreatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(term.getCreateTime())));
+            row.add(DataCell.of(term.getUpdatedBy()));
+            row.add(DataCell.of(getFormattedDateTime(term.getUpdateTime())));
+            row.add(DataCell.of(getREADME(term)));
+            row.add(DataCell.of(getTerms(term.getSeeAlso(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getPreferredTerms(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getSynonyms(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getAntonyms(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getTranslatedTerms(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getValidValuesFor(), termGuidToDetails)));
+            row.add(DataCell.of(getTerms(term.getClassifies(), termGuidToDetails)));
+            row.add(DataCell.of(getCount(term.getLinks())));
+            row.add(DataCell.of(getAssetLink(term.getGuid())));
+            addCustomMetadata(row, term);
+            xlsx.appendRow(sheet, row);
         }
     }
 
@@ -584,6 +601,40 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             }
         }
         return getDelimitedList(qualifiedTerms, getDelimiter());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addCustomMetadata(List<DataCell> row, Asset result) {
+        Map<String, CustomMetadataAttributes> map = result.getCustomMetadataSets();
+        for (Map.Entry<String, List<String>> entry : CM_ATTRIBUTE_ORDER.entrySet()) {
+            String cmName = entry.getKey();
+            List<String> attrOrder = entry.getValue();
+            CustomMetadataAttributes attrs = map.get(cmName);
+            if (attrs != null) {
+                Map<String, Object> active = attrs.getAttributes();
+                for (String attrName : attrOrder) {
+                    Object value = active.get(attrName);
+                    if (value == null) {
+                        row.add(DataCell.of(""));
+                    } else if (value instanceof Collection) {
+                        row.add(DataCell.of(getDelimitedList((Collection<String>) value, getDelimiter())));
+                    } else if (value instanceof Boolean) {
+                        row.add(DataCell.of((Boolean) value));
+                    } else if (value instanceof Long) {
+                        row.add(DataCell.of((Long) value));
+                    } else if (value instanceof Double) {
+                        row.add(DataCell.of((Double) value));
+                    } else {
+                        row.add(DataCell.of(value.toString()));
+                    }
+                }
+            } else {
+                // Fill in the blanks so that we retain positioning
+                for (int i = 0; i < attrOrder.size(); i++) {
+                    row.add(DataCell.of(""));
+                }
+            }
+        }
     }
 
     /**
@@ -768,6 +819,36 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return childAssets;
     }
 
+    static void getOrderedCustomMetadata() {
+        CM_ATTRIBUTE_ORDER = new LinkedHashMap<>();
+        CM_ATTRIBUTE_HEADERS = new LinkedHashMap<>();
+        CM_ATTRIBUTES_FOR_SEARCH = new HashSet<>();
+        try {
+            Map<String, List<AttributeDef>> allAttrs = CustomMetadataCache.getAllCustomAttributes();
+            List<String> sortedNames = allAttrs.keySet().stream().sorted().collect(Collectors.toList());
+            for (String cmName : sortedNames) {
+                CM_ATTRIBUTES_FOR_SEARCH.addAll(CustomMetadataCache.getAttributesForSearchResults(cmName));
+                List<AttributeDef> attrs = allAttrs.get(cmName);
+                List<String> attrNames = new ArrayList<>();
+                for (AttributeDef attr : attrs) {
+                    String attrName = attr.getDisplayName();
+                    attrNames.add(attrName);
+                    boolean multiValued = attr.getOptions().getMultiValueSelect() != null
+                            && attr.getOptions().getMultiValueSelect();
+                    if (multiValued) {
+                        CM_ATTRIBUTE_HEADERS.put(
+                                cmName + CM_DELIMITER + attrName, "Comma-separated list of " + attr.getDescription());
+                    } else {
+                        CM_ATTRIBUTE_HEADERS.put(cmName + CM_DELIMITER + attrName, attr.getDescription());
+                    }
+                }
+                CM_ATTRIBUTE_ORDER.put(cmName, attrNames);
+            }
+        } catch (AtlanException e) {
+            log.error("Unable to retrieve custom metadata definitions.", e);
+        }
+    }
+
     static LinkedHashMap<String, String> createAssetEnrichmentHeader() {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("Connector", "Type of the data source");
@@ -802,6 +883,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 "Children with descriptions",
                 "Count of children of this asset with a description present, whether system-provided or user-provided");
         map.put("Link", "Link to the detailed asset within Atlan");
+        map.putAll(CM_ATTRIBUTE_HEADERS);
         return map;
     }
 
@@ -828,6 +910,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("README", "README contents for this glossary (as HTML)");
         map.put("Resources", "Count of resources (links) associated with the glossary");
         map.put("Link", "Link to the detailed glossary within Atlan");
+        map.putAll(CM_ATTRIBUTE_HEADERS);
         return map;
     }
 
@@ -855,6 +938,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("README", "README contents for this category (as HTML)");
         map.put("Resources", "Count of resources (links) associated with the category");
         map.put("Link", "Link to the detailed category within Atlan");
+        map.putAll(CM_ATTRIBUTE_HEADERS);
         return map;
     }
 
@@ -891,6 +975,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Classifies", "Comma-separated list of the terms this term classifies");
         map.put("Resources", "Count of resources (links) associated with the term");
         map.put("Link", "Link to the detailed term within Atlan");
+        map.putAll(CM_ATTRIBUTE_HEADERS);
         return map;
     }
 }

@@ -6,6 +6,7 @@ import com.atlan.api.EntityUniqueAttributesEndpoint;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.core.Classification;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.AtlanCertificateStatus;
 import java.util.*;
@@ -217,6 +218,33 @@ public abstract class AssetDetails {
                     EntityUniqueAttributesEndpoint.addClassifications(typeName, qn, classifications);
                 } catch (AtlanException e) {
                     log.error("Unable to classify {} {} with: {}", typeName, qn, classifications, e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Selectively update the custom metadata for the provided assets. Only the custom metadata attributes that have been
+     * provided will be updated, while all other custom metadata attributes will be left as-is on existing assets.
+     *
+     * @param guidMap mapping of assets keyed by GUID with the value a map keyed by custom metadata structure name to populated attributes
+     */
+    protected static void selectivelyUpdateCustomMetadata(Map<String, Map<String, CustomMetadataAttributes>> guidMap) {
+        if (guidMap != null) {
+            for (Map.Entry<String, Map<String, CustomMetadataAttributes>> outer : guidMap.entrySet()) {
+                String guid = outer.getKey();
+                Map<String, CustomMetadataAttributes> attrMap = outer.getValue();
+                for (Map.Entry<String, CustomMetadataAttributes> inner : attrMap.entrySet()) {
+                    String cmName = inner.getKey();
+                    CustomMetadataAttributes cma = inner.getValue();
+                    if (cmName != null && cma != null && !cma.isEmpty()) {
+                        try {
+                            log.info("... selectively updating custom metadata {} on asset {}", cmName, guid);
+                            Asset.updateCustomMetadataAttributes(guid, cmName, cma);
+                        } catch (AtlanException e) {
+                            log.error("Unable to update custom metadata {} on {} with: {}", cmName, guid, cma, e);
+                        }
+                    }
                 }
             }
         }

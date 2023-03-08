@@ -5,6 +5,8 @@ package com.atlan.samples.loaders.models;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
+import com.atlan.model.core.Classification;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import java.util.*;
 import lombok.EqualsAndHashCode;
@@ -21,13 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true, onlyExplicitlyIncluded = true)
-public class AssetEnrichmentDetails extends AssetDetails {
+public class AssetEnrichmentDetails extends EnrichmentDetails {
 
     public static final String COL_QUALIFIED_NAME = "QUALIFIED NAME";
     public static final String COL_TYPE = "TYPE";
     public static final String COL_NAME = "NAME";
-    public static final String COL_USER_DESCRIPTION = "USER DESCRIPTION";
-    public static final String COL_README = "README";
     public static final String COL_ASSIGNED_TERMS = "ASSIGNED TERMS";
 
     private static final List<String> REQUIRED = List.of(COL_QUALIFIED_NAME, COL_TYPE, COL_NAME);
@@ -40,12 +40,6 @@ public class AssetEnrichmentDetails extends AssetDetails {
 
     @ToString.Include
     private String name;
-
-    @ToString.Include
-    private String userDescription;
-
-    @ToString.Include
-    private String readme;
 
     @ToString.Include
     private List<Asset> terms;
@@ -79,7 +73,8 @@ public class AssetEnrichmentDetails extends AssetDetails {
                     .type(row.get(COL_TYPE))
                     .name(row.get(COL_NAME))
                     .userDescription(row.get(COL_USER_DESCRIPTION))
-                    .readme(row.get(COL_README));
+                    .readme(row.get(COL_README))
+                    .customMetadataValues(getCustomMetadataValuesFromRow(row, delim));
             List<String> termIdentities = getMultiValuedList(row.get(COL_ASSIGNED_TERMS), delim);
             List<Asset> terms = new ArrayList<>();
             for (String termIdentity : termIdentities) {
@@ -104,10 +99,17 @@ public class AssetEnrichmentDetails extends AssetDetails {
      *
      * @param assets the set of assets to ensure exist
      * @param batchSize maximum number of assets to create per batch
+     * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
+     * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
      */
-    public static void upsert(Map<String, AssetEnrichmentDetails> assets, int batchSize) {
+    public static void upsert(
+            Map<String, AssetEnrichmentDetails> assets,
+            int batchSize,
+            boolean replaceClassifications,
+            boolean replaceCM) {
         Map<String, Map<String, List<String>>> toClassifyMap = new HashMap<>();
-        AssetBatch batch = new AssetBatch("asset", batchSize);
+        Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
+        AssetBatch batch = new AssetBatch("asset", batchSize, replaceClassifications, replaceCM);
         Map<String, String> readmes = new HashMap<>();
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 
@@ -128,8 +130,17 @@ public class AssetEnrichmentDetails extends AssetDetails {
             for (Asset term : details.getTerms()) {
                 builder = builder.assignedTerm(GlossaryTerm.refByGuid(term.getGuid()));
             }
+            if (details.getCustomMetadataValues() != null) {
+                builder = builder.customMetadataSets(details.getCustomMetadataValues());
+            }
+            if (details.getClassifications() != null) {
+                List<String> clsNames = details.getClassifications();
+                for (String clsName : clsNames) {
+                    builder = builder.classification(Classification.of(clsName));
+                }
+            }
             Asset asset = builder.build();
-            if (!details.getClassifications().isEmpty()) {
+            if (!replaceClassifications && !details.getClassifications().isEmpty()) {
                 if (!toClassifyMap.containsKey(details.getType())) {
                     toClassifyMap.put(details.getType(), new HashMap<>());
                 }
@@ -146,14 +157,35 @@ public class AssetEnrichmentDetails extends AssetDetails {
                 assetIdentityToResult.put(details.getIdentity(), asset);
             }
             cacheResult(assetIdentityToResult, batch.add(asset), asset);
+            if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
+                cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
+            }
         }
         cacheResult(assetIdentityToResult, batch.flush(), null);
 
-        // Classifications must be added in a second pass, after the asset exists
-        for (Map.Entry<String, Map<String, List<String>>> entry : toClassifyMap.entrySet()) {
-            String typeName = entry.getKey();
-            Map<String, List<String>> toClassify = entry.getValue();
-            appendClassifications(toClassify, typeName);
+        // If we did not replace the classifications, they must be added in a second pass, after the asset exists
+        if (!replaceClassifications) {
+            for (Map.Entry<String, Map<String, List<String>>> entry : toClassifyMap.entrySet()) {
+                String typeName = entry.getKey();
+                Map<String, List<String>> toClassify = entry.getValue();
+                appendClassifications(toClassify, typeName);
+            }
+        }
+
+        // If we did not replace custom metadata, it must be selectively updated one-by-one
+        if (!replaceCM) {
+            // Note that the GUID is only resolved after the asset is
+            // created (or updated) above, so we need to translate the identities in our
+            // map into resolved assets...
+            Map<String, Map<String, CustomMetadataAttributes>> toUpdate = new HashMap<>();
+            for (Map.Entry<String, Map<String, CustomMetadataAttributes>> entry : cmToUpdate.entrySet()) {
+                String identity = entry.getKey();
+                Asset resolved = assetIdentityToResult.get(identity);
+                if (resolved != null) {
+                    toUpdate.put(resolved.getGuid(), entry.getValue());
+                }
+            }
+            selectivelyUpdateCustomMetadata(toUpdate);
         }
 
         // Then go through and create any the READMEs linked to these assets...
