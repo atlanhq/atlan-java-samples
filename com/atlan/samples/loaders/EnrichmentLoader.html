@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":9};
+var data = {"i0":10,"i1":9,"i2":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -194,13 +194,20 @@ implements com.amazonaws.services.lambda.runtime.RequestHandler&lt;java.util.Map
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#main(java.lang.String%5B%5D)">main</a></span>&#8203;(java.lang.String[]&nbsp;args)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>protected void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parseParametersFromEvent(java.util.Map)">parseParametersFromEvent</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event)</code></th>
+<td class="colLast">
+<div class="block">Extract the configuration parameters to use from the lambda payload (or equivalent).</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.samples.loaders.AbstractLoader">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.atlan.samples.loaders.<a href="AbstractLoader.html" title="class in com.atlan.samples.loaders">AbstractLoader</a></h3>
-<code><a href="AbstractLoader.html#appendClassifications(java.util.Map,java.lang.String)">appendClassifications</a>, <a href="AbstractLoader.html#getBatchSize()">getBatchSize</a>, <a href="AbstractLoader.html#getBucket()">getBucket</a>, <a href="AbstractLoader.html#getDelimiter()">getDelimiter</a>, <a href="AbstractLoader.html#getFilename()">getFilename</a>, <a href="AbstractLoader.html#getRegion()">getRegion</a>, <a href="AbstractLoader.html#parseParametersFromEvent(java.util.Map)">parseParametersFromEvent</a>, <a href="AbstractLoader.html#setFilename(java.lang.String)">setFilename</a></code></li>
+<code><a href="AbstractLoader.html#appendClassifications(java.util.Map,java.lang.String)">appendClassifications</a>, <a href="AbstractLoader.html#getBatchSize()">getBatchSize</a>, <a href="AbstractLoader.html#getBucket()">getBucket</a>, <a href="AbstractLoader.html#getDelimiter()">getDelimiter</a>, <a href="AbstractLoader.html#getFilename()">getFilename</a>, <a href="AbstractLoader.html#getRegion()">getRegion</a>, <a href="AbstractLoader.html#setFilename(java.lang.String)">setFilename</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -251,6 +258,23 @@ implements com.amazonaws.services.lambda.runtime.RequestHandler&lt;java.util.Map
 <li class="blockList">
 <h4>main</h4>
 <pre class="methodSignature">public static&nbsp;void&nbsp;main&#8203;(java.lang.String[]&nbsp;args)</pre>
+</li>
+</ul>
+<a id="parseParametersFromEvent(java.util.Map)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>parseParametersFromEvent</h4>
+<pre class="methodSignature">protected&nbsp;void&nbsp;parseParametersFromEvent&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="AbstractLoader.html#parseParametersFromEvent(java.util.Map)">AbstractLoader</a></code></span></div>
+<div class="block">Extract the configuration parameters to use from the lambda payload (or equivalent).</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="AbstractLoader.html#parseParametersFromEvent(java.util.Map)">parseParametersFromEvent</a></code>&nbsp;in class&nbsp;<code><a href="AbstractLoader.html" title="class in com.atlan.samples.loaders">AbstractLoader</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>event</code> - configuration payload from the lambda function (or equivalent)</dd>
+</dl>
 </li>
 </ul>
 <a id="handleRequest(java.util.Map,com.amazonaws.services.lambda.runtime.Context)">

@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":9,"i4":10,"i5":9,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":9};
+var data = {"i0":9,"i1":10,"i2":10,"i3":9,"i4":10,"i5":9,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -126,7 +126,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">com.atlan.samples.loaders.models.AssetDetails</a></li>
 <li>
 <ul class="inheritance">
+<li><a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">com.atlan.samples.loaders.models.EnrichmentDetails</a></li>
+<li>
+<ul class="inheritance">
 <li>com.atlan.samples.loaders.models.AssetEnrichmentDetails</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -137,7 +142,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <hr>
 <pre>public class <span class="typeNameLabel">AssetEnrichmentDetails</span>
-extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></pre>
+extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></pre>
 <div class="block">Utility class for capturing the enrichment details provided about a glossary.</div>
 </li>
 </ul>
@@ -165,6 +170,13 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a id="nested.classes.inherited.from.class.com.atlan.samples.loaders.models.EnrichmentDetails">
+<!--   -->
+</a>
+<h3>Nested classes/interfaces inherited from class&nbsp;com.atlan.samples.loaders.models.<a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></h3>
+<code><a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails.EnrichmentDetailsBuilder</a>&lt;<a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="type parameter in EnrichmentDetails.EnrichmentDetailsBuilder">C</a> extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a>,&#8203;<a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="type parameter in EnrichmentDetails.EnrichmentDetailsBuilder">B</a> extends <a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails.EnrichmentDetailsBuilder</a>&lt;<a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="type parameter in EnrichmentDetails.EnrichmentDetailsBuilder">C</a>,&#8203;<a href="EnrichmentDetails.EnrichmentDetailsBuilder.html" title="type parameter in EnrichmentDetails.EnrichmentDetailsBuilder">B</a>&gt;&gt;</code></li>
+</ul>
 <ul class="blockList">
 <li class="blockList"><a id="nested.classes.inherited.from.class.com.atlan.samples.loaders.models.AssetDetails">
 <!--   -->
@@ -206,20 +218,17 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#COL_README">COL_README</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#COL_TYPE">COL_TYPE</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#COL_USER_DESCRIPTION">COL_USER_DESCRIPTION</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a id="fields.inherited.from.class.com.atlan.samples.loaders.models.EnrichmentDetails">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;com.atlan.samples.loaders.models.<a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></h3>
+<code><a href="EnrichmentDetails.html#COL_README">COL_README</a>, <a href="EnrichmentDetails.html#COL_USER_DESCRIPTION">COL_USER_DESCRIPTION</a></code></li>
+</ul>
 </li>
 </ul>
 </section>
@@ -308,50 +317,49 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getReadme()">getReadme</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;com.atlan.model.assets.Asset&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTerms()">getTerms</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getType()">getType</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i11" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserDescription()">getUserDescription</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i12" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,int)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a>&gt;&nbsp;assets,
-      int&nbsp;batchSize)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,int,boolean,boolean)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a>&gt;&nbsp;assets,
+      int&nbsp;batchSize,
+      boolean&nbsp;replaceClassifications,
+      boolean&nbsp;replaceCM)</code></th>
 <td class="colLast">
 <div class="block">Create assets in bulk, if they do not exist, or update them if they do (idempotent).</div>
 </td>
 </tr>
 </table>
 <ul class="blockList">
+<li class="blockList"><a id="methods.inherited.from.class.com.atlan.samples.loaders.models.EnrichmentDetails">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;com.atlan.samples.loaders.models.<a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></h3>
+<code><a href="EnrichmentDetails.html#getCustomMetadataValues()">getCustomMetadataValues</a>, <a href="EnrichmentDetails.html#getCustomMetadataValuesFromRow(java.util.Map,java.lang.String)">getCustomMetadataValuesFromRow</a>, <a href="EnrichmentDetails.html#getReadme()">getReadme</a>, <a href="EnrichmentDetails.html#getUserDescription()">getUserDescription</a></code></li>
+</ul>
+<ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.samples.loaders.models.AssetDetails">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.atlan.samples.loaders.models.<a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></h3>
-<code><a href="AssetDetails.html#appendClassifications(java.util.Map,java.lang.String)">appendClassifications</a>, <a href="AssetDetails.html#getAnnouncementMessage()">getAnnouncementMessage</a>, <a href="AssetDetails.html#getAnnouncementTitle()">getAnnouncementTitle</a>, <a href="AssetDetails.html#getAnnouncementType()">getAnnouncementType</a>, <a href="AssetDetails.html#getBoolean(java.lang.String)">getBoolean</a>, <a href="AssetDetails.html#getCertificate()">getCertificate</a>, <a href="AssetDetails.html#getCertificateStatusMessage()">getCertificateStatusMessage</a>, <a href="AssetDetails.html#getClassifications()">getClassifications</a>, <a href="AssetDetails.html#getDescription()">getDescription</a>, <a href="AssetDetails.html#getFromRow(T,java.util.Map,java.lang.String)">getFromRow</a>, <a href="AssetDetails.html#getMissingFields(java.util.Map,java.util.Collection)">getMissingFields</a>, <a href="AssetDetails.html#getMultiValuedList(java.lang.String,java.lang.String)">getMultiValuedList</a>, <a href="AssetDetails.html#getOwnerGroups()">getOwnerGroups</a>, <a href="AssetDetails.html#getOwnerUsers()">getOwnerUsers</a>, <a href="AssetDetails.html#getRequiredEmptyFields(java.util.Map,java.util.Collection)">getRequiredEmptyFields</a>, <a href="AssetDetails.html#isStub()">isStub</a></code></li>
+<code><a href="AssetDetails.html#appendClassifications(java.util.Map,java.lang.String)">appendClassifications</a>, <a href="AssetDetails.html#getAnnouncementMessage()">getAnnouncementMessage</a>, <a href="AssetDetails.html#getAnnouncementTitle()">getAnnouncementTitle</a>, <a href="AssetDetails.html#getAnnouncementType()">getAnnouncementType</a>, <a href="AssetDetails.html#getBoolean(java.lang.String)">getBoolean</a>, <a href="AssetDetails.html#getCertificate()">getCertificate</a>, <a href="AssetDetails.html#getCertificateStatusMessage()">getCertificateStatusMessage</a>, <a href="AssetDetails.html#getClassifications()">getClassifications</a>, <a href="AssetDetails.html#getDescription()">getDescription</a>, <a href="AssetDetails.html#getFromRow(T,java.util.Map,java.lang.String)">getFromRow</a>, <a href="AssetDetails.html#getMissingFields(java.util.Map,java.util.Collection)">getMissingFields</a>, <a href="AssetDetails.html#getMultiValuedList(java.lang.String,java.lang.String)">getMultiValuedList</a>, <a href="AssetDetails.html#getOwnerGroups()">getOwnerGroups</a>, <a href="AssetDetails.html#getOwnerUsers()">getOwnerUsers</a>, <a href="AssetDetails.html#getRequiredEmptyFields(java.util.Map,java.util.Collection)">getRequiredEmptyFields</a>, <a href="AssetDetails.html#isStub()">isStub</a>, <a href="AssetDetails.html#selectivelyUpdateCustomMetadata(java.util.Map)">selectivelyUpdateCustomMetadata</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -412,32 +420,6 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../constant-values.html#com.atlan.samples.loaders.models.AssetEnrichmentDetails.COL_NAME">Constant Field Values</a></dd>
-</dl>
-</li>
-</ul>
-<a id="COL_USER_DESCRIPTION">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>COL_USER_DESCRIPTION</h4>
-<pre>public static final&nbsp;java.lang.String COL_USER_DESCRIPTION</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../constant-values.html#com.atlan.samples.loaders.models.AssetEnrichmentDetails.COL_USER_DESCRIPTION">Constant Field Values</a></dd>
-</dl>
-</li>
-</ul>
-<a id="COL_README">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>COL_README</h4>
-<pre>public static final&nbsp;java.lang.String COL_README</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../constant-values.html#com.atlan.samples.loaders.models.AssetEnrichmentDetails.COL_README">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -529,19 +511,23 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 </dl>
 </li>
 </ul>
-<a id="upsert(java.util.Map,int)">
+<a id="upsert(java.util.Map,int,boolean,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>upsert</h4>
 <pre class="methodSignature">public static&nbsp;void&nbsp;upsert&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a>&gt;&nbsp;assets,
-                          int&nbsp;batchSize)</pre>
+                          int&nbsp;batchSize,
+                          boolean&nbsp;replaceClassifications,
+                          boolean&nbsp;replaceCM)</pre>
 <div class="block">Create assets in bulk, if they do not exist, or update them if they do (idempotent).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>assets</code> - the set of assets to ensure exist</dd>
 <dd><code>batchSize</code> - maximum number of assets to create per batch</dd>
+<dd><code>replaceClassifications</code> - if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended</dd>
+<dd><code>replaceCM</code> - if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated</dd>
 </dl>
 </li>
 </ul>
@@ -581,24 +567,6 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <pre class="methodSignature">public&nbsp;java.lang.String&nbsp;getName()</pre>
 </li>
 </ul>
-<a id="getUserDescription()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getUserDescription</h4>
-<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;getUserDescription()</pre>
-</li>
-</ul>
-<a id="getReadme()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getReadme</h4>
-<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;getReadme()</pre>
-</li>
-</ul>
 <a id="getTerms()">
 <!--   -->
 </a>
@@ -617,7 +585,7 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <pre class="methodSignature">public&nbsp;boolean&nbsp;equals&#8203;(java.lang.Object&nbsp;o)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AssetDetails.html#equals(java.lang.Object)">equals</a></code>&nbsp;in class&nbsp;<code><a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></code></dd>
+<dd><code><a href="EnrichmentDetails.html#equals(java.lang.Object)">equals</a></code>&nbsp;in class&nbsp;<code><a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -630,7 +598,7 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <pre class="methodSignature">protected&nbsp;boolean&nbsp;canEqual&#8203;(java.lang.Object&nbsp;other)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AssetDetails.html#canEqual(java.lang.Object)">canEqual</a></code>&nbsp;in class&nbsp;<code><a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></code></dd>
+<dd><code><a href="EnrichmentDetails.html#canEqual(java.lang.Object)">canEqual</a></code>&nbsp;in class&nbsp;<code><a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -643,7 +611,7 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <pre class="methodSignature">public&nbsp;int&nbsp;hashCode()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AssetDetails.html#hashCode()">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></code></dd>
+<dd><code><a href="EnrichmentDetails.html#hashCode()">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -656,7 +624,7 @@ extends <a href="AssetDetails.html" title="class in com.atlan.samples.loaders.mo
 <pre class="methodSignature">public&nbsp;java.lang.String&nbsp;toString()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AssetDetails.html#toString()">toString</a></code>&nbsp;in class&nbsp;<code><a href="AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></code></dd>
+<dd><code><a href="EnrichmentDetails.html#toString()">toString</a></code>&nbsp;in class&nbsp;<code><a href="EnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">EnrichmentDetails</a></code></dd>
 </dl>
 </li>
 </ul>

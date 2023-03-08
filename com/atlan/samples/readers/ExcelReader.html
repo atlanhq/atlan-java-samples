@@ -159,6 +159,13 @@ extends java.lang.Object</pre>
 <div class="block">Construct a new Excel file reader.</div>
 </td>
 </tr>
+<tr class="rowColor">
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String)">ExcelReader</a></span>&#8203;(java.lang.String&nbsp;fileLocation,
+           java.lang.String&nbsp;caseSensitiveDelimiter)</code></th>
+<td class="colLast">
+<div class="block">Construct a new Excel file reader allowing for case-sensitive column headings.</div>
+</td>
+</tr>
 </table>
 </li>
 </ul>
@@ -237,7 +244,7 @@ extends java.lang.Object</pre>
 <a id="&lt;init&gt;(java.lang.String)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>ExcelReader</h4>
 <pre>public&nbsp;ExcelReader&#8203;(java.lang.String&nbsp;fileLocation)
@@ -246,6 +253,25 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>fileLocation</code> - location of the Excel file</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - on any errors accessing or parsing the file</dd>
+</dl>
+</li>
+</ul>
+<a id="&lt;init&gt;(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>ExcelReader</h4>
+<pre>public&nbsp;ExcelReader&#8203;(java.lang.String&nbsp;fileLocation,
+                   java.lang.String&nbsp;caseSensitiveDelimiter)
+            throws java.io.IOException</pre>
+<div class="block">Construct a new Excel file reader allowing for case-sensitive column headings.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>fileLocation</code> - location of the Excel file</dd>
+<dd><code>caseSensitiveDelimiter</code> - delimiter to look for to leave a column heading as case-sensitive</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code> - on any errors accessing or parsing the file</dd>
 </dl>
