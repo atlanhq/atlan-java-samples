@@ -18,3 +18,4 @@ build/
 # Generated reports
 enrichment-report*.xlsx
 slack-discussion-report*.xlsx
+user-details-report*.xlsx
