@@ -8,6 +8,7 @@ import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.GlossaryCategory;
 import com.atlan.model.assets.Readme;
 import com.atlan.model.core.AssetMutationResponse;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -25,12 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true, onlyExplicitlyIncluded = true)
-public class CategoryEnrichmentDetails extends AssetDetails {
+public class CategoryEnrichmentDetails extends EnrichmentDetails {
 
     public static final String COL_GLOSSARY = "GLOSSARY NAME";
     public static final String COL_CATEGORY_PATH = "CATEGORY PATH";
-    public static final String COL_USER_DESCRIPTION = "USER DESCRIPTION";
-    public static final String COL_README = "README";
 
     private static final List<String> REQUIRED = List.of(COL_GLOSSARY, COL_CATEGORY_PATH);
 
@@ -41,12 +40,6 @@ public class CategoryEnrichmentDetails extends AssetDetails {
 
     @ToString.Include
     private String categoryPath;
-
-    @ToString.Include
-    private String userDescription;
-
-    @ToString.Include
-    private String readme;
 
     /**
      * {@inheritDoc}
@@ -84,7 +77,8 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                 builder = builder.glossary(glossary)
                         .categoryPath(row.get(COL_CATEGORY_PATH))
                         .userDescription(row.get(COL_USER_DESCRIPTION))
-                        .readme(row.get(COL_README));
+                        .readme(row.get(COL_README))
+                        .customMetadataValues(getCustomMetadataValuesFromRow(row, delim));
                 return builder.stub(false).build();
             }
         }
@@ -98,13 +92,18 @@ public class CategoryEnrichmentDetails extends AssetDetails {
      * @param categories the set of categories to ensure exist
      * @param batchSize maximum number of categories to create per batch
      * @param level of categories to create
+     * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
+     * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
      */
     public static void upsert(
             Map<String, Asset> categoryCache,
             Map<String, CategoryEnrichmentDetails> categories,
             int batchSize,
-            int level) {
+            int level,
+            boolean replaceClassifications,
+            boolean replaceCM) {
         Map<String, String> readmes = new HashMap<>();
+        Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, CategoryEnrichmentDetails> leftovers = new LinkedHashMap<>();
 
         // Note that we need to do this in multiple passes, so parent categories are always
@@ -139,6 +138,9 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                             .announcementMessage(details.getAnnouncementMessage())
                             .ownerUsers(details.getOwnerUsers())
                             .ownerGroups(details.getOwnerGroups());
+                    if (details.getCustomMetadataValues() != null) {
+                        builder = builder.customMetadataSets(details.getCustomMetadataValues());
+                    }
                     if (tokens.length > 1) {
                         // If there are multiple tokens, there is a hierarchy to construct
                         String parentPath = categoryPath.substring(0, categoryPath.lastIndexOf("@"));
@@ -163,7 +165,7 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                     GlossaryCategory category = builder.build();
                     try {
                         // TODO: matching on name alone has very minor risk of a collision as it is not strictly unique
-                        AssetMutationResponse response = category.upsert();
+                        AssetMutationResponse response = category.upsert(replaceClassifications, replaceCM);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
@@ -174,7 +176,7 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                                 }
                             }
                             List<Asset> updated = response.getUpdatedAssets();
-                            if (created != null) {
+                            if (updated != null) {
                                 for (Asset one : updated) {
                                     if (one.getName().equals(categoryName)) {
                                         categoryCache.put(details.getIdentity(), one);
@@ -189,6 +191,14 @@ public class CategoryEnrichmentDetails extends AssetDetails {
                     } catch (AtlanException e) {
                         log.error("Unable to upsert category: {}", details.getIdentity(), e);
                     }
+                    if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
+                        // Note that the GUID is only resolved after the asset is
+                        // created (or updated) above
+                        Asset resolved = categoryCache.get(details.getIdentity());
+                        if (resolved != null) {
+                            cmToUpdate.put(resolved.getGuid(), details.getCustomMetadataValues());
+                        }
+                    }
                     String readmeContents = details.getReadme();
                     if (readmeContents != null && readmeContents.length() > 0) {
                         readmes.put(details.getIdentity(), readmeContents);
@@ -197,6 +207,11 @@ public class CategoryEnrichmentDetails extends AssetDetails {
             } else {
                 leftovers.put(details.getIdentity(), details);
             }
+        }
+
+        // If we did not replace custom metadata, it must be selectively updated one-by-one
+        if (!replaceCM) {
+            selectivelyUpdateCustomMetadata(cmToUpdate);
         }
 
         // Then go through and create any the READMEs linked to these assets...
@@ -217,7 +232,7 @@ public class CategoryEnrichmentDetails extends AssetDetails {
 
         // And then recurse on the leftovers...
         if (!leftovers.isEmpty()) {
-            upsert(categoryCache, leftovers, batchSize, level + 1);
+            upsert(categoryCache, leftovers, batchSize, level + 1, replaceClassifications, replaceCM);
         }
     }
 }

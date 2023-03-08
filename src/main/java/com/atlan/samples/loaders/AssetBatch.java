@@ -19,17 +19,33 @@ public class AssetBatch {
     private List<Asset> _batch;
     private final String typeName;
     private final int maxSize;
+    private final boolean replaceClassifications;
+    private final boolean replaceCustomMetadata;
 
     /**
      * Create a new batch of assets to be bulk-upserted.
      *
      * @param typeName name of the type of assets to batch process (used only for logging)
-     * @param maxSize maximum size of each batch that should be processed
+     * @param maxSize maximum size of each batch that should be processed (per API call)
      */
     public AssetBatch(String typeName, int maxSize) {
+        this(typeName, maxSize, false, false);
+    }
+
+    /**
+     * Create a new batch of assets to be bulk-upserted.
+     *
+     * @param typeName name of the type of assets to batch process (used only for logging)
+     * @param maxSize maximum size of each batch that should be processed (per API call)
+     * @param replaceClassifications if true, all classifications on an existing asset will be overwritten; if false, all classifications will be ignored
+     * @param replaceCustomMetadata if true, all custom metadata on an existing asset will be overwritten; if false, all custom metadata will be ignored
+     */
+    public AssetBatch(String typeName, int maxSize, boolean replaceClassifications, boolean replaceCustomMetadata) {
         _batch = new ArrayList<>();
         this.typeName = typeName;
         this.maxSize = maxSize;
+        this.replaceClassifications = replaceClassifications;
+        this.replaceCustomMetadata = replaceCustomMetadata;
     }
 
     /**
@@ -68,7 +84,7 @@ public class AssetBatch {
         if (!_batch.isEmpty()) {
             try {
                 log.info("... upserting next batch of ({}) {}s...", _batch.size(), typeName);
-                response = EntityBulkEndpoint.upsert(_batch, false, false);
+                response = EntityBulkEndpoint.upsert(_batch, replaceClassifications, replaceCustomMetadata);
             } catch (AtlanException e) {
                 log.error("Unexpected exception while trying to upsert: {}", _batch, e);
             }

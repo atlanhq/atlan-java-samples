@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExcelReader {
 
     private final Workbook workbook;
+    private final String caseSensitiveDelimiter;
 
     /**
      * Construct a new Excel file reader.
@@ -29,8 +30,20 @@ public class ExcelReader {
      * @throws IOException on any errors accessing or parsing the file
      */
     public ExcelReader(String fileLocation) throws IOException {
+        this(fileLocation, "|");
+    }
+
+    /**
+     * Construct a new Excel file reader allowing for case-sensitive column headings.
+     *
+     * @param fileLocation location of the Excel file
+     * @param caseSensitiveDelimiter delimiter to look for to leave a column heading as case-sensitive
+     * @throws IOException on any errors accessing or parsing the file
+     */
+    public ExcelReader(String fileLocation, String caseSensitiveDelimiter) throws IOException {
         FileInputStream file = new FileInputStream(fileLocation);
         workbook = new XSSFWorkbook(file);
+        this.caseSensitiveDelimiter = caseSensitiveDelimiter;
     }
 
     /**
@@ -139,7 +152,11 @@ public class ExcelReader {
         for (Cell cell : header) {
             String name = cell.getRichStringCellValue().getString();
             if (name != null) {
-                columns.add(name.toUpperCase());
+                if (name.contains(caseSensitiveDelimiter)) {
+                    columns.add(name);
+                } else if (name.length() > 0) {
+                    columns.add(name.toUpperCase());
+                }
             }
         }
         return columns;

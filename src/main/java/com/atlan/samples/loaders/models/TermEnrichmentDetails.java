@@ -7,6 +7,8 @@ import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
+import com.atlan.model.core.Classification;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import java.util.*;
 import lombok.EqualsAndHashCode;
@@ -23,12 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true, onlyExplicitlyIncluded = true)
-public class TermEnrichmentDetails extends AssetDetails {
+public class TermEnrichmentDetails extends EnrichmentDetails {
 
     public static final String COL_GLOSSARY = "GLOSSARY NAME";
     public static final String COL_TERM_NAME = "TERM NAME*";
-    public static final String COL_USER_DESCRIPTION = "USER DESCRIPTION";
-    public static final String COL_README = "README";
     public static final String COL_CATEGORIES = "CATEGORIES";
     public static final String COL_T_RELATED = "RELATED TERMS";
     public static final String COL_T_RECOMMENDED = "RECOMMENDED TERMS";
@@ -130,6 +130,7 @@ public class TermEnrichmentDetails extends AssetDetails {
                         .name(termName)
                         .userDescription(row.get(COL_USER_DESCRIPTION))
                         .readme(row.get(COL_README))
+                        .customMetadataValues(getCustomMetadataValuesFromRow(row, delim))
                         .categories(categories)
                         .relatedTerms(getMultiValuedList(row.get(COL_T_RELATED), delim))
                         .recommendedTerms(getMultiValuedList(row.get(COL_T_RECOMMENDED), delim))
@@ -149,11 +150,18 @@ public class TermEnrichmentDetails extends AssetDetails {
      *
      * @param terms the set of terms to ensure exist
      * @param batchSize maximum number of terms to create per batch
+     * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
+     * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
      * @return a cache of the terms
      */
-    public static Map<String, Asset> upsert(Map<String, TermEnrichmentDetails> terms, int batchSize) {
+    public static Map<String, Asset> upsert(
+            Map<String, TermEnrichmentDetails> terms,
+            int batchSize,
+            boolean replaceClassifications,
+            boolean replaceCM) {
         Map<String, Asset> termIdentityToResult = new HashMap<>();
         Map<String, List<String>> toClassify = new HashMap<>();
+        Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, String> readmes = new HashMap<>();
         Map<String, TermEnrichmentDetails> termToTerm = new HashMap<>();
 
@@ -184,25 +192,44 @@ public class TermEnrichmentDetails extends AssetDetails {
                     for (Asset category : details.getCategories()) {
                         builder = builder.category(GlossaryCategory.refByGuid(category.getGuid()));
                     }
+                    if (details.getCustomMetadataValues() != null) {
+                        builder = builder.customMetadataSets(details.getCustomMetadataValues());
+                    }
+                    if (details.getClassifications() != null) {
+                        List<String> clsNames = details.getClassifications();
+                        for (String clsName : clsNames) {
+                            builder = builder.classification(Classification.of(clsName));
+                        }
+                    }
                     GlossaryTerm term = builder.build();
                     // Create the term now, as we need to resolve GUIDs and qualifiedNames
                     // before we can take next actions
                     try {
-                        AssetMutationResponse response = term.upsert();
+                        AssetMutationResponse response = term.upsert(replaceClassifications, replaceCM);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
                                 for (Asset one : created) {
                                     if (one.getName().equals(termName)) {
-                                        termIdentityToResult.put(details.getIdentity(), one);
+                                        termIdentityToResult.put(
+                                                details.getIdentity(),
+                                                term.toBuilder()
+                                                        .qualifiedName(one.getQualifiedName())
+                                                        .guid(one.getGuid())
+                                                        .build());
                                     }
                                 }
                             }
                             List<Asset> updated = response.getUpdatedAssets();
-                            if (created != null) {
+                            if (updated != null) {
                                 for (Asset one : updated) {
                                     if (one.getName().equals(termName)) {
-                                        termIdentityToResult.put(details.getIdentity(), one);
+                                        termIdentityToResult.put(
+                                                details.getIdentity(),
+                                                term.toBuilder()
+                                                        .qualifiedName(one.getQualifiedName())
+                                                        .guid(one.getGuid())
+                                                        .build());
                                     }
                                 }
                             }
@@ -214,12 +241,20 @@ public class TermEnrichmentDetails extends AssetDetails {
                     } catch (AtlanException e) {
                         log.error("Unable to upsert term: {}", details.getIdentity(), e);
                     }
-                    if (!details.getClassifications().isEmpty()) {
+                    if (!replaceClassifications && !details.getClassifications().isEmpty()) {
                         // Note that the qualifiedName is only resolved after the asset is
                         // created (or updated) above
                         Asset resolved = termIdentityToResult.get(details.getIdentity());
                         if (resolved != null) {
                             toClassify.put(resolved.getQualifiedName(), details.getClassifications());
+                        }
+                    }
+                    if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
+                        // Note that the GUID is only resolved after the asset is
+                        // created (or updated) above
+                        Asset resolved = termIdentityToResult.get(details.getIdentity());
+                        if (resolved != null) {
+                            cmToUpdate.put(resolved.getGuid(), details.getCustomMetadataValues());
                         }
                     }
                     String readmeContents = details.getReadme();
@@ -233,8 +268,15 @@ public class TermEnrichmentDetails extends AssetDetails {
             }
         }
 
-        // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, GlossaryTerm.TYPE_NAME);
+        // If we did not replace the classifications, they must be added in a second pass, after the asset exists
+        if (!replaceClassifications) {
+            appendClassifications(toClassify, GlossaryTerm.TYPE_NAME);
+        }
+
+        // If we did not replace custom metadata, it must be selectively updated one-by-one
+        if (!replaceCM) {
+            selectivelyUpdateCustomMetadata(cmToUpdate);
+        }
 
         // Then go through and create any the READMEs linked to these assets...
         AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
@@ -283,7 +325,7 @@ public class TermEnrichmentDetails extends AssetDetails {
                         if (synonym != null) {
                             toUpdate = toUpdate.synonym(GlossaryTerm.refByGuid(synonym.getGuid()));
                         } else {
-                            log.warn("Unable to find synonym: {}", synonym);
+                            log.warn("Unable to find synonym: {}", t2tSynonym);
                         }
                     }
                     for (String t2tAntonym : t2tDetails.getAntonyms()) {
