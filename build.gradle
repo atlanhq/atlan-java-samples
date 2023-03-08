@@ -144,3 +144,44 @@ task buildZip(type: Zip) {
     }
 }
 
+task DocumentationTemplateLoader(type: JavaExec) {
+    group = "Execution"
+    description = "Run the DocumentationTemplateLoader"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.loaders.DocumentationTemplateLoader"
+}
+
+task EnrichmentLoader(type: JavaExec) {
+    group = "Execution"
+    description = "Run the EnrichmentLoader"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.loaders.EnrichmentLoader"
+}
+
+task OpenAPISpecLoader(type: JavaExec) {
+    group = "Execution"
+    description = "Run the OpenAPISpecLoader"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.loaders.OpenAPISpecLoader"
+}
+
+task EnrichmentReporter(type: JavaExec) {
+    group = "Execution"
+    description = "Run the EnrichmentReporter"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.reporters.EnrichmentReporter"
+}
+
+task SlackDiscussionReporter(type: JavaExec) {
+    group = "Execution"
+    description = "Run the SlackDiscussionReporter"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.reporters.SlackDiscussionReporter"
+}
+
+task UserReporter(type: JavaExec) {
+    group = "Execution"
+    description = "Run the UserReporter"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.atlan.samples.reporters.UserReporter"
+}
