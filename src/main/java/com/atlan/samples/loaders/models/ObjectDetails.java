@@ -115,6 +115,7 @@ public class ObjectDetails extends AssetDetails {
 
         for (ObjectDetails details : objects.values()) {
             String parentQN = details.getContainerQualifiedName();
+            String bucketName = details.getBucketName();
             String objectName = details.getName();
             String objectARN = details.getArn();
             AtlanConnectorType objectType = Connection.getConnectorTypeFromQualifiedName(parentQN);
