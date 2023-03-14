@@ -606,32 +606,34 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     @SuppressWarnings("unchecked")
     private void addCustomMetadata(List<DataCell> row, Asset result) {
         Map<String, CustomMetadataAttributes> map = result.getCustomMetadataSets();
-        for (Map.Entry<String, List<String>> entry : CM_ATTRIBUTE_ORDER.entrySet()) {
-            String cmName = entry.getKey();
-            List<String> attrOrder = entry.getValue();
-            CustomMetadataAttributes attrs = map.get(cmName);
-            if (attrs != null) {
-                Map<String, Object> active = attrs.getAttributes();
-                for (String attrName : attrOrder) {
-                    Object value = active.get(attrName);
-                    if (value == null) {
-                        row.add(DataCell.of(""));
-                    } else if (value instanceof Collection) {
-                        row.add(DataCell.of(getDelimitedList((Collection<String>) value, getDelimiter())));
-                    } else if (value instanceof Boolean) {
-                        row.add(DataCell.of((Boolean) value));
-                    } else if (value instanceof Long) {
-                        row.add(DataCell.of((Long) value));
-                    } else if (value instanceof Double) {
-                        row.add(DataCell.of((Double) value));
-                    } else {
-                        row.add(DataCell.of(value.toString()));
+        if (map != null) {
+            for (Map.Entry<String, List<String>> entry : CM_ATTRIBUTE_ORDER.entrySet()) {
+                String cmName = entry.getKey();
+                List<String> attrOrder = entry.getValue();
+                CustomMetadataAttributes attrs = map.get(cmName);
+                if (attrs != null) {
+                    Map<String, Object> active = attrs.getAttributes();
+                    for (String attrName : attrOrder) {
+                        Object value = active.get(attrName);
+                        if (value == null) {
+                            row.add(DataCell.of(""));
+                        } else if (value instanceof Collection) {
+                            row.add(DataCell.of(getDelimitedList((Collection<String>) value, getDelimiter())));
+                        } else if (value instanceof Boolean) {
+                            row.add(DataCell.of((Boolean) value));
+                        } else if (value instanceof Long) {
+                            row.add(DataCell.of((Long) value));
+                        } else if (value instanceof Double) {
+                            row.add(DataCell.of((Double) value));
+                        } else {
+                            row.add(DataCell.of(value.toString()));
+                        }
                     }
-                }
-            } else {
-                // Fill in the blanks so that we retain positioning
-                for (int i = 0; i < attrOrder.size(); i++) {
-                    row.add(DataCell.of(""));
+                } else {
+                    // Fill in the blanks so that we retain positioning
+                    for (int i = 0; i < attrOrder.size(); i++) {
+                        row.add(DataCell.of(""));
+                    }
                 }
             }
         }

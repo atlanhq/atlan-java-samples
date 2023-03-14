@@ -115,6 +115,7 @@ public class ObjectDetails extends AssetDetails {
 
         for (ObjectDetails details : objects.values()) {
             String parentQN = details.getContainerQualifiedName();
+            String bucketName = details.getBucketName();
             String objectName = details.getName();
             String objectARN = details.getArn();
             AtlanConnectorType objectType = Connection.getConnectorTypeFromQualifiedName(parentQN);
@@ -124,7 +125,7 @@ public class ObjectDetails extends AssetDetails {
                     if (objectARN != null && objectARN.length() > 0) {
                         // Note: unlike other object stores, an S3Object must
                         // manually be placed in its bucket, beyond the creator
-                        S3Object s3 = S3Object.creator(objectName, connectionQN, objectARN)
+                        S3Object s3 = S3Object.creator(objectName, parentQN, bucketName, objectARN)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())
                                 .certificateStatusMessage(details.getCertificateStatusMessage())
