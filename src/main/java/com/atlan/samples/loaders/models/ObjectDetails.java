@@ -124,7 +124,7 @@ public class ObjectDetails extends AssetDetails {
                     if (objectARN != null && objectARN.length() > 0) {
                         // Note: unlike other object stores, an S3Object must
                         // manually be placed in its bucket, beyond the creator
-                        S3Object s3 = S3Object.creator(objectName, connectionQN, objectARN)
+                        S3Object s3 = S3Object.creator(objectName, parentQN, bucketName, objectARN)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())
                                 .certificateStatusMessage(details.getCertificateStatusMessage())
