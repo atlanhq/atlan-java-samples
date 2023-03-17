@@ -33,6 +33,7 @@ public class LineageDetails extends AssetDetails {
     public static final String COL_S_ASSET = "SOURCE ASSET";
     public static final String COL_ORCHESTRATOR = "ORCHESTRATOR";
     public static final String COL_PROCESS_ID = "PROCESS ID";
+    public static final String COL_PROCESS_TYPE = "PROCESS TYPE";
     public static final String COL_T_ASSET = "TARGET ASSET";
     public static final String COL_T_ASSET_TYPE = "TARGET ASSET TYPE";
     public static final String COL_T_CONNECTOR = "CONNECTOR (T)";
@@ -42,8 +43,14 @@ public class LineageDetails extends AssetDetails {
 
     private static final Pattern CONNECTION_QN_PREFIX = Pattern.compile("default/[a-z0-9]+/[0-9]{10}/.*");
 
-    private static final List<String> REQUIRED =
-            List.of(COL_S_ASSET_TYPE, COL_S_ASSET, COL_ORCHESTRATOR, COL_PROCESS_ID, COL_T_ASSET, COL_T_ASSET_TYPE);
+    private static final List<String> REQUIRED = List.of(
+            COL_S_ASSET_TYPE,
+            COL_S_ASSET,
+            COL_ORCHESTRATOR,
+            COL_PROCESS_TYPE,
+            COL_PROCESS_ID,
+            COL_T_ASSET,
+            COL_T_ASSET_TYPE);
 
     @ToString.Include
     private AssetHeader sourceAsset;
@@ -78,8 +85,12 @@ public class LineageDetails extends AssetDetails {
      * @return the connection details for the orchestrator for that row
      */
     public static ConnectionDetails getOrchestratorFromRow(Map<String, String> row) {
-        if (getMissingFields(row, List.of(COL_ORCHESTRATOR)).isEmpty()) {
-            return ConnectionDetails.getHeader(row.get(COL_ORCHESTRATOR), AtlanConnectorType.API);
+        if (getMissingFields(row, List.of(COL_ORCHESTRATOR, COL_PROCESS_TYPE)).isEmpty()) {
+            String processType = row.get(COL_PROCESS_TYPE);
+            AtlanConnectorType connectorType = AtlanConnectorType.fromValue(processType);
+            if (connectorType != null) {
+                return ConnectionDetails.getHeader(row.get(COL_ORCHESTRATOR), connectorType);
+            }
         }
         return null;
     }
