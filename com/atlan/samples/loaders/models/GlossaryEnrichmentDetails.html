@@ -301,10 +301,11 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>static java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,int,boolean,boolean)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="GlossaryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">GlossaryEnrichmentDetails</a>&gt;&nbsp;glossaries,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,int,boolean,boolean,boolean)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="GlossaryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">GlossaryEnrichmentDetails</a>&gt;&nbsp;glossaries,
       int&nbsp;batchSize,
       boolean&nbsp;replaceClassifications,
-      boolean&nbsp;replaceCM)</code></th>
+      boolean&nbsp;replaceCM,
+      boolean&nbsp;updateOnly)</code></th>
 <td class="colLast">
 <div class="block">Create glossaries in bulk, if they do not exist, or update them if they do (idempotent).</div>
 </td>
@@ -423,7 +424,7 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </dl>
 </li>
 </ul>
-<a id="upsert(java.util.Map,int,boolean,boolean)">
+<a id="upsert(java.util.Map,int,boolean,boolean,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -432,7 +433,8 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <pre class="methodSignature">public static&nbsp;java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;upsert&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="GlossaryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">GlossaryEnrichmentDetails</a>&gt;&nbsp;glossaries,
                                                                                         int&nbsp;batchSize,
                                                                                         boolean&nbsp;replaceClassifications,
-                                                                                        boolean&nbsp;replaceCM)</pre>
+                                                                                        boolean&nbsp;replaceCM,
+                                                                                        boolean&nbsp;updateOnly)</pre>
 <div class="block">Create glossaries in bulk, if they do not exist, or update them if they do (idempotent).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -440,6 +442,7 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <dd><code>batchSize</code> - maximum number of glossaries to create per batch</dd>
 <dd><code>replaceClassifications</code> - if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended</dd>
 <dd><code>replaceCM</code> - if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated</dd>
+<dd><code>updateOnly</code> - if true, only attempt to update existing assets, otherwise allow assets to be created as well</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a cache of glossaries</dd>
 </dl>
