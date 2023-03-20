@@ -88,7 +88,7 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                 }
             }
             Map<String, Asset> glossaryCache = GlossaryEnrichmentDetails.upsert(
-                    glossaries, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA);
+                    glossaries, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 2. Create categories for each row in the Category enrichment sheet
             log.info("Processing sheet: {}", CATEGORY_ENRICHMENT);
@@ -108,7 +108,13 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
             }
             Map<String, Asset> categoryCache = new HashMap<>();
             CategoryEnrichmentDetails.upsert(
-                    categoryCache, categories, getBatchSize(), 1, REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA);
+                    categoryCache,
+                    categories,
+                    getBatchSize(),
+                    1,
+                    REPLACE_CLASSIFICATIONS,
+                    REPLACE_CUSTOM_METADATA,
+                    isUpdateOnly());
 
             // 3. Create terms for each row in the Term enrichment sheet
             log.info("Processing sheet: {}", TERM_ENRICHMENT);
@@ -127,7 +133,7 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                 }
             }
             Map<String, Asset> termCache = TermEnrichmentDetails.upsert(
-                    terms, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA);
+                    terms, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 4. Create assets for each row in the Asset enrichment sheet
             log.info("Processing sheet: {}", ASSET_ENRICHMENT);
@@ -144,7 +150,8 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                     }
                 }
             }
-            AssetEnrichmentDetails.upsert(assets, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA);
+            AssetEnrichmentDetails.upsert(
+                    assets, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
         } catch (IOException e) {
             log.error("Failed to read Excel file from: {}", getFilename(), e);

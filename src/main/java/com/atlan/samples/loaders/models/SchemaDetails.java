@@ -2,6 +2,9 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
+import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Schema;
 import com.atlan.samples.loaders.AssetBatch;
 import java.util.*;
@@ -9,10 +12,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class for capturing the full details provided about a schema.
  */
+@Slf4j
 @Getter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
@@ -91,9 +96,10 @@ public class SchemaDetails extends AssetDetails {
      *
      * @param schemas the set of schemas to ensure exist
      * @param batchSize maximum number of schemas to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return qualifiedNames of all parent databases in which assets were created or updated
      */
-    public static Set<String> upsert(Map<String, SchemaDetails> schemas, int batchSize) {
+    public static Set<String> upsert(Map<String, SchemaDetails> schemas, int batchSize, boolean updateOnly) {
         Set<String> parents = new HashSet<>();
         AssetBatch batch = new AssetBatch(Schema.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
@@ -101,21 +107,47 @@ public class SchemaDetails extends AssetDetails {
         for (SchemaDetails details : schemas.values()) {
             String databaseQualifiedName = details.getDatabaseQualifiedName();
             String schemaName = details.getName();
-            Schema schema = Schema.creator(schemaName, databaseQualifiedName)
-                    .description(details.getDescription())
-                    .certificateStatus(details.getCertificate())
-                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                    .announcementType(details.getAnnouncementType())
-                    .announcementTitle(details.getAnnouncementTitle())
-                    .announcementMessage(details.getAnnouncementMessage())
-                    .ownerUsers(details.getOwnerUsers())
-                    .ownerGroups(details.getOwnerGroups())
-                    .build();
-            if (!details.getClassifications().isEmpty()) {
-                toClassify.put(schema.getQualifiedName(), details.getClassifications());
+            if (updateOnly) {
+                String qualifiedName = Schema.generateQualifiedName(schemaName, databaseQualifiedName);
+                try {
+                    Asset.retrieveMinimal(Schema.TYPE_NAME, qualifiedName);
+                    Schema toUpdate = Schema.updater(qualifiedName, schemaName)
+                            .description(details.getDescription())
+                            .certificateStatus(details.getCertificate())
+                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                            .announcementType(details.getAnnouncementType())
+                            .announcementTitle(details.getAnnouncementTitle())
+                            .announcementMessage(details.getAnnouncementMessage())
+                            .ownerUsers(details.getOwnerUsers())
+                            .ownerGroups(details.getOwnerGroups())
+                            .build();
+                    if (!details.getClassifications().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    }
+                    batch.add(toUpdate);
+                    parents.add(databaseQualifiedName);
+                } catch (NotFoundException e) {
+                    log.warn("Unable to find existing schema — skipping: {}", qualifiedName, e);
+                } catch (AtlanException e) {
+                    log.error("Unable to lookup whether schema exists or not.", e);
+                }
+            } else {
+                Schema schema = Schema.creator(schemaName, databaseQualifiedName)
+                        .description(details.getDescription())
+                        .certificateStatus(details.getCertificate())
+                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                        .announcementType(details.getAnnouncementType())
+                        .announcementTitle(details.getAnnouncementTitle())
+                        .announcementMessage(details.getAnnouncementMessage())
+                        .ownerUsers(details.getOwnerUsers())
+                        .ownerGroups(details.getOwnerGroups())
+                        .build();
+                if (!details.getClassifications().isEmpty()) {
+                    toClassify.put(schema.getQualifiedName(), details.getClassifications());
+                }
+                batch.add(schema);
+                parents.add(databaseQualifiedName);
             }
-            batch.add(schema);
-            parents.add(databaseQualifiedName);
         }
         // And don't forget to flush out any that remain
         batch.flush();

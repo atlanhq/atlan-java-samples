@@ -80,6 +80,11 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                         .readme(row.get(COL_README))
                         .customMetadataValues(getCustomMetadataValuesFromRow(row, delim));
                 return builder.stub(false).build();
+            } else {
+                log.warn(
+                        "Unknown glossary {} — skipping category: {}",
+                        row.get(COL_GLOSSARY),
+                        row.get(COL_CATEGORY_PATH));
             }
         }
         return null;
@@ -94,6 +99,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
      * @param level of categories to create
      * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
     public static void upsert(
             Map<String, Asset> categoryCache,
@@ -101,7 +107,8 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
             int batchSize,
             int level,
             boolean replaceClassifications,
-            boolean replaceCM) {
+            boolean replaceCM,
+            boolean updateOnly) {
         Map<String, String> readmes = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, CategoryEnrichmentDetails> leftovers = new LinkedHashMap<>();
@@ -122,8 +129,15 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                                 categoryName, glossary.getQualifiedName(), List.of("anchor"));
                         builder = found.trimToRequired().guid(found.getGuid());
                     } catch (NotFoundException e) {
-                        builder =
-                                GlossaryCategory.creator(categoryName, glossary.getGuid(), glossary.getQualifiedName());
+                        if (updateOnly) {
+                            log.warn(
+                                    "Unable to find existing category — skipping: {}@{}",
+                                    categoryName,
+                                    glossary.getName());
+                        } else {
+                            builder = GlossaryCategory.creator(
+                                    categoryName, glossary.getGuid(), glossary.getQualifiedName());
+                        }
                     } catch (AtlanException e) {
                         log.error("Unable to even search for the category: {}", details.getIdentity(), e);
                     }
@@ -232,7 +246,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
 
         // And then recurse on the leftovers...
         if (!leftovers.isEmpty()) {
-            upsert(categoryCache, leftovers, batchSize, level + 1, replaceClassifications, replaceCM);
+            upsert(categoryCache, leftovers, batchSize, level + 1, replaceClassifications, replaceCM, updateOnly);
         }
     }
 }

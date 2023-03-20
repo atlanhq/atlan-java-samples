@@ -140,6 +140,8 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                         .validValuesFor(getMultiValuedList(row.get(COL_T_VALID_VALUES), delim))
                         .classifies(getMultiValuedList(row.get(COL_T_CLASSIFIES), delim));
                 return builder.stub(false).build();
+            } else {
+                log.warn("Unknown glossary {} — skipping term: {}", row.get(COL_GLOSSARY), row.get(COL_TERM_NAME));
             }
         }
         return null;
@@ -152,13 +154,15 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
      * @param batchSize maximum number of terms to create per batch
      * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return a cache of the terms
      */
     public static Map<String, Asset> upsert(
             Map<String, TermEnrichmentDetails> terms,
             int batchSize,
             boolean replaceClassifications,
-            boolean replaceCM) {
+            boolean replaceCM,
+            boolean updateOnly) {
         Map<String, Asset> termIdentityToResult = new HashMap<>();
         Map<String, List<String>> toClassify = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
@@ -175,7 +179,11 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                             GlossaryTerm.findByNameFast(termName, glossary.getQualifiedName(), List.of("anchor"));
                     builder = found.trimToRequired().guid(found.getGuid());
                 } catch (NotFoundException e) {
-                    builder = GlossaryTerm.creator(termName, glossary.getGuid(), glossary.getQualifiedName());
+                    if (updateOnly) {
+                        log.warn("Unable to find existing term — skipping: {}@{}", termName, glossary.getName());
+                    } else {
+                        builder = GlossaryTerm.creator(termName, glossary.getGuid(), glossary.getQualifiedName());
+                    }
                 } catch (AtlanException e) {
                     log.error("Unable to even search for the term: {}", details.getIdentity(), e);
                 }
@@ -295,7 +303,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
         readmeBatch.flush();
 
         // And finally go through and create any term-to-term relationships
-        AssetBatch termToTermBatch = new AssetBatch(GlossaryTerm.TYPE_NAME, batchSize);
+        AssetBatch termToTermBatch = new AssetBatch("term-to-term relationship", batchSize);
         for (Map.Entry<String, TermEnrichmentDetails> entry : termToTerm.entrySet()) {
             String identity = entry.getKey();
             TermEnrichmentDetails t2tDetails = entry.getValue();

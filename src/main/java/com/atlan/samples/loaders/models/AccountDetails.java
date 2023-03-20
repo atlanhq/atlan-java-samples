@@ -2,17 +2,22 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.ADLSAccount;
+import com.atlan.model.assets.Asset;
 import com.atlan.samples.loaders.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class for capturing the full details provided about a database.
  */
+@Slf4j
 @Getter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
@@ -89,28 +94,54 @@ public class AccountDetails extends AssetDetails {
      *
      * @param accounts the set of accounts to ensure exist
      * @param batchSize maximum number of accounts to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
-    public static void upsert(Map<String, AccountDetails> accounts, int batchSize) {
+    public static void upsert(Map<String, AccountDetails> accounts, int batchSize, boolean updateOnly) {
         AssetBatch batch = new AssetBatch(ADLSAccount.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
         for (AccountDetails details : accounts.values()) {
             String connectionQualifiedName = details.getConnectionQualifiedName();
             String accountName = details.getName();
-            ADLSAccount account = ADLSAccount.creator(accountName, connectionQualifiedName)
-                    .description(details.getDescription())
-                    .certificateStatus(details.getCertificate())
-                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                    .announcementType(details.getAnnouncementType())
-                    .announcementTitle(details.getAnnouncementTitle())
-                    .announcementMessage(details.getAnnouncementMessage())
-                    .ownerUsers(details.getOwnerUsers())
-                    .ownerGroups(details.getOwnerGroups())
-                    .build();
-            if (!details.getClassifications().isEmpty()) {
-                toClassify.put(account.getQualifiedName(), details.getClassifications());
+            if (updateOnly) {
+                String qualifiedName = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
+                try {
+                    Asset.retrieveMinimal(ADLSAccount.TYPE_NAME, qualifiedName);
+                    ADLSAccount toUpdate = ADLSAccount.updater(qualifiedName, accountName)
+                            .description(details.getDescription())
+                            .certificateStatus(details.getCertificate())
+                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                            .announcementType(details.getAnnouncementType())
+                            .announcementTitle(details.getAnnouncementTitle())
+                            .announcementMessage(details.getAnnouncementMessage())
+                            .ownerUsers(details.getOwnerUsers())
+                            .ownerGroups(details.getOwnerGroups())
+                            .build();
+                    if (!details.getClassifications().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    }
+                    batch.add(toUpdate);
+                } catch (NotFoundException e) {
+                    log.warn("Unable to find existing account — skipping: {}", qualifiedName, e);
+                } catch (AtlanException e) {
+                    log.error("Unable to lookup whether account exists or not.", e);
+                }
+            } else {
+                ADLSAccount account = ADLSAccount.creator(accountName, connectionQualifiedName)
+                        .description(details.getDescription())
+                        .certificateStatus(details.getCertificate())
+                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                        .announcementType(details.getAnnouncementType())
+                        .announcementTitle(details.getAnnouncementTitle())
+                        .announcementMessage(details.getAnnouncementMessage())
+                        .ownerUsers(details.getOwnerUsers())
+                        .ownerGroups(details.getOwnerGroups())
+                        .build();
+                if (!details.getClassifications().isEmpty()) {
+                    toClassify.put(account.getQualifiedName(), details.getClassifications());
+                }
+                batch.add(account);
             }
-            batch.add(account);
         }
         // And don't forget to flush out any that remain
         batch.flush();
