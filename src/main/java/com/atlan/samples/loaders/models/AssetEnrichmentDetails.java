@@ -3,6 +3,7 @@
 package com.atlan.samples.loaders.models;
 
 import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.Classification;
@@ -101,12 +102,14 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
      * @param batchSize maximum number of assets to create per batch
      * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
     public static void upsert(
             Map<String, AssetEnrichmentDetails> assets,
             int batchSize,
             boolean replaceClassifications,
-            boolean replaceCM) {
+            boolean replaceCM,
+            boolean updateOnly) {
         Map<String, Map<String, List<String>>> toClassifyMap = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         AssetBatch batch = new AssetBatch("asset", batchSize, replaceClassifications, replaceCM);
@@ -114,51 +117,66 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 
         for (AssetEnrichmentDetails details : assets.values()) {
-            Asset.AssetBuilder<?, ?> builder = IndistinctAsset.builder()
-                    .typeName(details.getType())
-                    .qualifiedName(details.getQualifiedName())
-                    .name(details.getName())
-                    .description(details.getDescription())
-                    .userDescription(details.getUserDescription())
-                    .certificateStatus(details.getCertificate())
-                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                    .announcementType(details.getAnnouncementType())
-                    .announcementTitle(details.getAnnouncementTitle())
-                    .announcementMessage(details.getAnnouncementMessage())
-                    .ownerUsers(details.getOwnerUsers())
-                    .ownerGroups(details.getOwnerGroups());
-            for (Asset term : details.getTerms()) {
-                builder = builder.assignedTerm(GlossaryTerm.refByGuid(term.getGuid()));
-            }
-            if (details.getCustomMetadataValues() != null) {
-                builder = builder.customMetadataSets(details.getCustomMetadataValues());
-            }
-            if (details.getClassifications() != null) {
-                List<String> clsNames = details.getClassifications();
-                for (String clsName : clsNames) {
-                    builder = builder.classification(Classification.of(clsName));
+            Asset.AssetBuilder<?, ?> builder = null;
+            if (updateOnly) {
+                String typeName = details.getType();
+                String qualifiedName = details.getQualifiedName();
+                try {
+                    Asset.retrieveMinimal(typeName, qualifiedName);
+                    builder = IndistinctAsset.builder().typeName(typeName).qualifiedName(qualifiedName);
+                } catch (NotFoundException e) {
+                    log.warn("Unable to find existing asset — skipping: {}", qualifiedName);
+                } catch (AtlanException e) {
+                    log.error("Unable to lookup whether asset exists or not.", e);
                 }
+            } else {
+                builder =
+                        IndistinctAsset.builder().typeName(details.getType()).qualifiedName(details.getQualifiedName());
             }
-            Asset asset = builder.build();
-            if (!replaceClassifications && !details.getClassifications().isEmpty()) {
-                if (!toClassifyMap.containsKey(details.getType())) {
-                    toClassifyMap.put(details.getType(), new HashMap<>());
+            if (builder != null) {
+                builder.name(details.getName())
+                        .description(details.getDescription())
+                        .userDescription(details.getUserDescription())
+                        .certificateStatus(details.getCertificate())
+                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                        .announcementType(details.getAnnouncementType())
+                        .announcementTitle(details.getAnnouncementTitle())
+                        .announcementMessage(details.getAnnouncementMessage())
+                        .ownerUsers(details.getOwnerUsers())
+                        .ownerGroups(details.getOwnerGroups());
+                for (Asset term : details.getTerms()) {
+                    builder = builder.assignedTerm(GlossaryTerm.refByGuid(term.getGuid()));
                 }
-                List<String> existing = toClassifyMap
-                        .get(details.getType())
-                        .put(details.getQualifiedName(), details.getClassifications());
-                if (existing != null) {
-                    log.warn("Multiple entries with the same qualifiedName: {}", details.getQualifiedName());
+                if (details.getCustomMetadataValues() != null) {
+                    builder = builder.customMetadataSets(details.getCustomMetadataValues());
                 }
-            }
-            String readmeContents = details.getReadme();
-            if (readmeContents != null && readmeContents.length() > 0) {
-                readmes.put(details.getIdentity(), readmeContents);
-                assetIdentityToResult.put(details.getIdentity(), asset);
-            }
-            cacheResult(assetIdentityToResult, batch.add(asset), asset);
-            if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
-                cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
+                if (details.getClassifications() != null) {
+                    List<String> clsNames = details.getClassifications();
+                    for (String clsName : clsNames) {
+                        builder = builder.classification(Classification.of(clsName));
+                    }
+                }
+                Asset asset = builder.build();
+                if (!replaceClassifications && !details.getClassifications().isEmpty()) {
+                    if (!toClassifyMap.containsKey(details.getType())) {
+                        toClassifyMap.put(details.getType(), new HashMap<>());
+                    }
+                    List<String> existing = toClassifyMap
+                            .get(details.getType())
+                            .put(details.getQualifiedName(), details.getClassifications());
+                    if (existing != null) {
+                        log.warn("Multiple entries with the same qualifiedName: {}", details.getQualifiedName());
+                    }
+                }
+                String readmeContents = details.getReadme();
+                if (readmeContents != null && readmeContents.length() > 0) {
+                    readmes.put(details.getIdentity(), readmeContents);
+                    assetIdentityToResult.put(details.getIdentity(), asset);
+                }
+                cacheResult(assetIdentityToResult, batch.add(asset), asset);
+                if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
+                    cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
+                }
             }
         }
         cacheResult(assetIdentityToResult, batch.flush(), null);

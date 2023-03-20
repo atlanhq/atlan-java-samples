@@ -2,6 +2,9 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
+import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Column;
 import com.atlan.samples.loaders.*;
 import java.util.*;
@@ -106,9 +109,10 @@ public class ColumnDetails extends AssetDetails {
      *
      * @param columns the set of columns to ensure exist
      * @param batchSize maximum number of columns to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return details of all parent containers in which assets were created or updated
      */
-    public static Set<ContainerDetails> upsert(Map<String, ColumnDetails> columns, int batchSize) {
+    public static Set<ContainerDetails> upsert(Map<String, ColumnDetails> columns, int batchSize, boolean updateOnly) {
         Set<ContainerDetails> parents = new HashSet<>();
         AssetBatch batch = new AssetBatch(Column.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
@@ -117,39 +121,66 @@ public class ColumnDetails extends AssetDetails {
             String parentQualifiedName = details.getParentQualifiedName();
             String parentType = details.getParentType();
             String columnName = details.getName();
-            String mappedType = details.getMappedType();
-            String rawType = details.getRawType();
             parents.add(ContainerDetails.getHeader(parentQualifiedName, parentType));
-            Column.ColumnBuilder<?, ?> builder = Column.creator(
-                            columnName, parentType, parentQualifiedName, details.getIndex())
-                    .description(details.getDescription())
-                    .certificateStatus(details.getCertificate())
-                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                    .announcementType(details.getAnnouncementType())
-                    .announcementTitle(details.getAnnouncementTitle())
-                    .announcementMessage(details.getAnnouncementMessage())
-                    .ownerUsers(details.getOwnerUsers())
-                    .ownerGroups(details.getOwnerGroups())
-                    .dataType(mappedType)
-                    .isPrimary(details.getPrimaryKey())
-                    .isForeign(details.getForeignKey());
-            Long maxLength = DataTypeMapper.getMaxLength(rawType);
-            Integer precision = DataTypeMapper.getPrecision(rawType);
-            Double scale = DataTypeMapper.getScale(rawType);
-            if (maxLength != null) {
-                builder = builder.maxLength(maxLength);
+            if (updateOnly) {
+                String qualifiedName = Column.generateQualifiedName(columnName, parentQualifiedName);
+                try {
+                    Asset.retrieveMinimal(Column.TYPE_NAME, qualifiedName);
+                    Column toUpdate = Column.updater(qualifiedName, columnName)
+                            .description(details.getDescription())
+                            .certificateStatus(details.getCertificate())
+                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                            .announcementType(details.getAnnouncementType())
+                            .announcementTitle(details.getAnnouncementTitle())
+                            .announcementMessage(details.getAnnouncementMessage())
+                            .ownerUsers(details.getOwnerUsers())
+                            .ownerGroups(details.getOwnerGroups())
+                            .isPrimary(details.getPrimaryKey())
+                            .isForeign(details.getForeignKey())
+                            .build();
+                    if (!details.getClassifications().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    }
+                    batch.add(toUpdate);
+                } catch (NotFoundException e) {
+                    log.warn("Unable to find existing column — skipping: {}", qualifiedName, e);
+                } catch (AtlanException e) {
+                    log.error("Unable to lookup whether column exists or not.", e);
+                }
+            } else {
+                String mappedType = details.getMappedType();
+                String rawType = details.getRawType();
+                Column.ColumnBuilder<?, ?> builder = Column.creator(
+                                columnName, parentType, parentQualifiedName, details.getIndex())
+                        .description(details.getDescription())
+                        .certificateStatus(details.getCertificate())
+                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                        .announcementType(details.getAnnouncementType())
+                        .announcementTitle(details.getAnnouncementTitle())
+                        .announcementMessage(details.getAnnouncementMessage())
+                        .ownerUsers(details.getOwnerUsers())
+                        .ownerGroups(details.getOwnerGroups())
+                        .dataType(mappedType)
+                        .isPrimary(details.getPrimaryKey())
+                        .isForeign(details.getForeignKey());
+                Long maxLength = DataTypeMapper.getMaxLength(rawType);
+                Integer precision = DataTypeMapper.getPrecision(rawType);
+                Double scale = DataTypeMapper.getScale(rawType);
+                if (maxLength != null) {
+                    builder = builder.maxLength(maxLength);
+                }
+                if (precision != null) {
+                    builder = builder.precision(precision);
+                }
+                if (scale != null) {
+                    builder = builder.numericScale(scale);
+                }
+                Column column = builder.build();
+                if (!details.getClassifications().isEmpty()) {
+                    toClassify.put(column.getQualifiedName(), details.getClassifications());
+                }
+                batch.add(column);
             }
-            if (precision != null) {
-                builder = builder.precision(precision);
-            }
-            if (scale != null) {
-                builder = builder.numericScale(scale);
-            }
-            Column column = builder.build();
-            if (!details.getClassifications().isEmpty()) {
-                toClassify.put(column.getQualifiedName(), details.getClassifications());
-            }
-            batch.add(column);
         }
         // And don't forget to flush out any that remain
         batch.flush();

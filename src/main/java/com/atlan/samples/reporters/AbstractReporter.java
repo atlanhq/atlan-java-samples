@@ -13,6 +13,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.regions.Region;
 
@@ -136,7 +137,13 @@ public abstract class AbstractReporter {
      * @return comma-separated list of the classifications
      */
     protected static String getClassifications(Asset asset, String delimiter) {
-        return getDelimitedList(asset.getClassificationNames(), delimiter);
+        Set<Classification> classifications = asset.getClassifications();
+        if (classifications != null) {
+            Set<String> classificationNames =
+                    classifications.stream().map(Classification::getTypeName).collect(Collectors.toSet());
+            return getDelimitedList(classificationNames, delimiter);
+        }
+        return "";
     }
 
     /**

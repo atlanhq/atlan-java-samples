@@ -80,7 +80,8 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Map<ConnectionDetails, String> connectionCache = ConnectionDetails.upsert(connections, getBatchSize());
+        Map<ConnectionDetails, String> connectionCache =
+                ConnectionDetails.upsert(connections, getBatchSize(), isUpdateOnly());
 
         // 2. Create databases for each unique value in the Database column
         Map<String, DatabaseDetails> databases = new LinkedHashMap<>();
@@ -95,7 +96,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        DatabaseDetails.upsert(databases, getBatchSize());
+        DatabaseDetails.upsert(databases, getBatchSize(), isUpdateOnly());
 
         // 3. Create schemas for each unique value in the Schema column
         Map<String, SchemaDetails> schemas = new LinkedHashMap<>();
@@ -110,7 +111,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Set<String> databaseCountsToUpdate = SchemaDetails.upsert(schemas, getBatchSize());
+        Set<String> databaseCountsToUpdate = SchemaDetails.upsert(schemas, getBatchSize(), isUpdateOnly());
 
         // 4. Create table-level assets for each unique value in the Table / view columns
         Map<String, ContainerDetails> containers = new LinkedHashMap<>();
@@ -125,7 +126,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Set<String> schemaCountsToUpdate = ContainerDetails.upsert(containers, getBatchSize());
+        Set<String> schemaCountsToUpdate = ContainerDetails.upsert(containers, getBatchSize(), isUpdateOnly());
 
         // 5. Create columns for each unique value in the Column columns
         int colIdx = 1;
@@ -153,7 +154,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 colIdx--;
             }
         }
-        Set<ContainerDetails> containerCountsToUpdate = ColumnDetails.upsert(columns, getBatchSize());
+        Set<ContainerDetails> containerCountsToUpdate = ColumnDetails.upsert(columns, getBatchSize(), isUpdateOnly());
 
         // 6. Finally, update each of the objects that tracks counts with their counts
         log.info("Updating assets with counts...");
@@ -246,7 +247,8 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Map<ConnectionDetails, String> connectionCache = ConnectionDetails.upsert(connections, getBatchSize());
+        Map<ConnectionDetails, String> connectionCache =
+                ConnectionDetails.upsert(connections, getBatchSize(), isUpdateOnly());
 
         // 2. Create accounts for each unique value in the Account column
         Map<String, AccountDetails> accounts = new LinkedHashMap<>();
@@ -261,7 +263,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        AccountDetails.upsert(accounts, getBatchSize());
+        AccountDetails.upsert(accounts, getBatchSize(), isUpdateOnly());
 
         // 3. Create buckets for each unique value in the Container column
         Map<String, BucketDetails> buckets = new LinkedHashMap<>();
@@ -276,7 +278,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        BucketDetails.upsert(buckets, getBatchSize());
+        BucketDetails.upsert(buckets, getBatchSize(), isUpdateOnly());
 
         // 3. Create objects for each unique value in the Object column
         Map<String, ObjectDetails> objects = new LinkedHashMap<>();
@@ -291,7 +293,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Set<String> bucketCountsToUpdate = ObjectDetails.upsert(objects, getBatchSize());
+        Set<String> bucketCountsToUpdate = ObjectDetails.upsert(objects, getBatchSize(), isUpdateOnly());
 
         // 6. Finally, update each of the objects that tracks counts with their counts
         log.info("Updating assets with counts...");
@@ -349,7 +351,8 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 }
             }
         }
-        Map<ConnectionDetails, String> connectionCache = ConnectionDetails.upsert(connections, getBatchSize());
+        Map<ConnectionDetails, String> connectionCache =
+                ConnectionDetails.upsert(connections, getBatchSize(), isUpdateOnly());
 
         // 2. Add existing source and target connections into the cache
         for (Map<String, String> row : data) {

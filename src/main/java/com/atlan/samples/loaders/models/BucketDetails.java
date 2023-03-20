@@ -2,6 +2,8 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.samples.loaders.AssetBatch;
@@ -120,8 +122,9 @@ public class BucketDetails extends AssetDetails {
      *
      * @param buckets the set of buckets to ensure exist
      * @param batchSize maximum number of buckets to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
-    public static void upsert(Map<String, BucketDetails> buckets, int batchSize) {
+    public static void upsert(Map<String, BucketDetails> buckets, int batchSize, boolean updateOnly) {
         AssetBatch batch = new AssetBatch("bucket", batchSize);
         Map<String, List<String>> toClassifyS3 = new HashMap<>();
         Map<String, List<String>> toClassifyGCS = new HashMap<>();
@@ -136,44 +139,75 @@ public class BucketDetails extends AssetDetails {
             switch (bucketType) {
                 case S3:
                     if (bucketARN != null && bucketARN.length() > 0) {
-                        S3Bucket s3 = S3Bucket.creator(bucketName, connectionQualifiedName, bucketARN)
-                                .description(details.getDescription())
-                                .certificateStatus(details.getCertificate())
-                                .certificateStatusMessage(details.getCertificateStatusMessage())
-                                .announcementType(details.getAnnouncementType())
-                                .announcementTitle(details.getAnnouncementTitle())
-                                .announcementMessage(details.getAnnouncementMessage())
-                                .ownerUsers(details.getOwnerUsers())
-                                .ownerGroups(details.getOwnerGroups())
-                                .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyS3.put(s3.getQualifiedName(), details.getClassifications());
+                        if (updateOnly) {
+                            String qualifiedName = S3Bucket.generateQualifiedName(connectionQualifiedName, bucketARN);
+                            try {
+                                Asset.retrieveMinimal(S3Bucket.TYPE_NAME, qualifiedName);
+                                S3Bucket toUpdate = S3Bucket.updater(qualifiedName, bucketName)
+                                        .description(details.getDescription())
+                                        .certificateStatus(details.getCertificate())
+                                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                                        .announcementType(details.getAnnouncementType())
+                                        .announcementTitle(details.getAnnouncementTitle())
+                                        .announcementMessage(details.getAnnouncementMessage())
+                                        .ownerUsers(details.getOwnerUsers())
+                                        .ownerGroups(details.getOwnerGroups())
+                                        .build();
+                                if (!details.getClassifications().isEmpty()) {
+                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getClassifications());
+                                }
+                                batch.add(toUpdate);
+                            } catch (NotFoundException e) {
+                                log.warn("Unable to find existing bucket — skipping: {}", qualifiedName, e);
+                            } catch (AtlanException e) {
+                                log.error("Unable to lookup whether bucket exists or not.", e);
+                            }
+                        } else {
+                            S3Bucket s3 = S3Bucket.creator(bucketName, connectionQualifiedName, bucketARN)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyS3.put(s3.getQualifiedName(), details.getClassifications());
+                            }
+                            batch.add(s3);
                         }
-                        batch.add(s3);
                     } else {
-                        log.error("Unable to create an S3 bucket without an ARN: {}", details);
+                        log.error("Unable to create or update an S3 bucket without an ARN: {}", details);
                     }
                     break;
                 case GCS:
-                    GCSBucket gcs = GCSBucket.creator(bucketName, connectionQualifiedName)
-                            .description(details.getDescription())
-                            .certificateStatus(details.getCertificate())
-                            .certificateStatusMessage(details.getCertificateStatusMessage())
-                            .announcementType(details.getAnnouncementType())
-                            .announcementTitle(details.getAnnouncementTitle())
-                            .announcementMessage(details.getAnnouncementMessage())
-                            .ownerUsers(details.getOwnerUsers())
-                            .ownerGroups(details.getOwnerGroups())
-                            .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassifyGCS.put(gcs.getQualifiedName(), details.getClassifications());
-                    }
-                    batch.add(gcs);
-                    break;
-                case ADLS:
-                    if (accountName != null && accountName.length() > 0) {
-                        String accountQN = connectionQualifiedName + "/" + accountName;
-                        ADLSContainer adls = ADLSContainer.creator(bucketName, accountQN)
+                    if (updateOnly) {
+                        String qualifiedName = GCSBucket.generateQualifiedName(bucketName, connectionQualifiedName);
+                        try {
+                            Asset.retrieveMinimal(S3Bucket.TYPE_NAME, qualifiedName);
+                            GCSBucket toUpdate = GCSBucket.updater(qualifiedName, bucketName)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            }
+                            batch.add(toUpdate);
+                        } catch (NotFoundException e) {
+                            log.warn("Unable to find existing bucket — skipping: {}", qualifiedName, e);
+                        } catch (AtlanException e) {
+                            log.error("Unable to lookup whether bucket exists or not.", e);
+                        }
+                    } else {
+                        GCSBucket gcs = GCSBucket.creator(bucketName, connectionQualifiedName)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())
                                 .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -184,11 +218,55 @@ public class BucketDetails extends AssetDetails {
                                 .ownerGroups(details.getOwnerGroups())
                                 .build();
                         if (!details.getClassifications().isEmpty()) {
-                            toClassifyADLS.put(adls.getQualifiedName(), details.getClassifications());
+                            toClassifyGCS.put(gcs.getQualifiedName(), details.getClassifications());
                         }
-                        batch.add(adls);
+                        batch.add(gcs);
+                    }
+                    break;
+                case ADLS:
+                    if (accountName != null && accountName.length() > 0) {
+                        String accountQN = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
+                        if (updateOnly) {
+                            String qualifiedName = ADLSContainer.generateQualifiedName(bucketName, accountQN);
+                            try {
+                                Asset.retrieveMinimal(ADLSContainer.TYPE_NAME, qualifiedName);
+                                ADLSContainer toUpdate = ADLSContainer.updater(qualifiedName, bucketName)
+                                        .description(details.getDescription())
+                                        .certificateStatus(details.getCertificate())
+                                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                                        .announcementType(details.getAnnouncementType())
+                                        .announcementTitle(details.getAnnouncementTitle())
+                                        .announcementMessage(details.getAnnouncementMessage())
+                                        .ownerUsers(details.getOwnerUsers())
+                                        .ownerGroups(details.getOwnerGroups())
+                                        .build();
+                                if (!details.getClassifications().isEmpty()) {
+                                    toClassifyADLS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                                }
+                                batch.add(toUpdate);
+                            } catch (NotFoundException e) {
+                                log.warn("Unable to find existing container — skipping: {}", qualifiedName, e);
+                            } catch (AtlanException e) {
+                                log.error("Unable to lookup whether container exists or not.", e);
+                            }
+                        } else {
+                            ADLSContainer adls = ADLSContainer.creator(bucketName, accountQN)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyADLS.put(adls.getQualifiedName(), details.getClassifications());
+                            }
+                            batch.add(adls);
+                        }
                     } else {
-                        log.error("Unable to create an ADLS container without an account: {}", details);
+                        log.error("Unable to create or update an ADLS container without an account: {}", details);
                     }
                     break;
                 default:

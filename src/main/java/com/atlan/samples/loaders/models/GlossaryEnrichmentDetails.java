@@ -68,13 +68,15 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
      * @param batchSize maximum number of glossaries to create per batch
      * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return a cache of glossaries
      */
     public static Map<String, Asset> upsert(
             Map<String, GlossaryEnrichmentDetails> glossaries,
             int batchSize,
             boolean replaceClassifications,
-            boolean replaceCM) {
+            boolean replaceCM,
+            boolean updateOnly) {
         Map<String, String> readmes = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, Asset> glossaryNameToResult = new HashMap<>();
@@ -87,7 +89,11 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
                     Glossary found = Glossary.findByName(glossaryName, null);
                     builder = found.trimToRequired();
                 } catch (NotFoundException e) {
-                    builder = Glossary.creator(glossaryName);
+                    if (updateOnly) {
+                        log.warn("Unable to find existing glossary — skipping: {}", glossaryName);
+                    } else {
+                        builder = Glossary.creator(glossaryName);
+                    }
                 } catch (AtlanException e) {
                     log.error("Unable to even search for the glossary: {}", glossaryName, e);
                 }

@@ -19,6 +19,7 @@ public abstract class AbstractLoader {
     private Region _region = null;
     private String _bucket = null;
     private String _filename = null;
+    private boolean _updateOnly = false;
 
     /**
      * Extract the configuration parameters to use from the lambda payload (or equivalent).
@@ -37,6 +38,8 @@ public abstract class AbstractLoader {
                         batchSize);
                 _batchSize = 50;
             }
+            String updateOnly = event.getOrDefault("UPDATE_ONLY", "false");
+            _updateOnly = updateOnly.toUpperCase().equals("TRUE");
             _delimiter = event.getOrDefault("DELIMITER", "|");
             String region = event.getOrDefault("REGION", "ap-south-1");
             _region = Region.of(region);
@@ -126,5 +129,9 @@ public abstract class AbstractLoader {
 
     public String getDelimiter() {
         return _delimiter;
+    }
+
+    public boolean isUpdateOnly() {
+        return _updateOnly;
     }
 }

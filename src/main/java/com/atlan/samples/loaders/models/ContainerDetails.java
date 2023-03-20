@@ -2,9 +2,9 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
-import com.atlan.model.assets.MaterializedView;
-import com.atlan.model.assets.Table;
-import com.atlan.model.assets.View;
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
+import com.atlan.model.assets.*;
 import com.atlan.samples.loaders.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
@@ -117,9 +117,10 @@ public class ContainerDetails extends AssetDetails {
      *
      * @param containers the set of containers to ensure exist
      * @param batchSize maximum number of containers to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return qualifiedNames of all parent schemas in which assets were created or updated
      */
-    public static Set<String> upsert(Map<String, ContainerDetails> containers, int batchSize) {
+    public static Set<String> upsert(Map<String, ContainerDetails> containers, int batchSize, boolean updateOnly) {
         Set<String> parents = new HashSet<>();
         AssetBatch batchContainers = new AssetBatch("container", batchSize);
         Map<String, List<String>> toClassifyTables = new HashMap<>();
@@ -133,52 +134,128 @@ public class ContainerDetails extends AssetDetails {
             parents.add(schemaQualifiedName);
             switch (containerType) {
                 case Table.TYPE_NAME:
-                    Table table = Table.creator(containerName, schemaQualifiedName)
-                            .description(details.getDescription())
-                            .certificateStatus(details.getCertificate())
-                            .certificateStatusMessage(details.getCertificateStatusMessage())
-                            .announcementType(details.getAnnouncementType())
-                            .announcementTitle(details.getAnnouncementTitle())
-                            .announcementMessage(details.getAnnouncementMessage())
-                            .ownerUsers(details.getOwnerUsers())
-                            .ownerGroups(details.getOwnerGroups())
-                            .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassifyTables.put(table.getQualifiedName(), details.getClassifications());
+                    if (updateOnly) {
+                        String qualifiedName = Table.generateQualifiedName(containerName, schemaQualifiedName);
+                        try {
+                            Asset.retrieveMinimal(Table.TYPE_NAME, qualifiedName);
+                            Table toUpdate = Table.updater(qualifiedName, containerName)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyTables.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            }
+                            batchContainers.add(toUpdate);
+                        } catch (NotFoundException e) {
+                            log.warn("Unable to find existing table — skipping: {}", qualifiedName, e);
+                        } catch (AtlanException e) {
+                            log.error("Unable to lookup whether table exists or not.", e);
+                        }
+                    } else {
+                        Table table = Table.creator(containerName, schemaQualifiedName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getClassifications().isEmpty()) {
+                            toClassifyTables.put(table.getQualifiedName(), details.getClassifications());
+                        }
+                        batchContainers.add(table);
                     }
-                    batchContainers.add(table);
                     break;
                 case View.TYPE_NAME:
-                    View view = View.creator(containerName, schemaQualifiedName)
-                            .description(details.getDescription())
-                            .certificateStatus(details.getCertificate())
-                            .certificateStatusMessage(details.getCertificateStatusMessage())
-                            .announcementType(details.getAnnouncementType())
-                            .announcementTitle(details.getAnnouncementTitle())
-                            .announcementMessage(details.getAnnouncementMessage())
-                            .ownerUsers(details.getOwnerUsers())
-                            .ownerGroups(details.getOwnerGroups())
-                            .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassifyViews.put(view.getQualifiedName(), details.getClassifications());
+                    if (updateOnly) {
+                        String qualifiedName = View.generateQualifiedName(containerName, schemaQualifiedName);
+                        try {
+                            Asset.retrieveMinimal(View.TYPE_NAME, qualifiedName);
+                            View toUpdate = View.updater(qualifiedName, containerName)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyViews.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            }
+                            batchContainers.add(toUpdate);
+                        } catch (NotFoundException e) {
+                            log.warn("Unable to find existing view — skipping: {}", qualifiedName, e);
+                        } catch (AtlanException e) {
+                            log.error("Unable to lookup whether view exists or not.", e);
+                        }
+                    } else {
+                        View view = View.creator(containerName, schemaQualifiedName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getClassifications().isEmpty()) {
+                            toClassifyViews.put(view.getQualifiedName(), details.getClassifications());
+                        }
+                        batchContainers.add(view);
                     }
-                    batchContainers.add(view);
                     break;
                 case MaterializedView.TYPE_NAME:
-                    MaterializedView mv = MaterializedView.creator(containerName, schemaQualifiedName)
-                            .description(details.getDescription())
-                            .certificateStatus(details.getCertificate())
-                            .certificateStatusMessage(details.getCertificateStatusMessage())
-                            .announcementType(details.getAnnouncementType())
-                            .announcementTitle(details.getAnnouncementTitle())
-                            .announcementMessage(details.getAnnouncementMessage())
-                            .ownerUsers(details.getOwnerUsers())
-                            .ownerGroups(details.getOwnerGroups())
-                            .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassifyMVs.put(mv.getQualifiedName(), details.getClassifications());
+                    if (updateOnly) {
+                        String qualifiedName =
+                                MaterializedView.generateQualifiedName(containerName, schemaQualifiedName);
+                        try {
+                            Asset.retrieveMinimal(MaterializedView.TYPE_NAME, qualifiedName);
+                            MaterializedView toUpdate = MaterializedView.updater(qualifiedName, containerName)
+                                    .description(details.getDescription())
+                                    .certificateStatus(details.getCertificate())
+                                    .certificateStatusMessage(details.getCertificateStatusMessage())
+                                    .announcementType(details.getAnnouncementType())
+                                    .announcementTitle(details.getAnnouncementTitle())
+                                    .announcementMessage(details.getAnnouncementMessage())
+                                    .ownerUsers(details.getOwnerUsers())
+                                    .ownerGroups(details.getOwnerGroups())
+                                    .build();
+                            if (!details.getClassifications().isEmpty()) {
+                                toClassifyMVs.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            }
+                            batchContainers.add(toUpdate);
+                        } catch (NotFoundException e) {
+                            log.warn("Unable to find existing view — skipping: {}", qualifiedName, e);
+                        } catch (AtlanException e) {
+                            log.error("Unable to lookup whether view exists or not.", e);
+                        }
+                    } else {
+                        MaterializedView mv = MaterializedView.creator(containerName, schemaQualifiedName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getClassifications().isEmpty()) {
+                            toClassifyMVs.put(mv.getQualifiedName(), details.getClassifications());
+                        }
+                        batchContainers.add(mv);
                     }
-                    batchContainers.add(mv);
                     break;
                 default:
                     log.error("Invalid container type ({}) — skipping: {}", containerType, details);

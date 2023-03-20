@@ -2,6 +2,9 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
+import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Database;
 import com.atlan.samples.loaders.AssetBatch;
 import java.util.*;
@@ -9,10 +12,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class for capturing the full details provided about a database.
  */
+@Slf4j
 @Getter
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
@@ -91,28 +96,54 @@ public class DatabaseDetails extends AssetDetails {
      *
      * @param databases the set of databases to ensure exist
      * @param batchSize maximum number of databases to create per batch
+     * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
-    public static void upsert(Map<String, DatabaseDetails> databases, int batchSize) {
+    public static void upsert(Map<String, DatabaseDetails> databases, int batchSize, boolean updateOnly) {
         AssetBatch batch = new AssetBatch(Database.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
         for (DatabaseDetails details : databases.values()) {
             String connectionQualifiedName = details.getConnectionQualifiedName();
             String databaseName = details.getName();
-            Database database = Database.creator(databaseName, connectionQualifiedName)
-                    .description(details.getDescription())
-                    .certificateStatus(details.getCertificate())
-                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                    .announcementType(details.getAnnouncementType())
-                    .announcementTitle(details.getAnnouncementTitle())
-                    .announcementMessage(details.getAnnouncementMessage())
-                    .ownerUsers(details.getOwnerUsers())
-                    .ownerGroups(details.getOwnerGroups())
-                    .build();
-            if (!details.getClassifications().isEmpty()) {
-                toClassify.put(database.getQualifiedName(), details.getClassifications());
+            if (updateOnly) {
+                String qualifiedName = Database.generateQualifiedName(databaseName, connectionQualifiedName);
+                try {
+                    Asset.retrieveMinimal(Database.TYPE_NAME, qualifiedName);
+                    Database toUpdate = Database.updater(qualifiedName, databaseName)
+                            .description(details.getDescription())
+                            .certificateStatus(details.getCertificate())
+                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                            .announcementType(details.getAnnouncementType())
+                            .announcementTitle(details.getAnnouncementTitle())
+                            .announcementMessage(details.getAnnouncementMessage())
+                            .ownerUsers(details.getOwnerUsers())
+                            .ownerGroups(details.getOwnerGroups())
+                            .build();
+                    if (!details.getClassifications().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    }
+                    batch.add(toUpdate);
+                } catch (NotFoundException e) {
+                    log.warn("Unable to find existing database — skipping: {}", qualifiedName, e);
+                } catch (AtlanException e) {
+                    log.error("Unable to lookup whether database exists or not.", e);
+                }
+            } else {
+                Database database = Database.creator(databaseName, connectionQualifiedName)
+                        .description(details.getDescription())
+                        .certificateStatus(details.getCertificate())
+                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                        .announcementType(details.getAnnouncementType())
+                        .announcementTitle(details.getAnnouncementTitle())
+                        .announcementMessage(details.getAnnouncementMessage())
+                        .ownerUsers(details.getOwnerUsers())
+                        .ownerGroups(details.getOwnerGroups())
+                        .build();
+                if (!details.getClassifications().isEmpty()) {
+                    toClassify.put(database.getQualifiedName(), details.getClassifications());
+                }
+                batch.add(database);
             }
-            batch.add(database);
         }
         // And don't forget to flush out any that remain
         batch.flush();
