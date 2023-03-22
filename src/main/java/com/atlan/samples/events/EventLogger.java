@@ -11,7 +11,6 @@ import io.numaproj.numaflow.function.Message;
 import io.numaproj.numaflow.function.map.MapFunc;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,7 +27,7 @@ public class EventLogger {
         } catch (IOException e) {
             log.error("Unable to deserialize event: {}", new String(data.getValue(), StandardCharsets.UTF_8), e);
         }
-        return new Message[]{Message.toAll(data.getValue())};
+        return new Message[] {Message.toAll(data.getValue())};
     }
 
     public static void main(String[] args) throws IOException {
