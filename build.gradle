@@ -22,7 +22,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 group 'com.atlan'
-version '1.0-SNAPSHOT'
+version '1.1.0-SNAPSHOT'
 
 tasks.withType(JavaCompile) {
     options.release = project.targetCompatibility.majorVersion as Integer
@@ -75,12 +75,20 @@ repositories {
             snapshotsOnly()
         }
     }
+    maven {
+        url "https://maven.pkg.github.com/numaproj/numaflow-java"
+        credentials {
+            username = System.getenv("GH_USERNAME")
+            password = System.getenv("GH_TOKEN")
+        }
+    }
 }
 
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
     implementation group: "com.atlan", name: "atlan-java", "version": "0.5.0-SNAPSHOT"
+    implementation "io.numaproj.numaflow:numaflow-java:+"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
