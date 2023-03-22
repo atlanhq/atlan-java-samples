@@ -20,6 +20,9 @@ jobs:
         run: ./gradlew spotlessCheck
       - name: Build artifacts
         run: ./gradlew assemble
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   publish-docs:
     runs-on: ubuntu-latest
     name: "JavaDocs"
@@ -33,6 +36,8 @@ jobs:
         run: |
           ./gradlew gitPublishPush --stacktrace --info
         env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GRGIT_USER: ${{ github.actor }}
           GRGIT_PASS: ${{ secrets.GITHUB_TOKEN }}
   publish-snapshot:
@@ -55,6 +60,8 @@ jobs:
         run: |
           ./gradlew publish -Dorg.gradle.project.NEXUS_USERNAME=$NEXUS_USERNAME -Dorg.gradle.project.NEXUS_PASSWORD=$NEXUS_PASSWORD -Dorg.gradle.project.signing.gnupg.keyName=$GPG_SIGNING_KEYID -Dorg.gradle.project.signing.gnupg.passphrase=$GPG_SIGNING_PASSPHRASE
         env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
           GPG_SIGNING_KEYID: ${{ secrets.GPG_SIGNING_KEYID }}
