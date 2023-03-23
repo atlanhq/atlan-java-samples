@@ -141,4 +141,14 @@ public abstract class AbstractEventHandler {
         log.info("Routing to: {}", SUCCESS);
         return new Message[] {Message.to(SUCCESS, data.getValue())};
     }
+
+    /**
+     * Drop the message. Mostly this should be used when receiving an event that is
+     * the result of this handler taking an action. (Without this, we could have an
+     * infinite loop of that action being applied over and over again.)
+     * @return a message array indicating the message can be safely ignored
+     */
+    static Message[] drop() {
+        return new Message[] {Message.toDrop()};
+    }
 }
