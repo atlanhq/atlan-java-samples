@@ -107,7 +107,7 @@ public abstract class AbstractEventHandler {
                     .attributes(limitedToAttributes == null ? Collections.emptySet() : limitedToAttributes)
                     .build();
             IndexSearchResponse response = request.search();
-            if (response != null) {
+            if (response != null && response.getAssets() != null) {
                 if (response.getAssets().size() > 1) {
                     log.warn(
                             "Multiple assets of type {} found with the same qualifiedName {} — returning only the first.",
