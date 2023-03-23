@@ -19,7 +19,9 @@ import io.numaproj.numaflow.function.FunctionServer;
 import io.numaproj.numaflow.function.Message;
 import io.numaproj.numaflow.function.map.MapFunc;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
@@ -114,6 +116,16 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         }
     }
 
+    private static boolean scoreHasChanged(Asset asset, double score) {
+        Map<String, CustomMetadataAttributes> customMetadata = asset.getCustomMetadataSets();
+        if (customMetadata != null && customMetadata.containsKey(CM_DAAP)) {
+            Map<String, Object> attrs = customMetadata.get(CM_DAAP).getAttributes();
+            return attrs.containsKey(CM_ATTR_DAAP_SCORE)
+                    && !attrs.get(CM_ATTR_DAAP_SCORE).equals(score);
+        }
+        return true;
+    }
+
     private static Message[] process(String key, Datum data) {
         try {
             createCMIfNotExists();
@@ -128,7 +140,9 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         }
         Asset asset;
         try {
-            asset = getCurrentViewOfAsset(event, SCORED_ATTRS, true, true);
+            Set<String> searchAttrs = new HashSet<>(SCORED_ATTRS);
+            searchAttrs.addAll(CustomMetadataCache.getAttributesForSearchResults(CM_DAAP));
+            asset = getCurrentViewOfAsset(event, searchAttrs, true, true);
         } catch (AtlanException e) {
             log.error(
                     "Unable to find the asset in Atlan: {}",
@@ -156,17 +170,22 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             // but base it directly on inputs and outputs rather than the __hasLineage flag
             score = ((sDescription + sOwner + sLineage + sTerms + sClassifications) / 4.0) * 100;
         }
-        // Set the score on the asset
-        CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
-                .attribute(CM_ATTR_DAAP_SCORE, score)
-                .build();
-        try {
-            Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
-            log.info("Updated DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
-            return succeeded(data);
-        } catch (AtlanException e) {
-            log.error("Unable to update DaaP completeness score for {} to: {}", asset.getQualifiedName(), score, e);
-            return failed(data);
+        if (!scoreHasChanged(asset, score)) {
+            log.info("No change in DaaP completeness score for: {}", asset.getQualifiedName());
+            return drop();
+        } else {
+            // Set the score on the asset
+            CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
+                    .attribute(CM_ATTR_DAAP_SCORE, score)
+                    .build();
+            try {
+                Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
+                log.info("Updated DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
+                return succeeded(data);
+            } catch (AtlanException e) {
+                log.error("Unable to update DaaP completeness score for {} to: {}", asset.getQualifiedName(), score, e);
+                return failed(data);
+            }
         }
     }
 
