@@ -58,20 +58,24 @@ public class DaapScoreCalculator extends AbstractEventHandler {
                             .emoji("\uD83D\uDD16")
                             .build())
                     .build();
-            customMetadataDef.create();
-            log.info("Created DaaP custom metadata structure.");
-            Badge badge = Badge.creator(CM_ATTR_DAAP_SCORE, CM_DAAP, CM_ATTR_DAAP_SCORE)
-                    .userDescription(
-                            "Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
-                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "75", BadgeConditionColor.GREEN))
-                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "25", BadgeConditionColor.YELLOW))
-                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
-                    .build();
             try {
-                badge.upsert();
-                log.info("Created DaaP completeness score badge.");
-            } catch (AtlanException eBadge) {
-                log.error("Unable to create badge over the DaaP score.", eBadge);
+                customMetadataDef.create();
+                log.info("Created DaaP custom metadata structure.");
+                Badge badge = Badge.creator(CM_ATTR_DAAP_SCORE, CM_DAAP, CM_ATTR_DAAP_SCORE)
+                        .userDescription(
+                                "Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
+                        .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "75", BadgeConditionColor.GREEN))
+                        .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "25", BadgeConditionColor.YELLOW))
+                        .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
+                        .build();
+                try {
+                    badge.upsert();
+                    log.info("Created DaaP completeness score badge.");
+                } catch (AtlanException eBadge) {
+                    log.error("Unable to create badge over the DaaP score.", eBadge);
+                }
+            } catch (AtlanException eStruct) {
+                log.error("Unable to create DaaP custom metadata structure.", eStruct);
             }
         }
     }
@@ -114,7 +118,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         try {
             createCMIfNotExists();
         } catch (AtlanException e) {
-            log.error("Unable to create DaaP custom metadata.", e);
+            log.error("Unable to look up DaaP custom metadata.", e);
             return failed(data);
         }
         AtlanEvent event = getAtlanEvent(data);
@@ -122,40 +126,46 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             log.error("No payload found in event: {}", data);
             return failed(data);
         }
+        Asset asset;
         try {
-            Asset asset = getCurrentViewOfAsset(event, SCORED_ATTRS, true, true);
-            if (asset == null) {
-                log.error(
-                        "No current view of asset found (deleted or not yet available in search index): {}",
-                        event.getPayload().getAsset());
-                return failed(data);
-            }
-            int sDescription = hasDescription(asset) ? 1 : 0;
-            int sOwner = hasOwner(asset) ? 1 : 0;
-            int sTerms = hasAssignedTerms(asset) ? 1 : 0;
-            int sClassifications = hasClassifications(asset) ? 1 : 0;
-            int sLineage = hasLineage(asset) ? 1 : 0;
-            double score;
-            if (asset.getTypeName().startsWith("AtlasGlossary")) {
-                // Exclude lineage from the calculation for glossary objects
-                score = ((sDescription + sOwner + sTerms + sClassifications) / 4.0) * 100;
-            } else {
-                // Include lineage in the calculation for all other objects,
-                // but base it directly on inputs and outputs rather than the __hasLineage flag
-                score = ((sDescription + sOwner + sLineage + sTerms + sClassifications) / 4.0) * 100;
-            }
-            // Set the score on the asset
-            log.info("Updating DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
-            CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
-                    .attribute(CM_ATTR_DAAP_SCORE, score)
-                    .build();
-            Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
-            return succeeded(data);
+            asset = getCurrentViewOfAsset(event, SCORED_ATTRS, true, true);
         } catch (AtlanException e) {
             log.error(
                     "Unable to find the asset in Atlan: {}",
                     event.getPayload().getAsset().getQualifiedName(),
                     e);
+            return failed(data);
+        }
+        if (asset == null) {
+            log.error(
+                    "No current view of asset found (deleted or not yet available in search index): {}",
+                    event.getPayload().getAsset());
+            return failed(data);
+        }
+        int sDescription = hasDescription(asset) ? 1 : 0;
+        int sOwner = hasOwner(asset) ? 1 : 0;
+        int sTerms = hasAssignedTerms(asset) ? 1 : 0;
+        int sClassifications = hasClassifications(asset) ? 1 : 0;
+        int sLineage = hasLineage(asset) ? 1 : 0;
+        double score;
+        if (asset.getTypeName().startsWith("AtlasGlossary")) {
+            // Exclude lineage from the calculation for glossary objects
+            score = ((sDescription + sOwner + sTerms + sClassifications) / 4.0) * 100;
+        } else {
+            // Include lineage in the calculation for all other objects,
+            // but base it directly on inputs and outputs rather than the __hasLineage flag
+            score = ((sDescription + sOwner + sLineage + sTerms + sClassifications) / 4.0) * 100;
+        }
+        // Set the score on the asset
+        CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
+                .attribute(CM_ATTR_DAAP_SCORE, score)
+                .build();
+        try {
+            Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
+            log.info("Updated DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
+            return succeeded(data);
+        } catch (AtlanException e) {
+            log.error("Unable to update DaaP completeness score for {} to: {}", asset.getQualifiedName(), score, e);
             return failed(data);
         }
     }
