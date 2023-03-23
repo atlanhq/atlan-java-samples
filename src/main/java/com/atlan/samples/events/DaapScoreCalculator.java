@@ -61,7 +61,8 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             customMetadataDef.create();
             log.info("Created DaaP custom metadata structure.");
             Badge badge = Badge.creator(CM_ATTR_DAAP_SCORE, CM_DAAP, CM_ATTR_DAAP_SCORE)
-                    .userDescription("Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
+                    .userDescription(
+                            "Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
                     .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "75", BadgeConditionColor.GREEN))
                     .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "25", BadgeConditionColor.YELLOW))
                     .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
@@ -124,7 +125,9 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         try {
             Asset asset = getCurrentViewOfAsset(event, SCORED_ATTRS, true, true);
             if (asset == null) {
-                log.error("No current view of asset found (deleted or not yet available in search index): {}", event.getPayload().getAsset());
+                log.error(
+                        "No current view of asset found (deleted or not yet available in search index): {}",
+                        event.getPayload().getAsset());
                 return failed(data);
             }
             int sDescription = hasDescription(asset) ? 1 : 0;
