@@ -5,11 +5,11 @@ package com.atlan.samples.events;
 import com.atlan.cache.CustomMetadataCache;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.AbstractProcess;
-import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Catalog;
+import com.atlan.model.assets.*;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanCustomAttributePrimitiveType;
+import com.atlan.model.enums.BadgeComparisonOperator;
+import com.atlan.model.enums.BadgeConditionColor;
 import com.atlan.model.events.*;
 import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.model.typedefs.CustomMetadataDef;
@@ -58,9 +58,22 @@ public class DaapScoreCalculator extends AbstractEventHandler {
                             .emoji("\uD83D\uDD16")
                             .build())
                     .build();
-            CustomMetadataDef response = customMetadataDef.create();
+            customMetadataDef.create();
+            log.info("Created DaaP custom metadata structure.");
+            Badge badge = Badge.creator(CM_ATTR_DAAP_SCORE, CM_DAAP, CM_ATTR_DAAP_SCORE)
+                    .userDescription(
+                            "Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
+                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "75", BadgeConditionColor.GREEN))
+                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "25", BadgeConditionColor.YELLOW))
+                    .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
+                    .build();
+            try {
+                badge.upsert();
+                log.info("Created DaaP completeness score badge.");
+            } catch (AtlanException eBadge) {
+                log.error("Unable to create badge over the DaaP score.", eBadge);
+            }
         }
-        // TODO: Ensure a badge also exists for this score?
     }
 
     private static boolean hasDescription(Asset asset) {
@@ -106,11 +119,15 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         }
         AtlanEvent event = getAtlanEvent(data);
         if (event == null || event.getPayload() == null || event.getPayload().getAsset() == null) {
+            log.error("No payload found in event: {}", data);
             return failed(data);
         }
         try {
             Asset asset = getCurrentViewOfAsset(event, SCORED_ATTRS, true, true);
             if (asset == null) {
+                log.error(
+                        "No current view of asset found (deleted or not yet available in search index): {}",
+                        event.getPayload().getAsset());
                 return failed(data);
             }
             int sDescription = hasDescription(asset) ? 1 : 0;

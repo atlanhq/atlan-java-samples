@@ -128,6 +128,7 @@ public abstract class AbstractEventHandler {
      * @return a message array indicating the message failed to be processed
      */
     static Message[] failed(Datum data) {
+        log.info("Routing to: {}", FAILURE);
         return new Message[] {Message.to(FAILURE, data.getValue())};
     }
 
@@ -137,6 +138,7 @@ public abstract class AbstractEventHandler {
      * @return a message array indicating the message was successfully processed
      */
     static Message[] succeeded(Datum data) {
+        log.info("Routing to: {}", SUCCESS);
         return new Message[] {Message.to(SUCCESS, data.getValue())};
     }
 }
