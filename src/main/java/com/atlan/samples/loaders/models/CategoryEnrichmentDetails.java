@@ -10,6 +10,8 @@ import com.atlan.model.assets.Readme;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
+import com.atlan.samples.loaders.caches.CategoryCache;
+import com.atlan.samples.loaders.caches.GlossaryCache;
 import java.util.*;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
@@ -50,6 +52,45 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
     }
 
     /**
+     * Retrieve the path of the category from its identity.
+     *
+     * @param identity of the category
+     * @return only the path of the category
+     */
+    public static String getPathFromIdentity(String identity) {
+        if (identity != null && identity.contains(categoryGlossaryDelimiter)) {
+            return identity.substring(0, identity.indexOf(categoryGlossaryDelimiter));
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the name of the category from its path.
+     *
+     * @param path of the category
+     * @return only the name of the category
+     */
+    public static String getNameFromPath(String path) {
+        if (path != null && path.contains("@")) {
+            return path.substring(path.lastIndexOf("@"));
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the name of the glossary from a category's identity.
+     *
+     * @param identity of the category
+     * @return only the name of the glossary
+     */
+    public static String getGlossaryNameFromIdentity(String identity) {
+        if (identity != null && identity.contains(categoryGlossaryDelimiter)) {
+            return identity.substring(identity.indexOf(categoryGlossaryDelimiter));
+        }
+        return null;
+    }
+
+    /**
      * Construct the unique identity for the provided category path in a given glossary.
      *
      * @param categoryPath path of the category (@-delimited)
@@ -69,7 +110,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
      * @return the category enrichment details for that row
      */
     public static CategoryEnrichmentDetails getFromRow(
-            Map<String, Asset> glossaryCache, Map<String, String> row, String delim) {
+            GlossaryCache glossaryCache, Map<String, String> row, String delim) {
         CategoryEnrichmentDetailsBuilder<?, ?> builder = getFromRow(CategoryEnrichmentDetails.builder(), row, delim);
         if (getMissingFields(row, REQUIRED).isEmpty()) {
             Asset glossary = glossaryCache.get(row.get(COL_GLOSSARY));
@@ -93,7 +134,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
     /**
      * Create categories in bulk, if they do not exist, or update them if they do (idempotent).
      *
-     * @param categoryCache a cache of categories keyed by category identity
+     * @param categoryCache a cache of categories
      * @param categories the set of categories to ensure exist
      * @param batchSize maximum number of categories to create per batch
      * @param level of categories to create
@@ -102,7 +143,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
     public static void upsert(
-            Map<String, Asset> categoryCache,
+            CategoryCache categoryCache,
             Map<String, CategoryEnrichmentDetails> categories,
             int batchSize,
             int level,

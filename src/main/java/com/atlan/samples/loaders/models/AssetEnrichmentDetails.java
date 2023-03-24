@@ -9,6 +9,7 @@ import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.Classification;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
+import com.atlan.samples.loaders.caches.TermCache;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -60,13 +61,12 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
     /**
      * Build up details about the asset on the provided row.
      *
-     * @param termCache cache of terms keyed by term identity
+     * @param termCache cache of terms
      * @param row a row of data from the spreadsheet, as a map from column name to value
      * @param delim delimiter used in cells that can contain multiple values
      * @return the asset enrichment details for that row
      */
-    public static AssetEnrichmentDetails getFromRow(
-            Map<String, Asset> termCache, Map<String, String> row, String delim) {
+    public static AssetEnrichmentDetails getFromRow(TermCache termCache, Map<String, String> row, String delim) {
         AssetEnrichmentDetailsBuilder<?, ?> builder = getFromRow(AssetEnrichmentDetails.builder(), row, delim);
         if (getMissingFields(row, REQUIRED).isEmpty()) {
             String qualifiedName = row.get(COL_QUALIFIED_NAME);
