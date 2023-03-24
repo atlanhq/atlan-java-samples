@@ -75,6 +75,7 @@ public class VerificationEnforcer extends AbstractEventHandler {
                             .certificateStatusMessage(ENFORCEMENT_MESSAGE)
                             .build();
                     toUpdate.upsert();
+                    log.info("Enforced verification reversal on: {}", asset.getQualifiedName());
                     return succeeded(data);
                 } catch (AtlanException e) {
                     log.error("Unable to update the asset's certificate: {}", asset.getQualifiedName(), e);
