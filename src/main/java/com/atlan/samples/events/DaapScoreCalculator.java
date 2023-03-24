@@ -38,7 +38,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             "userDescription",
             "ownerUsers",
             "ownerGroups",
-            "__meanings",
+            "meanings",
             "__hasLineage",
             "classifications",
             "inputToProcesses",
@@ -163,7 +163,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
                         .userDescription(
                                 "Data as a Product completeness score. Indicates how enriched and ready for re-use this asset is, out of a total possible score of 100.")
                         .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GTE, "75", BadgeConditionColor.GREEN))
-                        .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.GT, "25", BadgeConditionColor.YELLOW))
+                        .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LT, "75", BadgeConditionColor.YELLOW))
                         .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
                         .build();
                 try {
