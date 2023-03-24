@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Very basic example of logging a deserialized event and then passing it on to all
- * subsequent vertices, unchanged.
+ * subsequent vertexes, unchanged.
  */
 @Slf4j
 public class EventLogger extends AbstractEventHandler {
