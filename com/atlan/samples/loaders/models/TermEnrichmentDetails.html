@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":9};
+var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":10,"i8":9,"i9":10,"i10":10,"i11":9,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -331,8 +331,8 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>static <a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(java.util.Map,java.util.Map,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;glossaryCache,
-          java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;categoryCache,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(com.atlan.samples.loaders.caches.GlossaryCache,com.atlan.samples.loaders.caches.CategoryCache,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(<a href="../caches/GlossaryCache.html" title="class in com.atlan.samples.loaders.caches">GlossaryCache</a>&nbsp;glossaryCache,
+          <a href="../caches/CategoryCache.html" title="class in com.atlan.samples.loaders.caches">CategoryCache</a>&nbsp;categoryCache,
           java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
           java.lang.String&nbsp;delim)</code></th>
 <td class="colLast">
@@ -345,64 +345,78 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGlossaryNameFromIdentity(java.lang.String)">getGlossaryNameFromIdentity</a></span>&#8203;(java.lang.String&nbsp;identity)</code></th>
+<td class="colLast">
+<div class="block">Retrieve the name of the glossary from a term's identity.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIdentity()">getIdentity</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Retrieve the unique identity of this asset for deduplication across rows.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getName()">getName</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNameFromIdentity(java.lang.String)">getNameFromIdentity</a></span>&#8203;(java.lang.String&nbsp;identity)</code></th>
+<td class="colLast">
+<div class="block">Retrieve the name of the term from its identity.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getReadme()">getReadme</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRecommendedTerms()">getRecommendedTerms</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRelatedTerms()">getRelatedTerms</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSynonyms()">getSynonyms</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTranslatedTerms()">getTranslatedTerms</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserDescription()">getUserDescription</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getValidValuesFor()">getValidValuesFor</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i19" class="rowColor">
-<td class="colFirst"><code>static java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;</code></td>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>static <a href="../caches/TermCache.html" title="class in com.atlan.samples.loaders.caches">TermCache</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,int,boolean,boolean,boolean)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a>&gt;&nbsp;terms,
       int&nbsp;batchSize,
       boolean&nbsp;replaceClassifications,
@@ -625,14 +639,46 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </dl>
 </li>
 </ul>
-<a id="getFromRow(java.util.Map,java.util.Map,java.util.Map,java.lang.String)">
+<a id="getNameFromIdentity(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNameFromIdentity</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;getNameFromIdentity&#8203;(java.lang.String&nbsp;identity)</pre>
+<div class="block">Retrieve the name of the term from its identity.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>identity</code> - of the term</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>only the name of the term</dd>
+</dl>
+</li>
+</ul>
+<a id="getGlossaryNameFromIdentity(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGlossaryNameFromIdentity</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;getGlossaryNameFromIdentity&#8203;(java.lang.String&nbsp;identity)</pre>
+<div class="block">Retrieve the name of the glossary from a term's identity.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>identity</code> - of the term</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>only the name of the glossary</dd>
+</dl>
+</li>
+</ul>
+<a id="getFromRow(com.atlan.samples.loaders.caches.GlossaryCache,com.atlan.samples.loaders.caches.CategoryCache,java.util.Map,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getFromRow</h4>
-<pre class="methodSignature">public static&nbsp;<a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a>&nbsp;getFromRow&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;glossaryCache,
-                                               java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;categoryCache,
+<pre class="methodSignature">public static&nbsp;<a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a>&nbsp;getFromRow&#8203;(<a href="../caches/GlossaryCache.html" title="class in com.atlan.samples.loaders.caches">GlossaryCache</a>&nbsp;glossaryCache,
+                                               <a href="../caches/CategoryCache.html" title="class in com.atlan.samples.loaders.caches">CategoryCache</a>&nbsp;categoryCache,
                                                java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
                                                java.lang.String&nbsp;delim)</pre>
 <div class="block">Build up details about the term on the provided row.</div>
@@ -653,11 +699,11 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <ul class="blockList">
 <li class="blockList">
 <h4>upsert</h4>
-<pre class="methodSignature">public static&nbsp;java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;upsert&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a>&gt;&nbsp;terms,
-                                                                                        int&nbsp;batchSize,
-                                                                                        boolean&nbsp;replaceClassifications,
-                                                                                        boolean&nbsp;replaceCM,
-                                                                                        boolean&nbsp;updateOnly)</pre>
+<pre class="methodSignature">public static&nbsp;<a href="../caches/TermCache.html" title="class in com.atlan.samples.loaders.caches">TermCache</a>&nbsp;upsert&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="TermEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">TermEnrichmentDetails</a>&gt;&nbsp;terms,
+                               int&nbsp;batchSize,
+                               boolean&nbsp;replaceClassifications,
+                               boolean&nbsp;replaceCM,
+                               boolean&nbsp;updateOnly)</pre>
 <div class="block">Create terms in bulk, if they do not exist, or update them if they do (idempotent).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

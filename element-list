@@ -1,5 +1,6 @@
 com.atlan.samples.events
 com.atlan.samples.loaders
+com.atlan.samples.loaders.caches
 com.atlan.samples.loaders.models
 com.atlan.samples.readers
 com.atlan.samples.reporters

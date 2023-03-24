@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":9,"i5":10,"i6":10,"i7":9,"i8":10,"i9":10,"i10":9};
+var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":9,"i5":10,"i6":9,"i7":10,"i8":9,"i9":9,"i10":9,"i11":10,"i12":10,"i13":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -281,7 +281,7 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>static <a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(java.util.Map,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;glossaryCache,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(com.atlan.samples.loaders.caches.GlossaryCache,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(<a href="../caches/GlossaryCache.html" title="class in com.atlan.samples.loaders.caches">GlossaryCache</a>&nbsp;glossaryCache,
           java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
           java.lang.String&nbsp;delim)</code></th>
 <td class="colLast">
@@ -294,13 +294,20 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGlossaryNameFromIdentity(java.lang.String)">getGlossaryNameFromIdentity</a></span>&#8203;(java.lang.String&nbsp;identity)</code></th>
+<td class="colLast">
+<div class="block">Retrieve the name of the glossary from a category's identity.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIdentity()">getIdentity</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Retrieve the unique identity of this asset for deduplication across rows.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIdentity(java.lang.String,com.atlan.model.assets.Asset)">getIdentity</a></span>&#8203;(java.lang.String&nbsp;categoryPath,
            com.atlan.model.assets.Asset&nbsp;glossary)</code></th>
@@ -308,19 +315,33 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <div class="block">Construct the unique identity for the provided category path in a given glossary.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNameFromPath(java.lang.String)">getNameFromPath</a></span>&#8203;(java.lang.String&nbsp;path)</code></th>
+<td class="colLast">
+<div class="block">Retrieve the name of the category from its path.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPathFromIdentity(java.lang.String)">getPathFromIdentity</a></span>&#8203;(java.lang.String&nbsp;identity)</code></th>
+<td class="colLast">
+<div class="block">Retrieve the path of the category from its identity.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(java.util.Map,java.util.Map,int,int,boolean,boolean,boolean)">upsert</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;categoryCache,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsert(com.atlan.samples.loaders.caches.CategoryCache,java.util.Map,int,int,boolean,boolean,boolean)">upsert</a></span>&#8203;(<a href="../caches/CategoryCache.html" title="class in com.atlan.samples.loaders.caches">CategoryCache</a>&nbsp;categoryCache,
       java.util.Map&lt;java.lang.String,&#8203;<a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a>&gt;&nbsp;categories,
       int&nbsp;batchSize,
       int&nbsp;level,
@@ -440,6 +461,54 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </dl>
 </li>
 </ul>
+<a id="getPathFromIdentity(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPathFromIdentity</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;getPathFromIdentity&#8203;(java.lang.String&nbsp;identity)</pre>
+<div class="block">Retrieve the path of the category from its identity.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>identity</code> - of the category</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>only the path of the category</dd>
+</dl>
+</li>
+</ul>
+<a id="getNameFromPath(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getNameFromPath</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;getNameFromPath&#8203;(java.lang.String&nbsp;path)</pre>
+<div class="block">Retrieve the name of the category from its path.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>path</code> - of the category</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>only the name of the category</dd>
+</dl>
+</li>
+</ul>
+<a id="getGlossaryNameFromIdentity(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getGlossaryNameFromIdentity</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;getGlossaryNameFromIdentity&#8203;(java.lang.String&nbsp;identity)</pre>
+<div class="block">Retrieve the name of the glossary from a category's identity.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>identity</code> - of the category</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>only the name of the glossary</dd>
+</dl>
+</li>
+</ul>
 <a id="getIdentity(java.lang.String,com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
@@ -458,13 +527,13 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </dl>
 </li>
 </ul>
-<a id="getFromRow(java.util.Map,java.util.Map,java.lang.String)">
+<a id="getFromRow(com.atlan.samples.loaders.caches.GlossaryCache,java.util.Map,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getFromRow</h4>
-<pre class="methodSignature">public static&nbsp;<a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a>&nbsp;getFromRow&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;glossaryCache,
+<pre class="methodSignature">public static&nbsp;<a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a>&nbsp;getFromRow&#8203;(<a href="../caches/GlossaryCache.html" title="class in com.atlan.samples.loaders.caches">GlossaryCache</a>&nbsp;glossaryCache,
                                                    java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
                                                    java.lang.String&nbsp;delim)</pre>
 <div class="block">Build up details about the category on the provided row.</div>
@@ -478,13 +547,13 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </dl>
 </li>
 </ul>
-<a id="upsert(java.util.Map,java.util.Map,int,int,boolean,boolean,boolean)">
+<a id="upsert(com.atlan.samples.loaders.caches.CategoryCache,java.util.Map,int,int,boolean,boolean,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>upsert</h4>
-<pre class="methodSignature">public static&nbsp;void&nbsp;upsert&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;categoryCache,
+<pre class="methodSignature">public static&nbsp;void&nbsp;upsert&#8203;(<a href="../caches/CategoryCache.html" title="class in com.atlan.samples.loaders.caches">CategoryCache</a>&nbsp;categoryCache,
                           java.util.Map&lt;java.lang.String,&#8203;<a href="CategoryEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">CategoryEnrichmentDetails</a>&gt;&nbsp;categories,
                           int&nbsp;batchSize,
                           int&nbsp;level,
@@ -494,7 +563,7 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 <div class="block">Create categories in bulk, if they do not exist, or update them if they do (idempotent).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>categoryCache</code> - a cache of categories keyed by category identity</dd>
+<dd><code>categoryCache</code> - a cache of categories</dd>
 <dd><code>categories</code> - the set of categories to ensure exist</dd>
 <dd><code>batchSize</code> - maximum number of categories to create per batch</dd>
 <dd><code>level</code> - of categories to create</dd>

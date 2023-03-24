@@ -286,7 +286,7 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>static <a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(java.util.Map,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;termCache,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFromRow(com.atlan.samples.loaders.caches.TermCache,java.util.Map,java.lang.String)">getFromRow</a></span>&#8203;(<a href="../caches/TermCache.html" title="class in com.atlan.samples.loaders.caches">TermCache</a>&nbsp;termCache,
           java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
           java.lang.String&nbsp;delim)</code></th>
 <td class="colLast">
@@ -492,19 +492,19 @@ extends <a href="EnrichmentDetails.html" title="class in com.atlan.samples.loade
                                            java.lang.String&nbsp;qualifiedName)</pre>
 </li>
 </ul>
-<a id="getFromRow(java.util.Map,java.util.Map,java.lang.String)">
+<a id="getFromRow(com.atlan.samples.loaders.caches.TermCache,java.util.Map,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getFromRow</h4>
-<pre class="methodSignature">public static&nbsp;<a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a>&nbsp;getFromRow&#8203;(java.util.Map&lt;java.lang.String,&#8203;com.atlan.model.assets.Asset&gt;&nbsp;termCache,
+<pre class="methodSignature">public static&nbsp;<a href="AssetEnrichmentDetails.html" title="class in com.atlan.samples.loaders.models">AssetEnrichmentDetails</a>&nbsp;getFromRow&#8203;(<a href="../caches/TermCache.html" title="class in com.atlan.samples.loaders.caches">TermCache</a>&nbsp;termCache,
                                                 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;row,
                                                 java.lang.String&nbsp;delim)</pre>
 <div class="block">Build up details about the asset on the provided row.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>termCache</code> - cache of terms keyed by term identity</dd>
+<dd><code>termCache</code> - cache of terms</dd>
 <dd><code>row</code> - a row of data from the spreadsheet, as a map from column name to value</dd>
 <dd><code>delim</code> - delimiter used in cells that can contain multiple values</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
