@@ -10,6 +10,7 @@ import com.atlan.model.assets.Readme;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
+import com.atlan.samples.loaders.caches.GlossaryCache;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -43,6 +44,16 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
     }
 
     /**
+     * Retrieve the name of the glossary from its identity.
+     *
+     * @param identity of the glossary
+     * @return only the name of the glossary
+     */
+    public static String getNameFromIdentity(String identity) {
+        return identity;
+    }
+
+    /**
      * Build up details about the glossary on the provided row.
      *
      * @param row a row of data from the spreadsheet, as a map from column name to value
@@ -71,7 +82,7 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return a cache of glossaries
      */
-    public static Map<String, Asset> upsert(
+    public static GlossaryCache upsert(
             Map<String, GlossaryEnrichmentDetails> glossaries,
             int batchSize,
             boolean replaceClassifications,
@@ -79,7 +90,7 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
             boolean updateOnly) {
         Map<String, String> readmes = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
-        Map<String, Asset> glossaryNameToResult = new HashMap<>();
+        GlossaryCache glossaryNameToResult = new GlossaryCache();
 
         for (GlossaryEnrichmentDetails details : glossaries.values()) {
             String glossaryName = details.getName();

@@ -10,6 +10,9 @@ import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.Classification;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
+import com.atlan.samples.loaders.caches.CategoryCache;
+import com.atlan.samples.loaders.caches.GlossaryCache;
+import com.atlan.samples.loaders.caches.TermCache;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -97,6 +100,32 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
     }
 
     /**
+     * Retrieve the name of the term from its identity.
+     *
+     * @param identity of the term
+     * @return only the name of the term
+     */
+    public static String getNameFromIdentity(String identity) {
+        if (identity != null && identity.contains(glossaryDelimiter)) {
+            return identity.substring(0, identity.indexOf(glossaryDelimiter));
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the name of the glossary from a term's identity.
+     *
+     * @param identity of the term
+     * @return only the name of the glossary
+     */
+    public static String getGlossaryNameFromIdentity(String identity) {
+        if (identity != null && identity.contains(glossaryDelimiter)) {
+            return identity.substring(identity.indexOf(glossaryDelimiter));
+        }
+        return null;
+    }
+
+    /**
      * Build up details about the term on the provided row.
      *
      * @param glossaryCache cache of glossaries keyed by glossary name
@@ -106,7 +135,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
      * @return the term enrichment details for that row
      */
     public static TermEnrichmentDetails getFromRow(
-            Map<String, Asset> glossaryCache, Map<String, Asset> categoryCache, Map<String, String> row, String delim) {
+            GlossaryCache glossaryCache, CategoryCache categoryCache, Map<String, String> row, String delim) {
         TermEnrichmentDetailsBuilder<?, ?> builder = getFromRow(TermEnrichmentDetails.builder(), row, delim);
         if (getMissingFields(row, REQUIRED).isEmpty()) {
             Asset glossary = glossaryCache.get(row.get(COL_GLOSSARY));
@@ -157,13 +186,13 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return a cache of the terms
      */
-    public static Map<String, Asset> upsert(
+    public static TermCache upsert(
             Map<String, TermEnrichmentDetails> terms,
             int batchSize,
             boolean replaceClassifications,
             boolean replaceCM,
             boolean updateOnly) {
-        Map<String, Asset> termIdentityToResult = new HashMap<>();
+        TermCache termIdentityToResult = new TermCache();
         Map<String, List<String>> toClassify = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, String> readmes = new HashMap<>();

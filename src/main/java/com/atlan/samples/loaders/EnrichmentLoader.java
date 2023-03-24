@@ -4,7 +4,9 @@ package com.atlan.samples.loaders;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.atlan.model.assets.Asset;
+import com.atlan.samples.loaders.caches.CategoryCache;
+import com.atlan.samples.loaders.caches.GlossaryCache;
+import com.atlan.samples.loaders.caches.TermCache;
 import com.atlan.samples.loaders.models.AssetEnrichmentDetails;
 import com.atlan.samples.loaders.models.CategoryEnrichmentDetails;
 import com.atlan.samples.loaders.models.GlossaryEnrichmentDetails;
@@ -87,7 +89,7 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                     }
                 }
             }
-            Map<String, Asset> glossaryCache = GlossaryEnrichmentDetails.upsert(
+            GlossaryCache glossaryCache = GlossaryEnrichmentDetails.upsert(
                     glossaries, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 2. Create categories for each row in the Category enrichment sheet
@@ -106,7 +108,7 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                     }
                 }
             }
-            Map<String, Asset> categoryCache = new HashMap<>();
+            CategoryCache categoryCache = new CategoryCache();
             CategoryEnrichmentDetails.upsert(
                     categoryCache,
                     categories,
@@ -132,7 +134,7 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
                     }
                 }
             }
-            Map<String, Asset> termCache = TermEnrichmentDetails.upsert(
+            TermCache termCache = TermEnrichmentDetails.upsert(
                     terms, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 4. Create assets for each row in the Asset enrichment sheet
