@@ -4,6 +4,7 @@ package com.atlan.samples.events;
 
 import com.atlan.cache.CustomMetadataCache;
 import com.atlan.exception.AtlanException;
+import com.atlan.exception.ConflictException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.CustomMetadataAttributes;
@@ -173,6 +174,14 @@ public class DaapScoreCalculator extends AbstractEventHandler {
                     log.error("Unable to create badge over the DaaP score.", eBadge);
                 }
                 return CustomMetadataCache.getIdForName(CM_DAAP);
+            } catch (ConflictException conflict) {
+                // Handle cross-thread race condition that the typedef has since been created
+                try {
+                    return CustomMetadataCache.getIdForName(CM_DAAP);
+                } catch (AtlanException eConflict) {
+                    log.error(
+                            "Unable to look up DaaP custom metadata, even though it should already exist.", eConflict);
+                }
             } catch (AtlanException eStruct) {
                 log.error("Unable to create DaaP custom metadata structure.", eStruct);
             }
