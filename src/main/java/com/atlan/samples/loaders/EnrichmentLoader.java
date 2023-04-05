@@ -76,84 +76,104 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
 
             // 1. Create glossaries for each row in the Glossary enrichment sheet
             log.info("Processing sheet: {}", GLOSSARY_ENRICHMENT);
-            List<Map<String, String>> glossaryData = xlsx.getRowsFromSheet(GLOSSARY_ENRICHMENT, 0);
-            Map<String, GlossaryEnrichmentDetails> glossaries = new LinkedHashMap<>();
-            for (Map<String, String> row : glossaryData) {
-                GlossaryEnrichmentDetails details = GlossaryEnrichmentDetails.getFromRow(row, getDelimiter());
-                if (details != null) {
-                    // Only overwrite any details about the glossary if none previously existed
-                    String identity = details.getIdentity();
-                    GlossaryEnrichmentDetails existing = glossaries.get(identity);
-                    if (existing == null || existing.isStub()) {
-                        glossaries.put(identity, details);
+            GlossaryCache glossaryCache;
+            try {
+                List<Map<String, String>> glossaryData = xlsx.getRowsFromSheet(GLOSSARY_ENRICHMENT, 0);
+                Map<String, GlossaryEnrichmentDetails> glossaries = new LinkedHashMap<>();
+                for (Map<String, String> row : glossaryData) {
+                    GlossaryEnrichmentDetails details = GlossaryEnrichmentDetails.getFromRow(row, getDelimiter());
+                    if (details != null) {
+                        // Only overwrite any details about the glossary if none previously existed
+                        String identity = details.getIdentity();
+                        GlossaryEnrichmentDetails existing = glossaries.get(identity);
+                        if (existing == null || existing.isStub()) {
+                            glossaries.put(identity, details);
+                        }
                     }
                 }
+                glossaryCache = GlossaryEnrichmentDetails.upsert(
+                        glossaries, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping.", GLOSSARY_ENRICHMENT);
+                glossaryCache = new GlossaryCache();
             }
-            GlossaryCache glossaryCache = GlossaryEnrichmentDetails.upsert(
-                    glossaries, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 2. Create categories for each row in the Category enrichment sheet
             log.info("Processing sheet: {}", CATEGORY_ENRICHMENT);
-            List<Map<String, String>> categoryData = xlsx.getRowsFromSheet(CATEGORY_ENRICHMENT, 0);
-            Map<String, CategoryEnrichmentDetails> categories = new LinkedHashMap<>();
-            for (Map<String, String> row : categoryData) {
-                CategoryEnrichmentDetails details =
-                        CategoryEnrichmentDetails.getFromRow(glossaryCache, row, getDelimiter());
-                if (details != null) {
-                    // Only overwrite any details about the category if none previously existed
-                    String identity = details.getIdentity();
-                    CategoryEnrichmentDetails existing = categories.get(identity);
-                    if (existing == null || existing.isStub()) {
-                        categories.put(identity, details);
+            CategoryCache categoryCache = new CategoryCache();
+            try {
+                List<Map<String, String>> categoryData = xlsx.getRowsFromSheet(CATEGORY_ENRICHMENT, 0);
+                Map<String, CategoryEnrichmentDetails> categories = new LinkedHashMap<>();
+                for (Map<String, String> row : categoryData) {
+                    CategoryEnrichmentDetails details =
+                            CategoryEnrichmentDetails.getFromRow(glossaryCache, row, getDelimiter());
+                    if (details != null) {
+                        // Only overwrite any details about the category if none previously existed
+                        String identity = details.getIdentity();
+                        CategoryEnrichmentDetails existing = categories.get(identity);
+                        if (existing == null || existing.isStub()) {
+                            categories.put(identity, details);
+                        }
                     }
                 }
+                CategoryEnrichmentDetails.upsert(
+                        categoryCache,
+                        categories,
+                        getBatchSize(),
+                        1,
+                        REPLACE_CLASSIFICATIONS,
+                        REPLACE_CUSTOM_METADATA,
+                        isUpdateOnly());
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping", CATEGORY_ENRICHMENT);
             }
-            CategoryCache categoryCache = new CategoryCache();
-            CategoryEnrichmentDetails.upsert(
-                    categoryCache,
-                    categories,
-                    getBatchSize(),
-                    1,
-                    REPLACE_CLASSIFICATIONS,
-                    REPLACE_CUSTOM_METADATA,
-                    isUpdateOnly());
 
             // 3. Create terms for each row in the Term enrichment sheet
             log.info("Processing sheet: {}", TERM_ENRICHMENT);
-            List<Map<String, String>> termData = xlsx.getRowsFromSheet(TERM_ENRICHMENT, 0);
-            Map<String, TermEnrichmentDetails> terms = new LinkedHashMap<>();
-            for (Map<String, String> row : termData) {
-                TermEnrichmentDetails details =
-                        TermEnrichmentDetails.getFromRow(glossaryCache, categoryCache, row, getDelimiter());
-                if (details != null) {
-                    // Only overwrite any details about the term if none previously existed
-                    String identity = details.getIdentity();
-                    TermEnrichmentDetails existing = terms.get(identity);
-                    if (existing == null || existing.isStub()) {
-                        terms.put(identity, details);
+            TermCache termCache;
+            try {
+                List<Map<String, String>> termData = xlsx.getRowsFromSheet(TERM_ENRICHMENT, 0);
+                Map<String, TermEnrichmentDetails> terms = new LinkedHashMap<>();
+                for (Map<String, String> row : termData) {
+                    TermEnrichmentDetails details =
+                            TermEnrichmentDetails.getFromRow(glossaryCache, categoryCache, row, getDelimiter());
+                    if (details != null) {
+                        // Only overwrite any details about the term if none previously existed
+                        String identity = details.getIdentity();
+                        TermEnrichmentDetails existing = terms.get(identity);
+                        if (existing == null || existing.isStub()) {
+                            terms.put(identity, details);
+                        }
                     }
                 }
+                termCache = TermEnrichmentDetails.upsert(
+                        terms, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping", TERM_ENRICHMENT);
+                termCache = new TermCache();
             }
-            TermCache termCache = TermEnrichmentDetails.upsert(
-                    terms, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
             // 4. Create assets for each row in the Asset enrichment sheet
             log.info("Processing sheet: {}", ASSET_ENRICHMENT);
-            List<Map<String, String>> assetData = xlsx.getRowsFromSheet(ASSET_ENRICHMENT, 0);
-            Map<String, AssetEnrichmentDetails> assets = new LinkedHashMap<>();
-            for (Map<String, String> row : assetData) {
-                AssetEnrichmentDetails details = AssetEnrichmentDetails.getFromRow(termCache, row, getDelimiter());
-                if (details != null) {
-                    // Only overwrite any details about the term if none previously existed
-                    String identity = details.getIdentity();
-                    AssetEnrichmentDetails existing = assets.get(identity);
-                    if (existing == null || existing.isStub()) {
-                        assets.put(identity, details);
+            try {
+                List<Map<String, String>> assetData = xlsx.getRowsFromSheet(ASSET_ENRICHMENT, 0);
+                Map<String, AssetEnrichmentDetails> assets = new LinkedHashMap<>();
+                for (Map<String, String> row : assetData) {
+                    AssetEnrichmentDetails details = AssetEnrichmentDetails.getFromRow(termCache, row, getDelimiter());
+                    if (details != null) {
+                        // Only overwrite any details about the term if none previously existed
+                        String identity = details.getIdentity();
+                        AssetEnrichmentDetails existing = assets.get(identity);
+                        if (existing == null || existing.isStub()) {
+                            assets.put(identity, details);
+                        }
                     }
                 }
+                AssetEnrichmentDetails.upsert(
+                        assets, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping.", ASSET_ENRICHMENT);
             }
-            AssetEnrichmentDetails.upsert(
-                    assets, getBatchSize(), REPLACE_CLASSIFICATIONS, REPLACE_CUSTOM_METADATA, isUpdateOnly());
 
         } catch (IOException e) {
             log.error("Failed to read Excel file from: {}", getFilename(), e);

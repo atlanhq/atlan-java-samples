@@ -74,7 +74,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
         if (path != null && path.contains("@")) {
             return path.substring(path.lastIndexOf("@"));
         }
-        return null;
+        return path;
     }
 
     /**
@@ -85,7 +85,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
      */
     public static String getGlossaryNameFromIdentity(String identity) {
         if (identity != null && identity.contains(categoryGlossaryDelimiter)) {
-            return identity.substring(identity.indexOf(categoryGlossaryDelimiter));
+            return identity.substring(identity.indexOf(categoryGlossaryDelimiter) + categoryGlossaryDelimiter.length());
         }
         return null;
     }
