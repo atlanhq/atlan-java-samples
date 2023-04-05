@@ -15,10 +15,7 @@ public class GlossaryCache extends AssetCache {
     protected Asset lookupAsset(String identity) {
         String glossaryName = GlossaryEnrichmentDetails.getNameFromIdentity(identity);
         try {
-            Glossary glossary = Glossary.findByName(glossaryName, null);
-            if (glossary != null) {
-                return Glossary.refByGuid(glossary.getGuid());
-            }
+            return Glossary.findByName(glossaryName, null);
         } catch (AtlanException e) {
             log.error("Unable to lookup or find glossary: {}", identity, e);
         }

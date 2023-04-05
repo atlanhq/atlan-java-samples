@@ -19,10 +19,7 @@ public class CategoryCache extends AssetCache {
         try {
             // TODO: technically there can be multiple categories with the same name in a
             //  given glossary, so we really need a findByPath() method instead
-            GlossaryCategory category = GlossaryCategory.findByName(categoryName, glossaryName, null);
-            if (category != null) {
-                return GlossaryCategory.refByGuid(category.getGuid());
-            }
+            return GlossaryCategory.findByName(categoryName, glossaryName, null);
         } catch (AtlanException e) {
             log.error("Unable to lookup or find category: {}", identity, e);
         }

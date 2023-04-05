@@ -120,7 +120,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
      */
     public static String getGlossaryNameFromIdentity(String identity) {
         if (identity != null && identity.contains(glossaryDelimiter)) {
-            return identity.substring(identity.indexOf(glossaryDelimiter));
+            return identity.substring(identity.indexOf(glossaryDelimiter) + glossaryDelimiter.length());
         }
         return null;
     }

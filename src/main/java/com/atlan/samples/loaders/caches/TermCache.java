@@ -16,10 +16,7 @@ public class TermCache extends AssetCache {
         String termName = TermEnrichmentDetails.getNameFromIdentity(identity);
         String glossaryName = TermEnrichmentDetails.getGlossaryNameFromIdentity(identity);
         try {
-            GlossaryTerm term = GlossaryTerm.findByName(termName, glossaryName, null);
-            if (term != null) {
-                return GlossaryTerm.refByGuid(term.getGuid());
-            }
+            return GlossaryTerm.findByName(termName, glossaryName, null);
         } catch (AtlanException e) {
             log.error("Unable to lookup or find term: {}", identity, e);
         }
