@@ -87,8 +87,8 @@ repositories {
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
-    implementation group: "com.atlan", name: "atlan-java", "version": "0.5.0-SNAPSHOT"
-    implementation "io.numaproj.numaflow:numaflow-java:0.3.4"
+    implementation group: "com.atlan", name: "atlan-java", "version": "0.5.1-SNAPSHOT"
+    implementation "io.numaproj.numaflow:numaflow-java:0.4.0"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
@@ -96,7 +96,6 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.18.24'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
     implementation 'io.swagger.parser.v3:swagger-parser:2.1.12'
-    implementation group: 'org.testng', name: 'testng', version: '7.4.0'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 }
 

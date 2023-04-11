@@ -8,7 +8,6 @@ import com.atlan.model.enums.AtlanCertificateStatus;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
 import io.numaproj.numaflow.function.Message;
-import io.numaproj.numaflow.function.map.MapFunc;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +37,11 @@ public class VerificationEnforcer extends AbstractEventHandler {
     /**
      * Logic to apply to each event we receive.
      *
-     * @param key unique key of the event
+     * @param keys unique key of the event
      * @param data details of the event (including its payload)
      * @return an array of messages that can be passed to further vertexes in the pipeline
      */
-    private static Message[] process(String key, Datum data) {
+    public Message[] processMessage(String[] keys, Datum data) {
 
         // 1. Ensure there's an Atlan event payload present
         Asset fromEvent = getAssetFromEvent(data);
@@ -98,8 +97,6 @@ public class VerificationEnforcer extends AbstractEventHandler {
      * @throws IOException on any errors starting the event processor
      */
     public static void main(String[] args) throws IOException {
-        new FunctionServer()
-                .registerMapper(new MapFunc(VerificationEnforcer::process))
-                .start();
+        new FunctionServer().registerMapHandler(new VerificationEnforcer()).start();
     }
 }

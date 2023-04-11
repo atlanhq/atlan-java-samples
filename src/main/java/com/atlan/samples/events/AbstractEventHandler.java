@@ -17,6 +17,7 @@ import com.atlan.serde.Serde;
 import com.atlan.util.QueryFactory;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.Message;
+import io.numaproj.numaflow.function.map.MapHandler;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * Base class for event handlers.
  */
 @Slf4j
-public abstract class AbstractEventHandler {
+public abstract class AbstractEventHandler extends MapHandler {
 
     public static final String FAILURE = "failure";
     public static final String SUCCESS = "success";
@@ -240,7 +241,7 @@ public abstract class AbstractEventHandler {
      */
     static Message[] failed(Datum data) {
         log.info("Routing to: {}", FAILURE);
-        return new Message[] {Message.to(FAILURE, data.getValue())};
+        return new Message[] {Message.to(new String[] {FAILURE}, data.getValue())};
     }
 
     /**
@@ -251,7 +252,7 @@ public abstract class AbstractEventHandler {
      */
     static Message[] succeeded(Datum data) {
         log.info("Routing to: {}", SUCCESS);
-        return new Message[] {Message.to(SUCCESS, data.getValue())};
+        return new Message[] {Message.to(new String[] {SUCCESS}, data.getValue())};
     }
 
     /**
