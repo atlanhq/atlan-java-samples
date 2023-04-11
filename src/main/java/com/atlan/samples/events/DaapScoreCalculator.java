@@ -17,7 +17,6 @@ import com.atlan.model.typedefs.CustomMetadataOptions;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
 import io.numaproj.numaflow.function.Message;
-import io.numaproj.numaflow.function.map.MapFunc;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -48,11 +47,11 @@ public class DaapScoreCalculator extends AbstractEventHandler {
     /**
      * Logic to apply to each event we receive.
      *
-     * @param key unique key of the event
+     * @param keys unique key of the event
      * @param data details of the event (including its payload)
      * @return an array of messages that can be passed to further vertexes in the pipeline
      */
-    private static Message[] process(String key, Datum data) {
+    public Message[] processMessage(String[] keys, Datum data) {
 
         // 1. Ensure the DaaP custom metadata exists
         if (createCMIfNotExists() == null) {
@@ -127,9 +126,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
      * @throws IOException on any errors starting the event processor
      */
     public static void main(String[] args) throws IOException {
-        new FunctionServer()
-                .registerMapper(new MapFunc(DaapScoreCalculator::process))
-                .start();
+        new FunctionServer().registerMapHandler(new DaapScoreCalculator()).start();
     }
 
     /**
@@ -138,7 +135,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
      *
      * @return the internal hashed-string name of the custom metadata
      */
-    private static String createCMIfNotExists() {
+    private String createCMIfNotExists() {
         try {
             return CustomMetadataCache.getIdForName(CM_DAAP);
         } catch (NotFoundException e) {
@@ -198,7 +195,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
      * @param score calculated by this latest event
      * @return true if the score calculated by this event is different from what is already present on the asset
      */
-    private static boolean scoreHasChanged(Asset asset, double score) {
+    private boolean scoreHasChanged(Asset asset, double score) {
         Map<String, CustomMetadataAttributes> customMetadata = asset.getCustomMetadataSets();
         if (customMetadata != null && customMetadata.containsKey(CM_DAAP)) {
             Map<String, Object> attrs = customMetadata.get(CM_DAAP).getAttributes();
