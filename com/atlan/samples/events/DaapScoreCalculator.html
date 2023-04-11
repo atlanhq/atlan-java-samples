@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":9,"i1":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -123,10 +123,15 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
+<li>io.numaproj.numaflow.function.map.MapHandler</li>
+<li>
+<ul class="inheritance">
 <li><a href="AbstractEventHandler.html" title="class in com.atlan.samples.events">com.atlan.samples.events.AbstractEventHandler</a></li>
 <li>
 <ul class="inheritance">
 <li>com.atlan.samples.events.DaapScoreCalculator</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -192,7 +197,7 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -203,6 +208,14 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#main(java.lang.String%5B%5D)">main</a></span>&#8203;(java.lang.String[]&nbsp;args)</code></th>
 <td class="colLast">
 <div class="block">Register the event processing function.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>io.numaproj.numaflow.function.Message[]</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processMessage(java.lang.String%5B%5D,io.numaproj.numaflow.function.Datum)">processMessage</a></span>&#8203;(java.lang.String[]&nbsp;keys,
+              io.numaproj.numaflow.function.Datum&nbsp;data)</code></th>
+<td class="colLast">
+<div class="block">Logic to apply to each event we receive.</div>
 </td>
 </tr>
 </table>
@@ -248,6 +261,26 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a id="processMessage(java.lang.String[],io.numaproj.numaflow.function.Datum)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>processMessage</h4>
+<pre class="methodSignature">public&nbsp;io.numaproj.numaflow.function.Message[]&nbsp;processMessage&#8203;(java.lang.String[]&nbsp;keys,
+                                                              io.numaproj.numaflow.function.Datum&nbsp;data)</pre>
+<div class="block">Logic to apply to each event we receive.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>processMessage</code>&nbsp;in class&nbsp;<code>io.numaproj.numaflow.function.map.MapHandler</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>keys</code> - unique key of the event</dd>
+<dd><code>data</code> - details of the event (including its payload)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an array of messages that can be passed to further vertexes in the pipeline</dd>
+</dl>
+</li>
+</ul>
 <a id="main(java.lang.String[])">
 <!--   -->
 </a>
