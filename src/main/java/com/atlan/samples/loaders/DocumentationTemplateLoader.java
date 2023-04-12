@@ -46,9 +46,23 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
             }
             parseParametersFromEvent(event);
 
-            processTabularAssets();
-            processObjectStoreAssets();
-            processLineage();
+            ExcelReader xlsx = new ExcelReader(getFilename());
+
+            try {
+                processTabularAssets(xlsx);
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping", TABULAR_SHEET);
+            }
+            try {
+                processObjectStoreAssets(xlsx);
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping", OBJECT_SHEET);
+            }
+            try {
+                processLineage(xlsx);
+            } catch (IOException e) {
+                log.warn("Could not find sheet: {} — skipping", LINEAGE_SHEET);
+            }
 
         } catch (IOException e) {
             log.error("Failed to read Excel file from: {}", getFilename(), e);
@@ -58,10 +72,9 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
         return getFilename();
     }
 
-    public void processTabularAssets() throws IOException {
+    public void processTabularAssets(ExcelReader xlsx) throws IOException {
         log.info("Loading tabular assets from: {}::{}", getFilename(), TABULAR_SHEET);
 
-        ExcelReader xlsx = new ExcelReader(getFilename());
         List<Map<String, String>> data = xlsx.getRowsFromSheet(TABULAR_SHEET, 1);
 
         // Fastest way will be to load in batches by level of the asset hierarchy,
@@ -225,10 +238,9 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
         containersToUpdate.flush();
     }
 
-    public void processObjectStoreAssets() throws IOException {
+    public void processObjectStoreAssets(ExcelReader xlsx) throws IOException {
         log.info("Loading object store assets from: {}::{}", getFilename(), OBJECT_SHEET);
 
-        ExcelReader xlsx = new ExcelReader(getFilename());
         List<Map<String, String>> data = xlsx.getRowsFromSheet(OBJECT_SHEET, 1);
 
         // Fastest way will be to load in batches by level of the asset hierarchy,
@@ -329,10 +341,9 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
         bucketsToUpdate.flush();
     }
 
-    public void processLineage() throws IOException {
+    public void processLineage(ExcelReader xlsx) throws IOException {
         log.info("Loading lineage from: {}::{}", getFilename(), LINEAGE_SHEET);
 
-        ExcelReader xlsx = new ExcelReader(getFilename());
         List<Map<String, String>> data = xlsx.getRowsFromSheet(LINEAGE_SHEET, 1);
 
         // Fastest way will be to load in batches by level of the asset hierarchy,
