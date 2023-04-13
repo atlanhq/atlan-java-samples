@@ -12,6 +12,7 @@ import com.atlan.model.assets.Asset;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.samples.readers.OpenAPISpecReader;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import java.util.*;
@@ -92,6 +93,7 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
                 AssetMutationResponse response = connectionToCreate.upsert();
                 if (response != null && response.getCreatedAssets().size() == 1) {
                     connectionQualifiedName = response.getCreatedAssets().get(0).getQualifiedName();
+                    log.info("... created connection: {}", connectionQualifiedName);
                 }
             } catch (AtlanException create) {
                 log.error("Unable to create a connection for the API.", create);
@@ -110,7 +112,6 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
         // Retrieve the connection, to ensure async access is resolved
         try {
             Asset.retrieveMinimal(Connection.TYPE_NAME, connectionQualifiedName);
-            log.info("... created connection: {}", connectionQualifiedName);
         } catch (AtlanException e) {
             log.error("Unable to retrieve the connection for the API.", e);
             System.exit(1);
@@ -141,6 +142,9 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
                 } else if (response.getUpdatedAssets().size() == 1) {
                     specQualifiedName = response.getUpdatedAssets().get(0).getQualifiedName();
                     log.info("... updated APISpec: {}", specQualifiedName);
+                } else {
+                    specQualifiedName = specToCreate.getQualifiedName();
+                    log.info("... reusing existing APISpec: {}", specQualifiedName);
                 }
             }
         } catch (AtlanException e) {
@@ -156,25 +160,39 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
                 String pathUrl = apiPath.getKey();
                 PathItem pathDetails = apiPath.getValue();
                 List<String> operations = new ArrayList<>();
-                if (pathDetails.getGet() != null) {
+                StringBuilder desc = new StringBuilder();
+                desc.append("| Method | Summary |\n|---|---|\n");
+                Operation get = pathDetails.getGet();
+                if (get != null) {
                     operations.add("GET");
+                    desc.append("| `GET` | ").append(get.getSummary()).append(" |\n");
                 }
-                if (pathDetails.getPost() != null) {
+                Operation post = pathDetails.getPost();
+                if (post != null) {
                     operations.add("POST");
+                    desc.append("| `POST` | ").append(post.getSummary()).append(" |\n");
                 }
-                if (pathDetails.getPut() != null) {
+                Operation put = pathDetails.getPut();
+                if (put != null) {
                     operations.add("PUT");
+                    desc.append("| `PUT` | ").append(put.getSummary()).append(" |\n");
                 }
-                if (pathDetails.getPatch() != null) {
+                Operation patch = pathDetails.getPatch();
+                if (patch != null) {
                     operations.add("PATCH");
+                    desc.append("| `PATCH` | ").append(patch.getSummary()).append(" |\n");
                 }
-                if (pathDetails.getDelete() != null) {
+                Operation delete = pathDetails.getDelete();
+                if (delete != null) {
                     operations.add("DELETE");
+                    desc.append("| `DELETE` | ").append(delete.getSummary()).append(" |\n");
                 }
                 APIPath path = APIPath.creator(pathUrl, specQualifiedName)
+                        .description(desc.toString())
                         .apiPathRawURI(pathUrl)
                         .apiPathSummary(pathDetails.getSummary())
                         .apiPathAvailableOperations(operations)
+                        .apiPathIsTemplated(pathUrl.contains("{") && pathUrl.contains("}"))
                         .build();
                 logResult(batch.add(path));
             }
