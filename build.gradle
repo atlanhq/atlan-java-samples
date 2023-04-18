@@ -135,7 +135,10 @@ spotless {
 
 shadowJar {
     archiveClassifier = 'jar-with-dependencies'
-    configurations = [project.configurations.runtimeClasspath]
+    dependencies {
+        include(dependency('ch.qos.logback:logback-classic:.*'))
+        include(dependency('ch.qos.logback:logback-core:.*'))
+    }
 }
 
 gitPublish {
