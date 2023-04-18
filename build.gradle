@@ -97,6 +97,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.18.24'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
     implementation 'io.swagger.parser.v3:swagger-parser:2.1.12'
+    runtimeOnly group: 'ch.qos.logback', name: 'logback-core', version: '1.2.11'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 }
 
@@ -136,6 +137,7 @@ shadowJar {
     archiveClassifier = 'jar-with-dependencies'
     dependencies {
         include(dependency('ch.qos.logback:logback-classic:.*'))
+        include(dependency('ch.qos.logback:logback-core:.*'))
     }
 }
 
