@@ -17,6 +17,7 @@ import com.atlan.serde.Serde;
 import com.atlan.util.QueryFactory;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.Message;
+import io.numaproj.numaflow.function.MessageList;
 import io.numaproj.numaflow.function.map.MapHandler;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -236,23 +237,39 @@ public abstract class AbstractEventHandler extends MapHandler {
     /**
      * Route the message as failed.
      *
+     * @param keys the Numaflow keys for the message
      * @param data the Numaflow message
-     * @return a message array indicating the message failed to be processed
+     * @return a message list indicating the message failed to be processed
      */
-    static Message[] failed(Datum data) {
+    static MessageList failed(String keys[], Datum data) {
         log.info("Routing to: {}", FAILURE);
-        return new Message[] {Message.to(new String[] {FAILURE}, data.getValue())};
+        return MessageList.newBuilder()
+                .addMessage(new Message(data.getValue(), keys, new String[] {FAILURE}))
+                .build();
     }
 
     /**
      * Route the message as succeeded.
      *
+     * @param keys the Numaflow keys for the message
      * @param data the Numaflow message
-     * @return a message array indicating the message was successfully processed
+     * @return a message list indicating the message was successfully processed
      */
-    static Message[] succeeded(Datum data) {
+    static MessageList succeeded(String keys[], Datum data) {
         log.info("Routing to: {}", SUCCESS);
-        return new Message[] {Message.to(new String[] {SUCCESS}, data.getValue())};
+        return MessageList.newBuilder()
+                .addMessage(new Message(data.getValue(), keys, new String[] {SUCCESS}))
+                .build();
+    }
+
+    /**
+     * Route the message forward, as-is.
+     *
+     * @param data the Numaflow message
+     * @return a message list indicating the message should be forwarded as-is
+     */
+    static MessageList forward(Datum data) {
+        return MessageList.newBuilder().addMessage(new Message(data.getValue())).build();
     }
 
     /**
@@ -261,9 +278,9 @@ public abstract class AbstractEventHandler extends MapHandler {
      * (Without this, we could have an infinite loop of that action being applied
      * over and over again.)
      *
-     * @return a message array indicating the message can be safely ignored
+     * @return a message list indicating the message can be safely ignored
      */
-    static Message[] drop() {
-        return new Message[] {Message.toDrop()};
+    static MessageList drop() {
+        return MessageList.newBuilder().addMessage(Message.toDrop()).build();
     }
 }

@@ -7,7 +7,7 @@ import com.atlan.model.assets.Asset;
 import com.atlan.model.enums.AtlanCertificateStatus;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.Message;
+import io.numaproj.numaflow.function.MessageList;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +41,12 @@ public class VerificationEnforcer extends AbstractEventHandler {
      * @param data details of the event (including its payload)
      * @return an array of messages that can be passed to further vertexes in the pipeline
      */
-    public Message[] processMessage(String[] keys, Datum data) {
+    public MessageList processMessage(String[] keys, Datum data) {
 
         // 1. Ensure there's an Atlan event payload present
         Asset fromEvent = getAssetFromEvent(data);
         if (fromEvent == null) {
-            return failed(data);
+            return failed(keys, data);
         }
 
         // 2. Retrieve the current details about the asset from Atlan
@@ -58,11 +58,11 @@ public class VerificationEnforcer extends AbstractEventHandler {
             asset = getCurrentViewOfAsset(fromEvent, REQUIRED_ATTRS, false, false);
         } catch (AtlanException e) {
             log.error("Unable to find the asset in Atlan: {}", fromEvent.getQualifiedName(), e);
-            return failed(data);
+            return failed(keys, data);
         }
         if (asset == null) {
             log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
-            return failed(data);
+            return failed(keys, data);
         }
 
         // 3. We only need to consider enforcement if the asset is currently verified
@@ -75,10 +75,10 @@ public class VerificationEnforcer extends AbstractEventHandler {
                             .build();
                     toUpdate.upsert();
                     log.info("Enforced verification reversal on: {}", asset.getQualifiedName());
-                    return succeeded(data);
+                    return succeeded(keys, data);
                 } catch (AtlanException e) {
                     log.error("Unable to update the asset's certificate: {}", asset.getQualifiedName(), e);
-                    return failed(data);
+                    return failed(keys, data);
                 }
             }
             log.info(

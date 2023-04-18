@@ -16,7 +16,7 @@ import com.atlan.model.typedefs.CustomMetadataDef;
 import com.atlan.model.typedefs.CustomMetadataOptions;
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.Message;
+import io.numaproj.numaflow.function.MessageList;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -51,17 +51,17 @@ public class DaapScoreCalculator extends AbstractEventHandler {
      * @param data details of the event (including its payload)
      * @return an array of messages that can be passed to further vertexes in the pipeline
      */
-    public Message[] processMessage(String[] keys, Datum data) {
+    public MessageList processMessage(String[] keys, Datum data) {
 
         // 1. Ensure the DaaP custom metadata exists
         if (createCMIfNotExists() == null) {
-            return failed(data);
+            return failed(keys, data);
         }
 
         // 2. Ensure there's an Atlan event payload present
         Asset fromEvent = getAssetFromEvent(data);
         if (fromEvent == null) {
-            return failed(data);
+            return failed(keys, data);
         }
 
         // 3. Retrieve the current details about the asset from Atlan
@@ -75,11 +75,11 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             asset = getCurrentViewOfAsset(fromEvent, searchAttrs, true, true);
         } catch (AtlanException e) {
             log.error("Unable to find the asset in Atlan: {}", fromEvent.getQualifiedName(), e);
-            return failed(data);
+            return failed(keys, data);
         }
         if (asset == null) {
             log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
-            return failed(data);
+            return failed(keys, data);
         }
 
         // 4. Look at each individual component that should make up the score
@@ -111,10 +111,10 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             try {
                 Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
                 log.info("Updated DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
-                return succeeded(data);
+                return succeeded(keys, data);
             } catch (AtlanException e) {
                 log.error("Unable to update DaaP completeness score for {} to: {}", asset.getQualifiedName(), score, e);
-                return failed(data);
+                return failed(keys, data);
             }
         }
     }
