@@ -17,6 +17,7 @@ plugins {
     id "com.diffplug.spotless" version "6.4.0"
     id "net.ltgt.errorprone" version "2.0.2"
     id "org.ajoberstar.git-publish" version "3.0.1"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -128,6 +129,13 @@ spotless {
         palantirJavaFormat("2.9.0")
         removeUnusedImports()
         licenseHeaderFile('LICENSE_HEADER')
+    }
+}
+
+shadowJar {
+    archiveClassifier = 'jar-with-dependencies'
+    dependencies {
+        include(dependency('ch.qos.logback:logback-classic:.*'))
     }
 }
 
