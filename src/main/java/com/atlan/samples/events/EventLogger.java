@@ -4,7 +4,7 @@ package com.atlan.samples.events;
 
 import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.Message;
+import io.numaproj.numaflow.function.MessageList;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EventLogger extends AbstractEventHandler {
 
-    public Message[] processMessage(String[] keys, Datum data) {
+    public MessageList processMessage(String[] keys, Datum data) {
         log.info("Event received: {}", getAtlanEvent(data));
-        return new Message[] {Message.toAll(data.getValue())};
+        return forward(data);
     }
 
     public static void main(String[] args) throws IOException {
