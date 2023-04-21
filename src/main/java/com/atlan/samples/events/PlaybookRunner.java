@@ -18,6 +18,7 @@ import com.atlan.model.search.IndexSearchDSL;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.model.workflow.*;
+import com.atlan.net.HttpClient;
 import com.atlan.serde.Serde;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.numaproj.numaflow.function.Datum;
@@ -117,9 +118,21 @@ public class PlaybookRunner extends AbstractEventHandler {
                             && response.getAssets() != null
                             && !response.getAssets().isEmpty()) {
                         asset = response.getAssets().get(0);
+                    } else {
+                        log.info("Retrying match for playbook \"{}\" (rule: {})...", playbookName, rule.getName());
+                        Thread.sleep(HttpClient.waitTime(4).toMillis());
+                        response = match.search();
+                        if (response != null
+                                && response.getAssets() != null
+                                && !response.getAssets().isEmpty()) {
+                            asset = response.getAssets().get(0);
+                        }
                     }
                 } catch (AtlanException e) {
                     log.error("Unable to search for asset {}, sending to a retry.", original.getGuid());
+                    return failed(keys, data);
+                } catch (InterruptedException e) {
+                    log.error("... inline retry was interrupted, failing over to a full retry.");
                     return failed(keys, data);
                 }
                 if (asset == null) {
