@@ -244,7 +244,8 @@ public class PlaybookRunner extends AbstractEventHandler {
      * @param trimmed asset containing only updates made by playbook actions (for limiting other changes)
      * @param schema defining the changes to apply
      */
-    private void applyMetadataUpdate(Asset.AssetBuilder<?, ?> full, Asset.AssetBuilder<?, ?> trimmed, PlaybookActionSchema schema) {
+    private void applyMetadataUpdate(
+            Asset.AssetBuilder<?, ?> full, Asset.AssetBuilder<?, ?> trimmed, PlaybookActionSchema schema) {
         String operand = schema.getOperand();
         PlaybookActionOperator operator = schema.getOperator();
         Object value = schema.getValue();
@@ -271,7 +272,11 @@ public class PlaybookRunner extends AbstractEventHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void changeOwners(Asset.AssetBuilder<?, ?> full, Asset.AssetBuilder<?, ?> trimmed, PlaybookActionOperator operator, Object value) {
+    private void changeOwners(
+            Asset.AssetBuilder<?, ?> full,
+            Asset.AssetBuilder<?, ?> trimmed,
+            PlaybookActionOperator operator,
+            Object value) {
         if (value instanceof Map) {
             Map<String, List<String>> owners = (Map<String, List<String>>) value;
             switch (operator) {
