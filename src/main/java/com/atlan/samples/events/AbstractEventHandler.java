@@ -153,6 +153,10 @@ public abstract class AbstractEventHandler extends MapHandler {
                 .excludeClassifications(!includeClassifications)
                 .excludeMeanings(!includeMeanings)
                 .attributes(limitedToAttributes == null ? Collections.emptySet() : limitedToAttributes)
+                // Include attributes that are mandatory for updates, for some asset types
+                .attribute("anchor")
+                .attribute("awsArn")
+                .relationAttribute("guid")
                 .build();
         IndexSearchResponse response = request.search();
         if (response != null && response.getAssets() != null) {
