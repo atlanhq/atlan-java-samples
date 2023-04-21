@@ -73,6 +73,10 @@ public class PlaybookRunner extends AbstractEventHandler {
                     event.getPayload().getAsset());
             return failed(keys, data);
         }
+
+        long start = System.currentTimeMillis();
+
+        log.info("Picked up event for: {}", original.getQualifiedName());
         Asset.AssetBuilder<?, ?> full = (Asset.AssetBuilder<?, ?>) original.toBuilder();
         Asset.AssetBuilder<?, ?> trimmed;
         try {
@@ -90,6 +94,19 @@ public class PlaybookRunner extends AbstractEventHandler {
         } catch (AtlanException e) {
             log.error("Unable to retrieve playbooks from Atlan.", e);
             return failed(keys, data);
+        }
+
+        long elapsed = System.currentTimeMillis() - start;
+
+        // Ensure we wait a little bit for Elastic to become consistent before attempting
+        // our queries
+        if (elapsed < 2000) {
+            try {
+                int wait = elapsed < 1000 ? 3 : 2;
+                Thread.sleep(HttpClient.waitTime(wait).toMillis());
+            } catch (InterruptedException e) {
+                log.warn("Consistency delay was interrupted, results from here may vary...", e);
+            }
         }
 
         // 4. Iterate through the playbooks
@@ -118,21 +135,9 @@ public class PlaybookRunner extends AbstractEventHandler {
                             && response.getAssets() != null
                             && !response.getAssets().isEmpty()) {
                         asset = response.getAssets().get(0);
-                    } else {
-                        log.info("Retrying match for playbook \"{}\" (rule: {})...", playbookName, rule.getName());
-                        Thread.sleep(HttpClient.waitTime(4).toMillis());
-                        response = match.search();
-                        if (response != null
-                                && response.getAssets() != null
-                                && !response.getAssets().isEmpty()) {
-                            asset = response.getAssets().get(0);
-                        }
                     }
                 } catch (AtlanException e) {
                     log.error("Unable to search for asset {}, sending to a retry.", original.getGuid());
-                    return failed(keys, data);
-                } catch (InterruptedException e) {
-                    log.error("... inline retry was interrupted, failing over to a full retry.");
                     return failed(keys, data);
                 }
                 if (asset == null) {
