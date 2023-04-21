@@ -69,7 +69,14 @@ public class PlaybookRunner extends AbstractEventHandler {
             log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
             return failed(keys, data);
         }
-        Asset.AssetBuilder<?, ?> builder = (Asset.AssetBuilder<?, ?>) original.toBuilder();
+        Asset.AssetBuilder<?, ?> full = (Asset.AssetBuilder<?, ?>) original.toBuilder();
+        Asset.AssetBuilder<?, ?> trimmed;
+        try {
+            trimmed = original.trimToRequired();
+        } catch (AtlanException e) {
+            log.error("Unable to produce update-able version of the asset: {}", original.getQualifiedName(), e);
+            return failed(keys, data);
+        }
 
         // 3. Retrieve the playbooks
         // TODO: cache them...
@@ -113,32 +120,32 @@ public class PlaybookRunner extends AbstractEventHandler {
                     return failed(keys, data);
                 }
                 if (asset == null) {
-                    // If there is no match, fail the asset (to be picked up by a retry vertex)
+                    // If there is no match, skip any actions for that rule
                     log.warn(
-                            "Asset {} did not match playbook {}'s criteria (rule: {}), sending to a retry.",
+                            "Asset {} did not match playbook {}'s criteria (rule: {}) — skipping its actions.",
                             original.getGuid(),
                             playbookName,
                             rule.getName());
-                    return failed(keys, data);
-                }
-                // 6. If there is a match, run the actions against the asset
-                List<PlaybookAction> actions = rule.getActions();
-                for (PlaybookAction action : actions) {
-                    PlaybookActionType type = action.getType();
-                    if (type == PlaybookActionType.METADATA_UPDATE) {
-                        log.info(
-                                "Applying actions from {}/{} to: {}",
-                                playbookName,
-                                rule.getName(),
-                                original.getQualifiedName());
-                        applyMetadataUpdate(builder, action.getActionsSchema());
-                    } else {
-                        // TODO: handle all playbook actions
-                        log.warn(
-                                "Unhandled playbook action type {} in playbook {} (rule: {}) — skipping.",
-                                type,
-                                playbookName,
-                                rule.getName());
+                } else {
+                    // 6. If there is a match, run the actions against the asset
+                    List<PlaybookAction> actions = rule.getActions();
+                    for (PlaybookAction action : actions) {
+                        PlaybookActionType type = action.getType();
+                        if (type == PlaybookActionType.METADATA_UPDATE) {
+                            log.info(
+                                    "Applying actions from \"{}::{}\" to: {}",
+                                    playbookName,
+                                    rule.getName(),
+                                    original.getQualifiedName());
+                            applyMetadataUpdate(full, trimmed, action.getActionsSchema());
+                        } else {
+                            // TODO: handle all playbook actions
+                            log.warn(
+                                    "Unhandled playbook action type {} in playbook {} (rule: {}) — skipping.",
+                                    type,
+                                    playbookName,
+                                    rule.getName());
+                        }
                     }
                 }
             }
@@ -146,14 +153,14 @@ public class PlaybookRunner extends AbstractEventHandler {
 
         // 7. If the asset is unchanged after the actions, drop it; otherwise
         //  upsert the changed asset
-        Asset mutated = builder.build();
+        Asset mutated = full.build();
         if (original.equals(mutated)) {
             log.info("No change in asset: {}", original.getQualifiedName());
             return drop();
         } else {
             try {
                 log.info("Updating changed asset: {}", original.getQualifiedName());
-                AssetMutationResponse response = mutated.upsert();
+                AssetMutationResponse response = trimmed.build().upsert();
                 if (response != null
                         && response.getUpdatedAssets() != null
                         && !response.getUpdatedAssets().isEmpty()) {
@@ -233,25 +240,29 @@ public class PlaybookRunner extends AbstractEventHandler {
     /**
      * Apply the metadata updates defined in by the playbook action.
      *
-     * @param builder against which to apply the changes
+     * @param full complete asset against which to apply the changes (for later idempotency comparison)
+     * @param trimmed asset containing only updates made by playbook actions (for limiting other changes)
      * @param schema defining the changes to apply
      */
-    private void applyMetadataUpdate(Asset.AssetBuilder<?, ?> builder, PlaybookActionSchema schema) {
+    private void applyMetadataUpdate(Asset.AssetBuilder<?, ?> full, Asset.AssetBuilder<?, ?> trimmed, PlaybookActionSchema schema) {
         String operand = schema.getOperand();
         PlaybookActionOperator operator = schema.getOperator();
         Object value = schema.getValue();
         switch (operand) {
             case "certificateStatus":
-                builder.certificateStatus(AtlanCertificateStatus.fromValue((String) value));
+                full.certificateStatus(AtlanCertificateStatus.fromValue((String) value));
+                trimmed.certificateStatus(AtlanCertificateStatus.fromValue((String) value));
                 break;
             case "description":
-                builder.description((String) value);
+                full.description((String) value);
+                trimmed.description((String) value);
                 break;
             case "userDescription":
-                builder.userDescription((String) value);
+                full.userDescription((String) value);
+                trimmed.userDescription((String) value);
                 break;
             case "owners":
-                changeOwners(builder, operator, value);
+                changeOwners(full, trimmed, operator, value);
                 break;
             default:
                 log.error("Unhandled attribute {} — skipping.", operand);
@@ -260,22 +271,25 @@ public class PlaybookRunner extends AbstractEventHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void changeOwners(Asset.AssetBuilder<?, ?> builder, PlaybookActionOperator operator, Object value) {
+    private void changeOwners(Asset.AssetBuilder<?, ?> full, Asset.AssetBuilder<?, ?> trimmed, PlaybookActionOperator operator, Object value) {
         if (value instanceof Map) {
             Map<String, List<String>> owners = (Map<String, List<String>>) value;
             switch (operator) {
                 case ADD:
                     if (owners.containsKey("ownerUsers")) {
-                        builder.ownerUsers(owners.get("ownerUsers"));
+                        full.ownerUsers(owners.get("ownerUsers"));
+                        trimmed.ownerUsers(owners.get("ownerUsers"));
                     }
                     if (owners.containsKey("ownerGroups")) {
-                        builder.ownerGroups(owners.get("ownerGroups"));
+                        full.ownerGroups(owners.get("ownerGroups"));
+                        trimmed.ownerGroups(owners.get("ownerGroups"));
                     }
                     break;
                 case REMOVE:
-                    Asset current = builder.build();
+                    Asset current = full.build();
                     if (owners.containsKey("ownerUsers")) {
-                        builder.clearOwnerUsers();
+                        full.clearOwnerUsers();
+                        trimmed.clearOwnerUsers();
                         List<String> usersToRemove = owners.get("ownerUsers");
                         List<String> usersToKeep = new ArrayList<>();
                         for (String user : current.getOwnerUsers()) {
@@ -284,13 +298,16 @@ public class PlaybookRunner extends AbstractEventHandler {
                             }
                         }
                         if (!usersToKeep.isEmpty()) {
-                            builder.ownerUsers(usersToKeep);
+                            full.ownerUsers(usersToKeep);
+                            trimmed.ownerUsers(usersToKeep);
                         } else {
-                            builder.nullField("ownerUsers");
+                            full.nullField("ownerUsers");
+                            trimmed.nullField("ownerUsers");
                         }
                     }
                     if (owners.containsKey("ownerGroups")) {
-                        builder.clearOwnerGroups();
+                        full.clearOwnerGroups();
+                        trimmed.clearOwnerGroups();
                         List<String> groupsToRemove = owners.get("ownerGroups");
                         List<String> groupsToKeep = new ArrayList<>();
                         for (String group : current.getOwnerGroups()) {
@@ -299,23 +316,30 @@ public class PlaybookRunner extends AbstractEventHandler {
                             }
                         }
                         if (!groupsToKeep.isEmpty()) {
-                            builder.ownerGroups(groupsToKeep);
+                            full.ownerGroups(groupsToKeep);
+                            trimmed.ownerGroups(groupsToKeep);
                         } else {
-                            builder.nullField("ownerGroups");
+                            full.nullField("ownerGroups");
+                            trimmed.nullField("ownerGroups");
                         }
                     }
                     break;
                 case REPLACE:
-                    builder.clearOwnerGroups().clearOwnerUsers();
+                    full.clearOwnerGroups().clearOwnerUsers();
+                    trimmed.clearOwnerGroups().clearOwnerUsers();
                     if (owners.containsKey("ownerUsers")) {
-                        builder.ownerUsers(owners.get("ownerUsers"));
+                        full.ownerUsers(owners.get("ownerUsers"));
+                        trimmed.ownerUsers(owners.get("ownerUsers"));
                     } else {
-                        builder.nullField("ownerUsers");
+                        full.nullField("ownerUsers");
+                        trimmed.nullField("ownerUsers");
                     }
                     if (owners.containsKey("ownerGroups")) {
-                        builder.ownerGroups(owners.get("ownerGroups"));
+                        full.ownerGroups(owners.get("ownerGroups"));
+                        trimmed.ownerGroups(owners.get("ownerGroups"));
                     } else {
-                        builder.nullField("ownerGroups");
+                        full.nullField("ownerGroups");
+                        trimmed.nullField("ownerGroups");
                     }
                     break;
                 default:
