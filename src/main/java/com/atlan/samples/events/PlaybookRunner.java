@@ -115,9 +115,10 @@ public class PlaybookRunner extends AbstractEventHandler {
                 if (asset == null) {
                     // If there is no match, fail the asset (to be picked up by a retry vertex)
                     log.warn(
-                            "Asset {} did not match playbook {}'s criteria, sending to a retry.",
+                            "Asset {} did not match playbook {}'s criteria (rule: {}), sending to a retry.",
                             original.getGuid(),
-                            playbookName);
+                            playbookName,
+                            rule.getName());
                     return failed(keys, data);
                 }
                 // 6. If there is a match, run the actions against the asset
@@ -125,10 +126,19 @@ public class PlaybookRunner extends AbstractEventHandler {
                 for (PlaybookAction action : actions) {
                     PlaybookActionType type = action.getType();
                     if (type == PlaybookActionType.METADATA_UPDATE) {
+                        log.info(
+                                "Applying actions from {}/{} to: {}",
+                                playbookName,
+                                rule.getName(),
+                                original.getQualifiedName());
                         applyMetadataUpdate(builder, action.getActionsSchema());
                     } else {
                         // TODO: handle all playbook actions
-                        log.error("Unhandled playbook action type {} in playbook {} — skipping.", type, playbookName);
+                        log.warn(
+                                "Unhandled playbook action type {} in playbook {} (rule: {}) — skipping.",
+                                type,
+                                playbookName,
+                                rule.getName());
                     }
                 }
             }
@@ -142,6 +152,7 @@ public class PlaybookRunner extends AbstractEventHandler {
             return drop();
         } else {
             try {
+                log.info("Updating changed asset: {}", original.getQualifiedName());
                 AssetMutationResponse response = mutated.upsert();
                 if (response != null
                         && response.getUpdatedAssets() != null
