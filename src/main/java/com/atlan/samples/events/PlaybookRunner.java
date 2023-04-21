@@ -13,10 +13,12 @@ import com.atlan.model.enums.AtlanCertificateStatus;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.enums.PlaybookActionOperator;
 import com.atlan.model.enums.PlaybookActionType;
+import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.search.IndexSearchDSL;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.model.workflow.*;
+import com.atlan.net.HttpClient;
 import com.atlan.serde.Serde;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.numaproj.numaflow.function.Datum;
@@ -52,21 +54,23 @@ public class PlaybookRunner extends AbstractEventHandler {
     public MessageList processMessage(String[] keys, Datum data) {
 
         // 1. Ensure there's an Atlan event payload present
-        Asset fromEvent = getAssetFromEvent(data);
-        if (fromEvent == null) {
+        AtlanEvent event = getAtlanEvent(data);
+        if (event == null) {
             return failed(keys, data);
         }
 
         // 2. Retrieve the current view of the asset
         Asset original;
         try {
-            original = getCurrentViewOfAsset(fromEvent, MUTABLE_ATTRS, true, true);
+            original = getCurrentFullAsset(event);
         } catch (AtlanException e) {
-            log.error("Unable to find the asset in Atlan: {}", fromEvent.getQualifiedName(), e);
+            log.error("Unable to find the asset in Atlan: {}", event.getPayload(), e);
             return failed(keys, data);
         }
         if (original == null) {
-            log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
+            log.error(
+                    "No current view of asset found (deleted or not yet available in search index): {}",
+                    event.getPayload().getAsset());
             return failed(keys, data);
         }
         Asset.AssetBuilder<?, ?> full = (Asset.AssetBuilder<?, ?>) original.toBuilder();
@@ -114,15 +118,27 @@ public class PlaybookRunner extends AbstractEventHandler {
                             && response.getAssets() != null
                             && !response.getAssets().isEmpty()) {
                         asset = response.getAssets().get(0);
+                    } else {
+                        log.info("Retrying match for playbook \"{}\" (rule: {})...", playbookName, rule.getName());
+                        Thread.sleep(HttpClient.waitTime(4).toMillis());
+                        response = match.search();
+                        if (response != null
+                                && response.getAssets() != null
+                                && !response.getAssets().isEmpty()) {
+                            asset = response.getAssets().get(0);
+                        }
                     }
                 } catch (AtlanException e) {
                     log.error("Unable to search for asset {}, sending to a retry.", original.getGuid());
                     return failed(keys, data);
+                } catch (InterruptedException e) {
+                    log.error("... inline retry was interrupted, failing over to a full retry.");
+                    return failed(keys, data);
                 }
                 if (asset == null) {
                     // If there is no match, skip any actions for that rule
-                    log.warn(
-                            "Asset {} did not match playbook {}'s criteria (rule: {}) — skipping its actions.",
+                    log.info(
+                            "Asset {} did not match playbook \"{}\"'s criteria (rule: {}) - skipping its actions.",
                             original.getGuid(),
                             playbookName,
                             rule.getName());
@@ -141,7 +157,7 @@ public class PlaybookRunner extends AbstractEventHandler {
                         } else {
                             // TODO: handle all playbook actions
                             log.warn(
-                                    "Unhandled playbook action type {} in playbook {} (rule: {}) — skipping.",
+                                    "Unhandled playbook action type {} in playbook \"{}\" (rule: {}) - skipping.",
                                     type,
                                     playbookName,
                                     rule.getName());
@@ -225,7 +241,7 @@ public class PlaybookRunner extends AbstractEventHandler {
                         try {
                             rules = Serde.mapper.readValue(value, new TypeReference<>() {});
                         } catch (IOException e) {
-                            log.error("Unable to parse rules for playbook {} — skipping...", playbookName);
+                            log.error("Unable to parse rules for playbook \"{}\" - skipping...", playbookName);
                         }
                     }
                 }
@@ -266,7 +282,7 @@ public class PlaybookRunner extends AbstractEventHandler {
                 changeOwners(full, trimmed, operator, value);
                 break;
             default:
-                log.error("Unhandled attribute {} — skipping.", operand);
+                log.error("Unhandled attribute {} - skipping.", operand);
                 break;
         }
     }
@@ -348,7 +364,7 @@ public class PlaybookRunner extends AbstractEventHandler {
                     }
                     break;
                 default:
-                    log.error("Unknown operation for owners — skipping: {}", operator);
+                    log.error("Unknown operation for owners - skipping: {}", operator);
                     break;
             }
         }
