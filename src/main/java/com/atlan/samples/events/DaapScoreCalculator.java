@@ -11,6 +11,7 @@ import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanCustomAttributePrimitiveType;
 import com.atlan.model.enums.BadgeComparisonOperator;
 import com.atlan.model.enums.BadgeConditionColor;
+import com.atlan.model.structs.BadgeCondition;
 import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.model.typedefs.CustomMetadataDef;
 import com.atlan.model.typedefs.CustomMetadataOptions;

@@ -4,9 +4,9 @@ package com.atlan.samples.events;
 
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
-import com.atlan.model.assets.AbstractProcess;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Catalog;
+import com.atlan.model.assets.LineageProcess;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.events.AtlanEventPayload;
@@ -230,8 +230,8 @@ public abstract class AbstractEventHandler extends MapHandler {
         if (asset instanceof Catalog) {
             // If possible, look directly on inputs and outputs rather than the __hasLineage flag
             Catalog details = (Catalog) asset;
-            List<AbstractProcess> downstream = details.getInputToProcesses();
-            List<AbstractProcess> upstream = details.getOutputFromProcesses();
+            Set<LineageProcess> downstream = details.getInputToProcesses();
+            Set<LineageProcess> upstream = details.getOutputFromProcesses();
             return (downstream != null && !downstream.isEmpty()) || (upstream != null && !upstream.isEmpty());
         } else {
             return asset.getHasLineage();
