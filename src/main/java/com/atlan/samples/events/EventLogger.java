@@ -2,10 +2,9 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
-import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.MessageList;
-import java.io.IOException;
+import io.numaproj.numaflow.function.interfaces.Datum;
+import io.numaproj.numaflow.function.types.MessageList;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,7 +19,7 @@ public class EventLogger extends AbstractEventHandler {
         return forward(data);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new FunctionServer().registerMapHandler(new EventLogger()).start();
     }
 }

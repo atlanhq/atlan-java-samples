@@ -4,11 +4,10 @@ package com.atlan.samples.events;
 
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
-import com.atlan.model.enums.AtlanCertificateStatus;
-import io.numaproj.numaflow.function.Datum;
+import com.atlan.model.enums.CertificateStatus;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.MessageList;
-import java.io.IOException;
+import io.numaproj.numaflow.function.interfaces.Datum;
+import io.numaproj.numaflow.function.types.MessageList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,11 +65,11 @@ public class VerificationEnforcer extends AbstractEventHandler {
         }
 
         // 3. We only need to consider enforcement if the asset is currently verified
-        if (asset.getCertificateStatus() == AtlanCertificateStatus.VERIFIED) {
+        if (asset.getCertificateStatus() == CertificateStatus.VERIFIED) {
             if (!hasDescription(asset) || !hasOwner(asset) || !hasLineage(asset)) {
                 try {
                     Asset toUpdate = asset.trimToRequired()
-                            .certificateStatus(AtlanCertificateStatus.DRAFT)
+                            .certificateStatus(CertificateStatus.DRAFT)
                             .certificateStatusMessage(ENFORCEMENT_MESSAGE)
                             .build();
                     toUpdate.upsert();
@@ -94,9 +93,9 @@ public class VerificationEnforcer extends AbstractEventHandler {
      * Register the event processing function.
      *
      * @param args (unused)
-     * @throws IOException on any errors starting the event processor
+     * @throws Exception on any errors starting the event processor
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new FunctionServer().registerMapHandler(new VerificationEnforcer()).start();
     }
 }
