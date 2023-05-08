@@ -10,6 +10,7 @@ import com.atlan.model.core.Classification;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.TermCache;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -112,7 +113,8 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
             boolean updateOnly) {
         Map<String, Map<String, List<String>>> toClassifyMap = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
-        AssetBatch batch = new AssetBatch("asset", batchSize, replaceClassifications, replaceCM);
+        AssetBatch batch =
+                new AssetBatch("asset", batchSize, replaceClassifications, AssetBatch.CustomMetadataHandling.OVERWRITE);
         Map<String, String> readmes = new HashMap<>();
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 

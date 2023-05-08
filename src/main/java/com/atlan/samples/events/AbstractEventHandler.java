@@ -4,9 +4,9 @@ package com.atlan.samples.events;
 
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
-import com.atlan.model.assets.AbstractProcess;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Catalog;
+import com.atlan.model.assets.LineageProcess;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.events.AtlanEventPayload;
@@ -15,15 +15,14 @@ import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.serde.Serde;
 import com.atlan.util.QueryFactory;
-import io.numaproj.numaflow.function.Datum;
-import io.numaproj.numaflow.function.Message;
-import io.numaproj.numaflow.function.MessageList;
-import io.numaproj.numaflow.function.map.MapHandler;
+import io.numaproj.numaflow.function.handlers.MapHandler;
+import io.numaproj.numaflow.function.interfaces.Datum;
+import io.numaproj.numaflow.function.types.Message;
+import io.numaproj.numaflow.function.types.MessageList;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
@@ -206,8 +205,7 @@ public abstract class AbstractEventHandler extends MapHandler {
      * @return true if there is at least one assigned term
      */
     static boolean hasAssignedTerms(Asset asset) {
-        return (asset.getAssignedTerms() != null && !asset.getAssignedTerms().isEmpty())
-                || (asset.getMeanings() != null && !asset.getMeanings().isEmpty());
+        return (asset.getAssignedTerms() != null && !asset.getAssignedTerms().isEmpty());
     }
 
     /**
@@ -230,8 +228,8 @@ public abstract class AbstractEventHandler extends MapHandler {
         if (asset instanceof Catalog) {
             // If possible, look directly on inputs and outputs rather than the __hasLineage flag
             Catalog details = (Catalog) asset;
-            List<AbstractProcess> downstream = details.getInputToProcesses();
-            List<AbstractProcess> upstream = details.getOutputFromProcesses();
+            Set<LineageProcess> downstream = details.getInputToProcesses();
+            Set<LineageProcess> upstream = details.getOutputFromProcesses();
             return (downstream != null && !downstream.isEmpty()) || (upstream != null && !upstream.isEmpty());
         } else {
             return asset.getHasLineage();

@@ -7,6 +7,7 @@ import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Column;
 import com.atlan.samples.loaders.*;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

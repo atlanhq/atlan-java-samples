@@ -11,13 +11,13 @@ import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanCustomAttributePrimitiveType;
 import com.atlan.model.enums.BadgeComparisonOperator;
 import com.atlan.model.enums.BadgeConditionColor;
+import com.atlan.model.structs.BadgeCondition;
 import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.model.typedefs.CustomMetadataDef;
 import com.atlan.model.typedefs.CustomMetadataOptions;
-import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.MessageList;
-import java.io.IOException;
+import io.numaproj.numaflow.function.interfaces.Datum;
+import io.numaproj.numaflow.function.types.MessageList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -123,9 +123,9 @@ public class DaapScoreCalculator extends AbstractEventHandler {
      * Register the event processing function.
      *
      * @param args (unused)
-     * @throws IOException on any errors starting the event processor
+     * @throws Exception on any errors starting the event processor
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new FunctionServer().registerMapHandler(new DaapScoreCalculator()).start();
     }
 

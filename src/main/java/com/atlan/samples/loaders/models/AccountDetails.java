@@ -6,7 +6,7 @@ import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.ADLSAccount;
 import com.atlan.model.assets.Asset;
-import com.atlan.samples.loaders.AssetBatch;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

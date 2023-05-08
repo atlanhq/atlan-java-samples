@@ -8,7 +8,7 @@ import com.atlan.model.assets.Asset;
 import com.atlan.model.core.Classification;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanAnnouncementType;
-import com.atlan.model.enums.AtlanCertificateStatus;
+import com.atlan.model.enums.CertificateStatus;
 import java.util.*;
 import java.util.regex.Pattern;
 import lombok.Builder;
@@ -41,7 +41,7 @@ public abstract class AssetDetails {
     private String description;
 
     @ToString.Include
-    private AtlanCertificateStatus certificate;
+    private CertificateStatus certificate;
 
     @ToString.Include
     private String certificateStatusMessage;
@@ -100,7 +100,7 @@ public abstract class AssetDetails {
         String announcement = row.get(COL_ANNOUNCEMENT);
 
         if (certificate.length() > 0) {
-            builder.certificate(AtlanCertificateStatus.fromValue(certificate));
+            builder.certificate(CertificateStatus.fromValue(certificate));
         }
         if (announcement.length() > 0) {
             builder.announcementType(AtlanAnnouncementType.fromValue(announcement));

@@ -11,6 +11,7 @@ import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.GlossaryCache;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -128,7 +129,9 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
                     readmes.put(details.getIdentity(), readmeContents);
                 }
                 try {
-                    AssetMutationResponse result = glossary.upsert(replaceClassifications, replaceCM);
+                    AssetMutationResponse result = replaceCM
+                            ? glossary.upsertReplacingCM(replaceClassifications)
+                            : glossary.upsertMergingCM(replaceClassifications);
                     if (result != null) {
                         List<Asset> created = result.getCreatedAssets();
                         for (Asset one : created) {

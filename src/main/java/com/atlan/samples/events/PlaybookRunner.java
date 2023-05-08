@@ -9,7 +9,7 @@ import com.atlan.api.PlaybooksEndpoint;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
-import com.atlan.model.enums.AtlanCertificateStatus;
+import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.enums.PlaybookActionOperator;
 import com.atlan.model.enums.PlaybookActionType;
@@ -21,9 +21,9 @@ import com.atlan.model.workflow.*;
 import com.atlan.net.HttpClient;
 import com.atlan.serde.Serde;
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.numaproj.numaflow.function.Datum;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.MessageList;
+import io.numaproj.numaflow.function.interfaces.Datum;
+import io.numaproj.numaflow.function.types.MessageList;
 import java.io.IOException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -209,9 +209,9 @@ public class PlaybookRunner extends AbstractEventHandler {
      * Register the event processing function.
      *
      * @param args (unused)
-     * @throws IOException on any errors starting the event processor
+     * @throws Exception on any errors starting the event processor
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new FunctionServer().registerMapHandler(new PlaybookRunner()).start();
     }
 
@@ -272,8 +272,8 @@ public class PlaybookRunner extends AbstractEventHandler {
         Object value = schema.getValue();
         switch (operand) {
             case "certificateStatus":
-                full.certificateStatus(AtlanCertificateStatus.fromValue((String) value));
-                trimmed.certificateStatus(AtlanCertificateStatus.fromValue((String) value));
+                full.certificateStatus(CertificateStatus.fromValue((String) value));
+                trimmed.certificateStatus(CertificateStatus.fromValue((String) value));
                 break;
             case "description":
                 full.description((String) value);
