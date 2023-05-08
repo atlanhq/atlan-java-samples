@@ -123,7 +123,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>io.numaproj.numaflow.function.map.MapHandler</li>
+<li>io.numaproj.numaflow.function.handlers.MapHandler</li>
 <li>
 <ul class="inheritance">
 <li><a href="AbstractEventHandler.html" title="class in com.atlan.samples.events">com.atlan.samples.events.AbstractEventHandler</a></li>
@@ -211,9 +211,9 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>io.numaproj.numaflow.function.MessageList</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processMessage(java.lang.String%5B%5D,io.numaproj.numaflow.function.Datum)">processMessage</a></span>&#8203;(java.lang.String[]&nbsp;keys,
-              io.numaproj.numaflow.function.Datum&nbsp;data)</code></th>
+<td class="colFirst"><code>io.numaproj.numaflow.function.types.MessageList</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processMessage(java.lang.String%5B%5D,io.numaproj.numaflow.function.interfaces.Datum)">processMessage</a></span>&#8203;(java.lang.String[]&nbsp;keys,
+              io.numaproj.numaflow.function.interfaces.Datum&nbsp;data)</code></th>
 <td class="colLast">
 <div class="block">Logic to apply to each event we receive.</div>
 </td>
@@ -261,18 +261,18 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="processMessage(java.lang.String[],io.numaproj.numaflow.function.Datum)">
+<a id="processMessage(java.lang.String[],io.numaproj.numaflow.function.interfaces.Datum)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>processMessage</h4>
-<pre class="methodSignature">public&nbsp;io.numaproj.numaflow.function.MessageList&nbsp;processMessage&#8203;(java.lang.String[]&nbsp;keys,
-                                                                io.numaproj.numaflow.function.Datum&nbsp;data)</pre>
+<pre class="methodSignature">public&nbsp;io.numaproj.numaflow.function.types.MessageList&nbsp;processMessage&#8203;(java.lang.String[]&nbsp;keys,
+                                                                      io.numaproj.numaflow.function.interfaces.Datum&nbsp;data)</pre>
 <div class="block">Logic to apply to each event we receive.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>processMessage</code>&nbsp;in class&nbsp;<code>io.numaproj.numaflow.function.map.MapHandler</code></dd>
+<dd><code>processMessage</code>&nbsp;in class&nbsp;<code>io.numaproj.numaflow.function.handlers.MapHandler</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>keys</code> - unique key of the event</dd>
 <dd><code>data</code> - details of the event (including its payload)</dd>
@@ -288,13 +288,13 @@ extends <a href="AbstractEventHandler.html" title="class in com.atlan.samples.ev
 <li class="blockList">
 <h4>main</h4>
 <pre class="methodSignature">public static&nbsp;void&nbsp;main&#8203;(java.lang.String[]&nbsp;args)
-                 throws java.io.IOException</pre>
+                 throws java.lang.Exception</pre>
 <div class="block">Register the event processing function.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>args</code> - (unused)</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.io.IOException</code> - on any errors starting the event processor</dd>
+<dd><code>java.lang.Exception</code> - on any errors starting the event processor</dd>
 </dl>
 </li>
 </ul>
