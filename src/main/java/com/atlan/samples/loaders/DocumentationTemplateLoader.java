@@ -9,6 +9,7 @@ import com.atlan.model.assets.*;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.samples.loaders.models.*;
 import com.atlan.samples.readers.ExcelReader;
+import com.atlan.util.AssetBatch;
 import java.io.IOException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;

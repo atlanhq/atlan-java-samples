@@ -13,6 +13,7 @@ import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.CategoryCache;
 import com.atlan.samples.loaders.caches.GlossaryCache;
 import com.atlan.samples.loaders.caches.TermCache;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -242,7 +243,9 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     // Create the term now, as we need to resolve GUIDs and qualifiedNames
                     // before we can take next actions
                     try {
-                        AssetMutationResponse response = term.upsert(replaceClassifications, replaceCM);
+                        AssetMutationResponse response = replaceCM
+                                ? term.upsertReplacingCM(replaceClassifications)
+                                : term.upsertMergingCM(replaceClassifications);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {

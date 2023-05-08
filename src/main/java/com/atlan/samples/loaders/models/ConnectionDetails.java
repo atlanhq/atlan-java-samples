@@ -8,7 +8,7 @@ import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Connection;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
-import com.atlan.samples.loaders.AssetBatch;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

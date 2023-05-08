@@ -12,6 +12,7 @@ import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.CategoryCache;
 import com.atlan.samples.loaders.caches.GlossaryCache;
+import com.atlan.util.AssetBatch;
 import java.util.*;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
@@ -220,7 +221,9 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                     GlossaryCategory category = builder.build();
                     try {
                         // TODO: matching on name alone has very minor risk of a collision as it is not strictly unique
-                        AssetMutationResponse response = category.upsert(replaceClassifications, replaceCM);
+                        AssetMutationResponse response = replaceCM
+                                ? category.upsertReplacingCM(replaceClassifications)
+                                : category.upsertMergingCM(replaceClassifications);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
