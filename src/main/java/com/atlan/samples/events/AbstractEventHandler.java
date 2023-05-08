@@ -205,8 +205,7 @@ public abstract class AbstractEventHandler extends MapHandler {
      * @return true if there is at least one assigned term
      */
     static boolean hasAssignedTerms(Asset asset) {
-        return (asset.getAssignedTerms() != null && !asset.getAssignedTerms().isEmpty())
-                || (asset.getMeanings() != null && !asset.getMeanings().isEmpty());
+        return (asset.getAssignedTerms() != null && !asset.getAssignedTerms().isEmpty());
     }
 
     /**
