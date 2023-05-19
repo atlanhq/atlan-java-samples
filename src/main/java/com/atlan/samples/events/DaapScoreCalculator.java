@@ -150,10 +150,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
                                         .toBuilder()
                                         .description("Data as a Product completeness score for this asset")
                                         .build())
-                        .options(CustomMetadataOptions.builder()
-                                .logoType("emoji")
-                                .emoji("\uD83D\uDD16")
-                                .build())
+                        .options(CustomMetadataOptions.withLogoAsEmoji("\uD83D\uDD16"))
                         .build();
                 customMetadataDef.create();
                 log.info("Created DaaP custom metadata structure.");
