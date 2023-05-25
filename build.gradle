@@ -81,7 +81,7 @@ repositories {
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
-    implementation group: "com.atlan", name: "atlan-java", "version": "0.6.0-SNAPSHOT"
+    implementation group: "com.atlan", name: "atlan-java", "version": "0.6.0"
     implementation "io.numaproj.numaflow:numaflow-java:0.4.6"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
