@@ -6,7 +6,6 @@ import com.atlan.Atlan;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.Classification;
 import com.atlan.model.relations.Reference;
-import com.atlan.util.StringUtils;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -117,12 +116,7 @@ public abstract class AbstractReporter {
         if (readme != null) {
             String content = readme.getDescription();
             if (content != null && content.length() > 0) {
-                try {
-                    return StringUtils.decodeContent(content);
-                } catch (IllegalArgumentException e) {
-                    log.warn("Unable to decode the README — returning as plain text.", e);
-                    return content;
-                }
+                return content;
             }
         }
         return "";
