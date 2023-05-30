@@ -6,7 +6,6 @@ import com.atlan.Atlan;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.Classification;
 import com.atlan.model.relations.Reference;
-import com.atlan.util.StringUtils;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
