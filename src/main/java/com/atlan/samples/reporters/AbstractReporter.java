@@ -117,12 +117,7 @@ public abstract class AbstractReporter {
         if (readme != null) {
             String content = readme.getDescription();
             if (content != null && content.length() > 0) {
-                try {
-                    return StringUtils.decodeContent(content);
-                } catch (IllegalArgumentException e) {
-                    log.warn("Unable to decode the README — returning as plain text.", e);
-                    return content;
-                }
+                return content;
             }
         }
         return "";
