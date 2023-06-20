@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":9,"i4":9,"i5":9,"i6":10,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":10,"i16":10,"i17":10};
+var data = {"i0":9,"i1":9,"i2":10,"i3":10,"i4":9,"i5":9,"i6":10,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":10,"i16":10,"i17":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -212,27 +212,27 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">getAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
+            java.lang.String&nbsp;delimiter)</code></th>
+<td class="colLast">
+<div class="block">Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
+ whether directly or through propagation.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBatchSize()">getBatchSize</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBucket()">getBucket</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getClassifications(com.atlan.model.assets.Asset,java.lang.String)">getClassifications</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                  java.lang.String&nbsp;delimiter)</code></th>
-<td class="colLast">
-<div class="block">Retrieve a comma-separated list of all classifications assigned to the provided asset,
- whether directly or through propagation.</div>
-</td>
-</tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>protected static &lt;T extends com.atlan.model.relations.Reference&gt;<br>int</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCount(java.util.Collection)">getCount</a></span>&#8203;(java.util.Collection&lt;T&gt;&nbsp;collection)</code></th>
+<td class="colFirst"><code>protected static int</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCount(java.util.Collection)">getCount</a></span>&#8203;(java.util.Collection&lt;?&gt;&nbsp;collection)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -255,10 +255,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDirectClassifications(com.atlan.model.assets.Asset,java.lang.String)">getDirectClassifications</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                        java.lang.String&nbsp;delimiter)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDirectAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">getDirectAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
+                  java.lang.String&nbsp;delimiter)</code></th>
 <td class="colLast">
-<div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) classifications
+<div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) Atlan tags
  to the provided asset.</div>
 </td>
 </tr>
@@ -468,7 +468,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getCount</h4>
-<pre class="methodSignature">protected static&nbsp;&lt;T extends com.atlan.model.relations.Reference&gt;&nbsp;int&nbsp;getCount&#8203;(java.util.Collection&lt;T&gt;&nbsp;collection)</pre>
+<pre class="methodSignature">protected static&nbsp;int&nbsp;getCount&#8203;(java.util.Collection&lt;?&gt;&nbsp;collection)</pre>
 </li>
 </ul>
 <a id="getREADME(com.atlan.model.assets.Asset)">
@@ -480,41 +480,41 @@ extends java.lang.Object</pre>
 <pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getREADME&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 </li>
 </ul>
-<a id="getClassifications(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getClassifications</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getClassifications&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                                     java.lang.String&nbsp;delimiter)</pre>
-<div class="block">Retrieve a comma-separated list of all classifications assigned to the provided asset,
+<h4>getAtlanTags</h4>
+<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
+                                               java.lang.String&nbsp;delimiter)</pre>
+<div class="block">Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
  whether directly or through propagation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>asset</code> - for which to find classifications</dd>
+<dd><code>asset</code> - for which to find Atlan tags</dd>
 <dd><code>delimiter</code> - the separator to use between multiple values</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>comma-separated list of the classifications</dd>
+<dd>comma-separated list of the Atlan tags</dd>
 </dl>
 </li>
 </ul>
-<a id="getDirectClassifications(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getDirectAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getDirectClassifications</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getDirectClassifications&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                                           java.lang.String&nbsp;delimiter)</pre>
-<div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) classifications
+<h4>getDirectAtlanTags</h4>
+<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getDirectAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
+                                                     java.lang.String&nbsp;delimiter)</pre>
+<div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) Atlan tags
  to the provided asset.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>asset</code> - for which to find direct classifications</dd>
+<dd><code>asset</code> - for which to find direct Atlan tags</dd>
 <dd><code>delimiter</code> - the separator to use between multiple values</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>comma-separated list of the direct classifications</dd>
+<dd>comma-separated list of the direct Atlan tags</dd>
 </dl>
 </li>
 </ul>

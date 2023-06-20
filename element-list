@@ -5,3 +5,10 @@ com.atlan.samples.loaders.models
 com.atlan.samples.readers
 com.atlan.samples.reporters
 com.atlan.samples.writers
+com.probable.guacamole
+com.probable.guacamole.generators
+com.probable.guacamole.instances
+com.probable.guacamole.model.assets
+com.probable.guacamole.model.enums
+com.probable.guacamole.model.structs
+com.probable.guacamole.typedefs

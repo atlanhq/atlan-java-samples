@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":9,"i7":10,"i8":10,"i9":10,"i10":10,"i11":9,"i12":6,"i13":9,"i14":9,"i15":10,"i16":10,"i17":9,"i18":10,"i19":10,"i20":9,"i21":10};
+var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":9,"i8":10,"i9":10,"i10":10,"i11":9,"i12":6,"i13":9,"i14":9,"i15":10,"i16":10,"i17":9,"i18":10,"i19":10,"i20":9,"i21":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -206,10 +206,10 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendClassifications(java.util.Map,java.lang.String)">appendClassifications</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;assetMap,
-                     java.lang.String&nbsp;typeName)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendAtlanTags(java.util.Map,java.lang.String)">appendAtlanTags</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;assetMap,
+               java.lang.String&nbsp;typeName)</code></th>
 <td class="colLast">
-<div class="block">Retrieve a mapping of the assets that need to be reclassified.</div>
+<div class="block">Retrieve a mapping of the assets that need to be retagged.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -238,25 +238,25 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAtlanTags()">getAtlanTags</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>protected static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBoolean(java.lang.String)">getBoolean</a></span>&#8203;(java.lang.String&nbsp;candidate)</code></th>
 <td class="colLast">
 <div class="block">Translate the provided cell value into a boolean.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>com.atlan.model.enums.CertificateStatus</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCertificate()">getCertificate</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCertificateStatusMessage()">getCertificateStatusMessage</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getClassifications()">getClassifications</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
@@ -488,20 +488,20 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="appendClassifications(java.util.Map,java.lang.String)">
+<a id="appendAtlanTags(java.util.Map,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>appendClassifications</h4>
-<pre class="methodSignature">protected static&nbsp;void&nbsp;appendClassifications&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;assetMap,
-                                            java.lang.String&nbsp;typeName)</pre>
-<div class="block">Retrieve a mapping of the assets that need to be reclassified.
- The method will first look up the provided assets to determine only the missing classifications
- that need to be appended (rather than attempting to blindly append all classifications).</div>
+<h4>appendAtlanTags</h4>
+<pre class="methodSignature">protected static&nbsp;void&nbsp;appendAtlanTags&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;assetMap,
+                                      java.lang.String&nbsp;typeName)</pre>
+<div class="block">Retrieve a mapping of the assets that need to be retagged.
+ The method will first look up the provided assets to determine only the missing Atlan tag
+ that need to be appended (rather than attempting to blindly append all Atlan tags).</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>assetMap</code> - mapping of assets to consider, keyed by qualifiedName with the value a list of classification names to add the asset to</dd>
+<dd><code>assetMap</code> - mapping of assets to consider, keyed by qualifiedName with the value a list of Atlan tag names to add the asset to</dd>
 <dd><code>typeName</code> - of all the assets</dd>
 </dl>
 </li>
@@ -593,13 +593,13 @@ extends java.lang.Object</pre>
 <pre class="methodSignature">public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getOwnerGroups()</pre>
 </li>
 </ul>
-<a id="getClassifications()">
+<a id="getAtlanTags()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getClassifications</h4>
-<pre class="methodSignature">public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getClassifications()</pre>
+<h4>getAtlanTags</h4>
+<pre class="methodSignature">public&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getAtlanTags()</pre>
 </li>
 </ul>
 <a id="isStub()">
