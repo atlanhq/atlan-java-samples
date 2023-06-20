@@ -38,15 +38,15 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     private enum FilterType {
         BY_GROUP,
-        BY_CLASSIFICATION,
+        BY_ATLAN_TAG,
         BY_PREFIX
     }
 
     private static FilterType FILTER_TYPE = null;
-    private static List<String> CLASSIFICATION_LIST = null;
+    private static List<String> ATLAN_TAG_LIST = null;
     private static String PREFIX = null;
     private static boolean INCLUDE_FIELD_LEVEL = false;
-    private static boolean DIRECT_CLASSIFICATIONS_ONLY = false;
+    private static boolean DIRECT_ATLAN_TAG_ONLY = false;
 
     private static final Map<String, String> categoryGuidToPath = new HashMap<>();
     private static final Map<String, Glossary> glossaryGuidToDetails = new HashMap<>();
@@ -184,14 +184,14 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             String filterBy = event.getOrDefault("FILTER_BY", "GROUP");
             if (filterBy.toUpperCase().equals("GROUP")) {
                 FILTER_TYPE = FilterType.BY_GROUP;
-            } else if (filterBy.toUpperCase().equals("CLASSIFICATION")) {
-                FILTER_TYPE = FilterType.BY_CLASSIFICATION;
+            } else if (filterBy.toUpperCase().equals("ATLAN_TAG")) {
+                FILTER_TYPE = FilterType.BY_ATLAN_TAG;
             } else {
                 FILTER_TYPE = FilterType.BY_PREFIX;
             }
-            String classification = event.getOrDefault("CLASSIFICATION", null);
-            if (classification != null && classification.length() > 0) {
-                CLASSIFICATION_LIST = List.of(classification);
+            String atlanTag = event.getOrDefault("ATLAN_TAG", null);
+            if (atlanTag != null && atlanTag.length() > 0) {
+                ATLAN_TAG_LIST = List.of(atlanTag);
             }
             String prefix = event.getOrDefault("PREFIX", null);
             if (prefix != null && prefix.length() > 0) {
@@ -199,9 +199,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             }
             String includeFieldLevel = event.getOrDefault("INCLUDE_FIELD_LEVEL", "false");
             INCLUDE_FIELD_LEVEL = includeFieldLevel.toUpperCase().equals("TRUE");
-            String directClassificationsOnly = event.getOrDefault("DIRECT_CLASSIFICATIONS_ONLY", "false");
-            DIRECT_CLASSIFICATIONS_ONLY =
-                    directClassificationsOnly.toUpperCase().equals("TRUE");
+            String directAtlanTagsOnly = event.getOrDefault("DIRECT_ATLAN_TAGS_ONLY", "false");
+            DIRECT_ATLAN_TAG_ONLY = directAtlanTagsOnly.toUpperCase().equals("TRUE");
         }
     }
 
@@ -357,8 +356,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         }
         if (FILTER_TYPE == FilterType.BY_GROUP) {
             builder = builder.must(have(KeywordFields.OWNER_GROUPS).present());
-        } else if (FILTER_TYPE == FilterType.BY_CLASSIFICATION) {
-            builder = builder.must(beClassifiedByAtLeastOneOf(CLASSIFICATION_LIST));
+        } else if (FILTER_TYPE == FilterType.BY_ATLAN_TAG) {
+            builder = builder.must(beTaggedByAtLeastOneOf(ATLAN_TAG_LIST));
         } else if (FILTER_TYPE == FilterType.BY_PREFIX) {
             builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
         }
@@ -415,9 +414,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
                     row.add(DataCell.of(getCount(result.getLinks())));
                     row.add(DataCell.of(
-                            DIRECT_CLASSIFICATIONS_ONLY
-                                    ? getDirectClassifications(result, getDelimiter())
-                                    : getClassifications(result, getDelimiter())));
+                            DIRECT_ATLAN_TAG_ONLY
+                                    ? getDirectAtlanTags(result, getDelimiter())
+                                    : getAtlanTags(result, getDelimiter())));
                     row.add(DataCell.of(childAssets.size()));
                     row.add(DataCell.of(descriptionCounts));
                     row.add(DataCell.of(getAssetLink(guid)));
@@ -526,7 +525,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     }
 
     static String getCategoryPath(GlossaryCategory category, Map<String, GlossaryCategory> guidMap) {
-        GlossaryCategory parent = category.getParentCategory();
+        IGlossaryCategory parent = category.getParentCategory();
         if (parent == null || parent.getGuid() == null) {
             return category.getName();
         } else {
@@ -548,9 +547,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             row.add(DataCell.of(getGroupOwners(term, getDelimiter())));
             row.add(DataCell.of(term.getCertificateStatus()));
             row.add(DataCell.of(
-                    DIRECT_CLASSIFICATIONS_ONLY
-                            ? getDirectClassifications(term, getDelimiter())
-                            : getClassifications(term, getDelimiter())));
+                    DIRECT_ATLAN_TAG_ONLY
+                            ? getDirectAtlanTags(term, getDelimiter())
+                            : getAtlanTags(term, getDelimiter())));
             row.add(DataCell.of(term.getCertificateStatusMessage()));
             row.add(DataCell.of(term.getCertificateUpdatedBy()));
             row.add(DataCell.of(getFormattedDateTime(term.getCertificateUpdatedAt())));
@@ -579,9 +578,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     }
 
     String getCategories(GlossaryTerm term) {
-        Set<GlossaryCategory> categories = term.getCategories();
+        Set<IGlossaryCategory> categories = term.getCategories();
         List<String> categoryPaths = new ArrayList<>(categories.size());
-        for (GlossaryCategory category : categories) {
+        for (IGlossaryCategory category : categories) {
             String path = categoryGuidToPath.getOrDefault(category.getGuid(), null);
             if (path != null) {
                 categoryPaths.add(path);
@@ -590,9 +589,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return getDelimitedList(categoryPaths, getDelimiter());
     }
 
-    String getTerms(Set<GlossaryTerm> terms, Map<String, GlossaryTerm> guidMap) {
+    String getTerms(Set<IGlossaryTerm> terms, Map<String, GlossaryTerm> guidMap) {
         List<String> qualifiedTerms = new ArrayList<>(terms.size());
-        for (GlossaryTerm term : terms) {
+        for (IGlossaryTerm term : terms) {
             GlossaryTerm related = guidMap.getOrDefault(term.getGuid(), null);
             if (related != null) {
                 Glossary glossary =
@@ -646,172 +645,308 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
      * @return the list of child assets
      */
     static List<Asset> getChildAssets(Asset asset) {
-        List<Asset> childAssets;
+        List<Asset> childAssets = new ArrayList<>();
         String assetType = asset.getTypeName();
         switch (assetType) {
             case Table.TYPE_NAME:
-                childAssets = new ArrayList<>(((Table) asset).getColumns());
+                for (IColumn column : ((Table) asset).getColumns()) {
+                    childAssets.add((Column) column);
+                }
                 break;
             case View.TYPE_NAME:
-                childAssets = new ArrayList<>(((View) asset).getColumns());
+                for (IColumn column : ((View) asset).getColumns()) {
+                    childAssets.add((Column) column);
+                }
                 break;
             case MaterializedView.TYPE_NAME:
-                childAssets = new ArrayList<>(((MaterializedView) asset).getColumns());
+                for (IColumn column : ((MaterializedView) asset).getColumns()) {
+                    childAssets.add((Column) column);
+                }
                 break;
             case LookerDashboard.TYPE_NAME:
                 LookerDashboard dashboard = (LookerDashboard) asset;
-                childAssets = new ArrayList<>(dashboard.getTiles());
-                childAssets.addAll(dashboard.getLooks());
+                for (ILookerTile tile : dashboard.getTiles()) {
+                    childAssets.add((LookerTile) tile);
+                }
+                for (ILookerLook look : dashboard.getLooks()) {
+                    childAssets.add((LookerLook) look);
+                }
                 break;
             case LookerModel.TYPE_NAME:
                 LookerModel model = (LookerModel) asset;
-                childAssets = new ArrayList<>(model.getExplores());
-                childAssets.addAll(model.getFields());
-                childAssets.addAll(model.getQueries());
+                for (ILookerExplore explore : model.getExplores()) {
+                    childAssets.add((LookerExplore) explore);
+                }
+                for (ILookerField field : model.getFields()) {
+                    childAssets.add((LookerField) field);
+                }
+                for (ILookerQuery query : model.getQueries()) {
+                    childAssets.add((LookerQuery) query);
+                }
                 break;
             case LookerProject.TYPE_NAME:
                 LookerProject project = (LookerProject) asset;
-                childAssets = new ArrayList<>(project.getModels());
-                childAssets.addAll(project.getExplores());
-                childAssets.addAll(project.getFields());
-                childAssets.addAll(project.getViews());
+                for (ILookerModel lModel : project.getModels()) {
+                    childAssets.add((LookerModel) lModel);
+                }
+                for (ILookerExplore explore : project.getExplores()) {
+                    childAssets.add((LookerExplore) explore);
+                }
+                for (ILookerField field : project.getFields()) {
+                    childAssets.add((LookerField) field);
+                }
+                for (ILookerView view : project.getViews()) {
+                    childAssets.add((LookerView) view);
+                }
                 break;
             case LookerExplore.TYPE_NAME:
-                childAssets = new ArrayList<>(((LookerExplore) asset).getFields());
+                for (ILookerField field : ((LookerExplore) asset).getFields()) {
+                    childAssets.add((LookerField) field);
+                }
                 break;
             case LookerQuery.TYPE_NAME:
                 LookerQuery query = (LookerQuery) asset;
-                childAssets = new ArrayList<>(query.getTiles());
-                childAssets.addAll(query.getLooks());
+                for (ILookerTile tile : query.getTiles()) {
+                    childAssets.add((LookerTile) tile);
+                }
+                for (ILookerLook look : query.getLooks()) {
+                    childAssets.add((LookerLook) look);
+                }
                 break;
             case LookerView.TYPE_NAME:
-                childAssets = new ArrayList<>(((LookerView) asset).getFields());
+                for (ILookerField field : ((LookerView) asset).getFields()) {
+                    childAssets.add((LookerField) field);
+                }
                 break;
             case MetabaseCollection.TYPE_NAME:
                 MetabaseCollection collection = (MetabaseCollection) asset;
-                childAssets = new ArrayList<>(collection.getMetabaseDashboards());
-                childAssets.addAll(collection.getMetabaseQuestions());
+                for (IMetabaseDashboard mDashboard : collection.getMetabaseDashboards()) {
+                    childAssets.add((MetabaseDashboard) mDashboard);
+                }
+                for (IMetabaseQuestion question : collection.getMetabaseQuestions()) {
+                    childAssets.add((MetabaseQuestion) question);
+                }
                 break;
             case MetabaseDashboard.TYPE_NAME:
-                childAssets = new ArrayList<>(((MetabaseDashboard) asset).getMetabaseQuestions());
+                for (IMetabaseQuestion question : ((MetabaseDashboard) asset).getMetabaseQuestions()) {
+                    childAssets.add((MetabaseQuestion) question);
+                }
                 break;
             case MetabaseQuestion.TYPE_NAME:
-                childAssets = new ArrayList<>(((MetabaseQuestion) asset).getMetabaseDashboards());
+                for (IMetabaseDashboard mDashboard : ((MetabaseQuestion) asset).getMetabaseDashboards()) {
+                    childAssets.add((MetabaseDashboard) mDashboard);
+                }
                 break;
             case ModeWorkspace.TYPE_NAME:
-                childAssets = new ArrayList<>(((ModeWorkspace) asset).getModeCollections());
+                for (IModeCollection mCollection : ((ModeWorkspace) asset).getModeCollections()) {
+                    childAssets.add((ModeCollection) mCollection);
+                }
                 break;
             case ModeCollection.TYPE_NAME:
-                childAssets = new ArrayList<>(((ModeCollection) asset).getModeReports());
+                for (IModeReport report : ((ModeCollection) asset).getModeReports()) {
+                    childAssets.add((ModeReport) report);
+                }
                 break;
             case ModeQuery.TYPE_NAME:
-                childAssets = new ArrayList<>(((ModeQuery) asset).getModeCharts());
+                for (IModeChart chart : ((ModeQuery) asset).getModeCharts()) {
+                    childAssets.add((ModeChart) chart);
+                }
                 break;
             case ModeReport.TYPE_NAME:
                 ModeReport modeReport = (ModeReport) asset;
-                childAssets = new ArrayList<>(modeReport.getModeCollections());
-                childAssets.addAll(modeReport.getModeQueries());
+                for (IModeCollection mCollection : modeReport.getModeCollections()) {
+                    childAssets.add((ModeCollection) mCollection);
+                }
+                for (IModeQuery mQuery : modeReport.getModeQueries()) {
+                    childAssets.add((ModeQuery) mQuery);
+                }
                 break;
             case PowerBIWorkspace.TYPE_NAME:
                 PowerBIWorkspace workspace = (PowerBIWorkspace) asset;
-                childAssets = new ArrayList<>(workspace.getReports());
-                childAssets.addAll(workspace.getDatasets());
-                childAssets.addAll(workspace.getDashboards());
-                childAssets.addAll(workspace.getDataflows());
+                for (IPowerBIReport report : workspace.getReports()) {
+                    childAssets.add((PowerBIReport) report);
+                }
+                for (IPowerBIDataset dataset : workspace.getDatasets()) {
+                    childAssets.add((PowerBIDataset) dataset);
+                }
+                for (IPowerBIDashboard pDashboard : workspace.getDashboards()) {
+                    childAssets.add((PowerBIDashboard) pDashboard);
+                }
+                for (IPowerBIDataflow dataflow : workspace.getDataflows()) {
+                    childAssets.add((PowerBIDataflow) dataflow);
+                }
                 break;
             case PowerBIDashboard.TYPE_NAME:
-                childAssets = new ArrayList<>(((PowerBIDashboard) asset).getTiles());
+                for (IPowerBITile tile : ((PowerBIDashboard) asset).getTiles()) {
+                    childAssets.add((PowerBITile) tile);
+                }
                 break;
             case PowerBIDataflow.TYPE_NAME:
-                childAssets = new ArrayList<>(((PowerBIDataflow) asset).getDatasets());
+                for (IPowerBIDataset dataset : ((PowerBIDataflow) asset).getDatasets()) {
+                    childAssets.add((PowerBIDataset) dataset);
+                }
                 break;
             case PowerBIDataset.TYPE_NAME:
                 PowerBIDataset dataset = (PowerBIDataset) asset;
-                childAssets = new ArrayList<>(dataset.getReports());
-                childAssets.addAll(dataset.getTiles());
-                childAssets.addAll(dataset.getTables());
-                childAssets.addAll(dataset.getDatasources());
-                childAssets.addAll(dataset.getDataflows());
+                for (IPowerBIReport report : dataset.getReports()) {
+                    childAssets.add((PowerBIReport) report);
+                }
+                for (IPowerBITile tile : dataset.getTiles()) {
+                    childAssets.add((PowerBITile) tile);
+                }
+                for (IPowerBITable table : dataset.getTables()) {
+                    childAssets.add((PowerBITable) table);
+                }
+                for (IPowerBIDatasource datasource : dataset.getDatasources()) {
+                    childAssets.add((PowerBIDatasource) datasource);
+                }
+                for (IPowerBIDataflow dataflow : dataset.getDataflows()) {
+                    childAssets.add((PowerBIDataflow) dataflow);
+                }
                 break;
             case PowerBIDatasource.TYPE_NAME:
-                childAssets = new ArrayList<>(((PowerBIDatasource) asset).getDatasets());
+                for (IPowerBIDataset pDataset : ((PowerBIDatasource) asset).getDatasets()) {
+                    childAssets.add((PowerBIDataset) pDataset);
+                }
                 break;
             case PowerBIReport.TYPE_NAME:
                 PowerBIReport pbiReport = (PowerBIReport) asset;
-                childAssets = new ArrayList<>(pbiReport.getTiles());
-                childAssets.addAll(pbiReport.getPages());
+                for (IPowerBITile tile : pbiReport.getTiles()) {
+                    childAssets.add((PowerBITile) tile);
+                }
+                for (IPowerBIPage page : pbiReport.getPages()) {
+                    childAssets.add((PowerBIPage) page);
+                }
                 break;
             case PowerBITable.TYPE_NAME:
                 PowerBITable pbiTable = (PowerBITable) asset;
-                childAssets = new ArrayList<>(pbiTable.getMeasures());
-                childAssets.addAll(pbiTable.getColumns());
+                for (IPowerBIMeasure measure : pbiTable.getMeasures()) {
+                    childAssets.add((PowerBIMeasure) measure);
+                }
+                for (IPowerBIColumn column : pbiTable.getColumns()) {
+                    childAssets.add((PowerBIColumn) column);
+                }
                 break;
             case PresetWorkspace.TYPE_NAME:
-                childAssets = new ArrayList<>(((PresetWorkspace) asset).getPresetDashboards());
+                for (IPresetDashboard pDashboard : ((PresetWorkspace) asset).getPresetDashboards()) {
+                    childAssets.add((PresetDashboard) pDashboard);
+                }
                 break;
             case PresetDashboard.TYPE_NAME:
                 PresetDashboard presetDashboard = (PresetDashboard) asset;
-                childAssets = new ArrayList<>(presetDashboard.getPresetDatasets());
-                childAssets.addAll(presetDashboard.getPresetCharts());
+                for (IPresetDataset pDataset : presetDashboard.getPresetDatasets()) {
+                    childAssets.add((PresetDataset) pDataset);
+                }
+                for (IPresetChart chart : presetDashboard.getPresetCharts()) {
+                    childAssets.add((PresetChart) chart);
+                }
                 break;
             case ADLSContainer.TYPE_NAME:
-                childAssets = new ArrayList<>(((ADLSContainer) asset).getAdlsObjects());
+                for (IADLSObject object : ((ADLSContainer) asset).getAdlsObjects()) {
+                    childAssets.add((ADLSObject) object);
+                }
                 break;
             case GCSBucket.TYPE_NAME:
-                childAssets = new ArrayList<>(((GCSBucket) asset).getGcsObjects());
+                for (IGCSObject object : ((GCSBucket) asset).getGcsObjects()) {
+                    childAssets.add((GCSObject) object);
+                }
                 break;
             case S3Bucket.TYPE_NAME:
-                childAssets = new ArrayList<>(((S3Bucket) asset).getObjects());
+                for (IS3Object object : ((S3Bucket) asset).getObjects()) {
+                    childAssets.add((S3Object) object);
+                }
                 break;
             case SalesforceOrganization.TYPE_NAME:
                 SalesforceOrganization org = (SalesforceOrganization) asset;
-                childAssets = new ArrayList<>(org.getReports());
-                childAssets.addAll(org.getObjects());
-                childAssets.addAll(org.getDashboards());
+                for (ISalesforceReport report : org.getReports()) {
+                    childAssets.add((SalesforceReport) report);
+                }
+                for (ISalesforceObject object : org.getObjects()) {
+                    childAssets.add((SalesforceObject) object);
+                }
+                for (ISalesforceDashboard sDashboard : org.getDashboards()) {
+                    childAssets.add((SalesforceDashboard) sDashboard);
+                }
                 break;
             case SalesforceDashboard.TYPE_NAME:
-                childAssets = new ArrayList<>(((SalesforceDashboard) asset).getReports());
+                for (ISalesforceReport report : ((SalesforceDashboard) asset).getReports()) {
+                    childAssets.add((SalesforceReport) report);
+                }
                 break;
             case SalesforceReport.TYPE_NAME:
-                childAssets = new ArrayList<>(((SalesforceReport) asset).getDashboards());
+                for (ISalesforceDashboard sDashboard : ((SalesforceReport) asset).getDashboards()) {
+                    childAssets.add((SalesforceDashboard) sDashboard);
+                }
                 break;
             case SalesforceObject.TYPE_NAME:
                 SalesforceObject object = (SalesforceObject) asset;
-                childAssets = new ArrayList<>(object.getLookupFields());
-                childAssets.addAll(object.getFields());
+                for (ISalesforceField field : object.getLookupFields()) {
+                    childAssets.add((SalesforceField) field);
+                }
+                for (ISalesforceField field : object.getFields()) {
+                    childAssets.add((SalesforceField) field);
+                }
                 break;
             case TableauSite.TYPE_NAME:
-                childAssets = new ArrayList<>(((TableauSite) asset).getProjects());
+                for (ITableauProject tProject : ((TableauSite) asset).getProjects()) {
+                    childAssets.add((TableauProject) tProject);
+                }
                 break;
             case TableauProject.TYPE_NAME:
                 TableauProject tableauProject = (TableauProject) asset;
-                childAssets = new ArrayList<>(tableauProject.getWorkbooks());
-                childAssets.addAll(tableauProject.getDatasources());
-                childAssets.addAll(tableauProject.getFlows());
+                for (ITableauWorkbook workbook : tableauProject.getWorkbooks()) {
+                    childAssets.add((TableauWorkbook) workbook);
+                }
+                for (ITableauDatasource datasource : tableauProject.getDatasources()) {
+                    childAssets.add((TableauDatasource) datasource);
+                }
+                for (ITableauFlow flow : tableauProject.getFlows()) {
+                    childAssets.add((TableauFlow) flow);
+                }
                 break;
             case TableauWorkbook.TYPE_NAME:
                 TableauWorkbook tableauWorkbook = (TableauWorkbook) asset;
-                childAssets = new ArrayList<>(tableauWorkbook.getWorksheets());
-                childAssets.addAll(tableauWorkbook.getDatasources());
-                childAssets.addAll(tableauWorkbook.getDashboards());
+                for (ITableauWorksheet worksheet : tableauWorkbook.getWorksheets()) {
+                    childAssets.add((TableauWorksheet) worksheet);
+                }
+                for (ITableauDatasource datasource : tableauWorkbook.getDatasources()) {
+                    childAssets.add((TableauDatasource) datasource);
+                }
+                for (ITableauDashboard tDashboard : tableauWorkbook.getDashboards()) {
+                    childAssets.add((TableauDashboard) tDashboard);
+                }
                 break;
             case TableauWorksheet.TYPE_NAME:
                 TableauWorksheet worksheet = (TableauWorksheet) asset;
-                childAssets = new ArrayList<>(worksheet.getDatasourceFields());
-                childAssets.addAll(worksheet.getCalculatedFields());
-                childAssets.addAll(worksheet.getDashboards());
+                for (ITableauDatasourceField field : worksheet.getDatasourceFields()) {
+                    childAssets.add((TableauDatasourceField) field);
+                }
+                for (ITableauCalculatedField field : worksheet.getCalculatedFields()) {
+                    childAssets.add((TableauCalculatedField) field);
+                }
+                for (ITableauDashboard tDashboard : worksheet.getDashboards()) {
+                    childAssets.add((TableauDashboard) tDashboard);
+                }
                 break;
             case TableauCalculatedField.TYPE_NAME:
-                childAssets = new ArrayList<>(((TableauCalculatedField) asset).getWorksheets());
+                for (ITableauWorksheet tWorksheet : ((TableauCalculatedField) asset).getWorksheets()) {
+                    childAssets.add((TableauWorksheet) tWorksheet);
+                }
                 break;
             case TableauDashboard.TYPE_NAME:
-                childAssets = new ArrayList<>(((TableauDashboard) asset).getWorksheets());
+                for (ITableauWorksheet tWorksheet : ((TableauDashboard) asset).getWorksheets()) {
+                    childAssets.add((TableauWorksheet) tWorksheet);
+                }
                 break;
             case TableauDatasource.TYPE_NAME:
-                childAssets = new ArrayList<>(((TableauDatasource) asset).getFields());
+                for (ITableauCalculatedField field : ((TableauDatasource) asset).getFields()) {
+                    childAssets.add((TableauCalculatedField) field);
+                }
                 break;
             case TableauDatasourceField.TYPE_NAME:
-                childAssets = new ArrayList<>(((TableauDatasourceField) asset).getWorksheets());
+                for (ITableauWorksheet tWorksheet : ((TableauDatasourceField) asset).getWorksheets()) {
+                    childAssets.add((TableauWorksheet) tWorksheet);
+                }
                 break;
             case DataStudioAsset.TYPE_NAME:
             default:
@@ -878,8 +1013,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Assigned Terms", "Terms that have been linked to the asset");
         map.put("Resources", "Count of resources (links) associated with the asset");
         map.put(
-                "Classifications",
-                "Comma-separated list of the names of classifications applied to the asset, if any (blank means no classifications)");
+                "Atlan Tags",
+                "Comma-separated list of the names of Atlan tags applied to the asset, if any (blank means no Atlan tags)");
         map.put("Children", "Count of children of this asset (for example, columns in a table)");
         map.put(
                 "Children with descriptions",
@@ -954,7 +1089,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         map.put("Owner Users", "Comma-separated list of the usernames who are owners of this term");
         map.put("Owner Groups", "Comma-separated list of the group names who are owners of this term");
         map.put("Certificate", "Certificate associated with this term, one of: Verified, Draft, Deprecated");
-        map.put("Classifications", "Comma-separated list of the classifications associated with this term");
+        map.put("Atlan Tags", "Comma-separated list of the Atlan tags associated with this term");
         map.put("Certificate Message", "Message associated with the certificate (if any)");
         map.put("Certificate Updated By", "User who last updated the certificate");
         map.put("Certificate Updated At", "Date and time when the certificate was last updated");

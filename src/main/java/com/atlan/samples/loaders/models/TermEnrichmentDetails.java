@@ -7,9 +7,8 @@ import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
-import com.atlan.model.core.Classification;
+import com.atlan.model.core.AtlanTag;
 import com.atlan.model.core.CustomMetadataAttributes;
-import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.CategoryCache;
 import com.atlan.samples.loaders.caches.GlossaryCache;
 import com.atlan.samples.loaders.caches.TermCache;
@@ -182,7 +181,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
      *
      * @param terms the set of terms to ensure exist
      * @param batchSize maximum number of terms to create per batch
-     * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
+     * @param replaceAtlanTags if true, the Atlan tags in the spreadsheet will overwrite all existing Atlan tags on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      * @return a cache of the terms
@@ -190,11 +189,11 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
     public static TermCache upsert(
             Map<String, TermEnrichmentDetails> terms,
             int batchSize,
-            boolean replaceClassifications,
+            boolean replaceAtlanTags,
             boolean replaceCM,
             boolean updateOnly) {
         TermCache termIdentityToResult = new TermCache();
-        Map<String, List<String>> toClassify = new HashMap<>();
+        Map<String, List<String>> toTag = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         Map<String, String> readmes = new HashMap<>();
         Map<String, TermEnrichmentDetails> termToTerm = new HashMap<>();
@@ -233,10 +232,10 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     if (details.getCustomMetadataValues() != null) {
                         builder = builder.customMetadataSets(details.getCustomMetadataValues());
                     }
-                    if (details.getClassifications() != null) {
-                        List<String> clsNames = details.getClassifications();
+                    if (details.getAtlanTags() != null) {
+                        List<String> clsNames = details.getAtlanTags();
                         for (String clsName : clsNames) {
-                            builder = builder.classification(Classification.of(clsName));
+                            builder = builder.atlanTag(AtlanTag.of(clsName));
                         }
                     }
                     GlossaryTerm term = builder.build();
@@ -244,8 +243,8 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     // before we can take next actions
                     try {
                         AssetMutationResponse response = replaceCM
-                                ? term.upsertReplacingCM(replaceClassifications)
-                                : term.upsertMergingCM(replaceClassifications);
+                                ? term.upsertReplacingCM(replaceAtlanTags)
+                                : term.upsertMergingCM(replaceAtlanTags);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
@@ -281,12 +280,12 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     } catch (AtlanException e) {
                         log.error("Unable to upsert term: {}", details.getIdentity(), e);
                     }
-                    if (!replaceClassifications && !details.getClassifications().isEmpty()) {
+                    if (!replaceAtlanTags && !details.getAtlanTags().isEmpty()) {
                         // Note that the qualifiedName is only resolved after the asset is
                         // created (or updated) above
                         Asset resolved = termIdentityToResult.get(details.getIdentity());
                         if (resolved != null) {
-                            toClassify.put(resolved.getQualifiedName(), details.getClassifications());
+                            toTag.put(resolved.getQualifiedName(), details.getAtlanTags());
                         }
                     }
                     if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
@@ -308,9 +307,9 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
             }
         }
 
-        // If we did not replace the classifications, they must be added in a second pass, after the asset exists
-        if (!replaceClassifications) {
-            appendClassifications(toClassify, GlossaryTerm.TYPE_NAME);
+        // If we did not replace the Atlan tags, they must be added in a second pass, after the asset exists
+        if (!replaceAtlanTags) {
+            appendAtlanTags(toTag, GlossaryTerm.TYPE_NAME);
         }
 
         // If we did not replace custom metadata, it must be selectively updated one-by-one

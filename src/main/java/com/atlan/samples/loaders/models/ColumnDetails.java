@@ -6,7 +6,6 @@ import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Column;
-import com.atlan.samples.loaders.*;
 import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
@@ -139,8 +138,8 @@ public class ColumnDetails extends AssetDetails {
                             .isPrimary(details.getPrimaryKey())
                             .isForeign(details.getForeignKey())
                             .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    if (!details.getAtlanTags().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                     }
                     batch.add(toUpdate);
                 } catch (NotFoundException e) {
@@ -177,8 +176,8 @@ public class ColumnDetails extends AssetDetails {
                     builder = builder.numericScale(scale);
                 }
                 Column column = builder.build();
-                if (!details.getClassifications().isEmpty()) {
-                    toClassify.put(column.getQualifiedName(), details.getClassifications());
+                if (!details.getAtlanTags().isEmpty()) {
+                    toClassify.put(column.getQualifiedName(), details.getAtlanTags());
                 }
                 batch.add(column);
             }
@@ -187,7 +186,7 @@ public class ColumnDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, Column.TYPE_NAME);
+        appendAtlanTags(toClassify, Column.TYPE_NAME);
 
         return parents;
     }

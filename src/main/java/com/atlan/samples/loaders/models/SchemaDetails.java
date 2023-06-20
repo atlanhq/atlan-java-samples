@@ -121,8 +121,8 @@ public class SchemaDetails extends AssetDetails {
                             .ownerUsers(details.getOwnerUsers())
                             .ownerGroups(details.getOwnerGroups())
                             .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    if (!details.getAtlanTags().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                     }
                     batch.add(toUpdate);
                     parents.add(databaseQualifiedName);
@@ -142,8 +142,8 @@ public class SchemaDetails extends AssetDetails {
                         .ownerUsers(details.getOwnerUsers())
                         .ownerGroups(details.getOwnerGroups())
                         .build();
-                if (!details.getClassifications().isEmpty()) {
-                    toClassify.put(schema.getQualifiedName(), details.getClassifications());
+                if (!details.getAtlanTags().isEmpty()) {
+                    toClassify.put(schema.getQualifiedName(), details.getAtlanTags());
                 }
                 batch.add(schema);
                 parents.add(databaseQualifiedName);
@@ -153,7 +153,7 @@ public class SchemaDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, Schema.TYPE_NAME);
+        appendAtlanTags(toClassify, Schema.TYPE_NAME);
 
         return parents;
     }

@@ -6,9 +6,8 @@ import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
-import com.atlan.model.core.Classification;
+import com.atlan.model.core.AtlanTag;
 import com.atlan.model.core.CustomMetadataAttributes;
-import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.TermCache;
 import com.atlan.util.AssetBatch;
 import java.util.*;
@@ -101,20 +100,20 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
      *
      * @param assets the set of assets to ensure exist
      * @param batchSize maximum number of assets to create per batch
-     * @param replaceClassifications if true, the classifications in the spreadsheet will overwrite all existing classifications on the asset; otherwise they will only be appended
+     * @param replaceAtlanTags if true, the Atlan tags in the spreadsheet will overwrite all existing Atlan tags on the asset; otherwise they will only be appended
      * @param replaceCM if true, the custom metadata in the spreadsheet will overwrite all custom metadata on the asset; otherwise only the attributes with values will be updated
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
     public static void upsert(
             Map<String, AssetEnrichmentDetails> assets,
             int batchSize,
-            boolean replaceClassifications,
+            boolean replaceAtlanTags,
             boolean replaceCM,
             boolean updateOnly) {
-        Map<String, Map<String, List<String>>> toClassifyMap = new HashMap<>();
+        Map<String, Map<String, List<String>>> toTagMap = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         AssetBatch batch =
-                new AssetBatch("asset", batchSize, replaceClassifications, AssetBatch.CustomMetadataHandling.OVERWRITE);
+                new AssetBatch("asset", batchSize, replaceAtlanTags, AssetBatch.CustomMetadataHandling.OVERWRITE);
         Map<String, String> readmes = new HashMap<>();
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 
@@ -152,20 +151,19 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
                 if (details.getCustomMetadataValues() != null) {
                     builder = builder.customMetadataSets(details.getCustomMetadataValues());
                 }
-                if (details.getClassifications() != null) {
-                    List<String> clsNames = details.getClassifications();
+                if (details.getAtlanTags() != null) {
+                    List<String> clsNames = details.getAtlanTags();
                     for (String clsName : clsNames) {
-                        builder = builder.classification(Classification.of(clsName));
+                        builder = builder.atlanTag(AtlanTag.of(clsName));
                     }
                 }
                 Asset asset = builder.build();
-                if (!replaceClassifications && !details.getClassifications().isEmpty()) {
-                    if (!toClassifyMap.containsKey(details.getType())) {
-                        toClassifyMap.put(details.getType(), new HashMap<>());
+                if (!replaceAtlanTags && !details.getAtlanTags().isEmpty()) {
+                    if (!toTagMap.containsKey(details.getType())) {
+                        toTagMap.put(details.getType(), new HashMap<>());
                     }
-                    List<String> existing = toClassifyMap
-                            .get(details.getType())
-                            .put(details.getQualifiedName(), details.getClassifications());
+                    List<String> existing =
+                            toTagMap.get(details.getType()).put(details.getQualifiedName(), details.getAtlanTags());
                     if (existing != null) {
                         log.warn("Multiple entries with the same qualifiedName: {}", details.getQualifiedName());
                     }
@@ -183,12 +181,12 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
         }
         cacheResult(assetIdentityToResult, batch.flush(), null);
 
-        // If we did not replace the classifications, they must be added in a second pass, after the asset exists
-        if (!replaceClassifications) {
-            for (Map.Entry<String, Map<String, List<String>>> entry : toClassifyMap.entrySet()) {
+        // If we did not replace the Atlan tags, they must be added in a second pass, after the asset exists
+        if (!replaceAtlanTags) {
+            for (Map.Entry<String, Map<String, List<String>>> entry : toTagMap.entrySet()) {
                 String typeName = entry.getKey();
-                Map<String, List<String>> toClassify = entry.getValue();
-                appendClassifications(toClassify, typeName);
+                Map<String, List<String>> toTag = entry.getValue();
+                appendAtlanTags(toTag, typeName);
             }
         }
 

@@ -148,8 +148,8 @@ public class ContainerDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyTables.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyTables.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             batchContainers.add(toUpdate);
                         } catch (NotFoundException e) {
@@ -168,8 +168,8 @@ public class ContainerDetails extends AssetDetails {
                                 .ownerUsers(details.getOwnerUsers())
                                 .ownerGroups(details.getOwnerGroups())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyTables.put(table.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyTables.put(table.getQualifiedName(), details.getAtlanTags());
                         }
                         batchContainers.add(table);
                     }
@@ -189,8 +189,8 @@ public class ContainerDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyViews.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyViews.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             batchContainers.add(toUpdate);
                         } catch (NotFoundException e) {
@@ -209,8 +209,8 @@ public class ContainerDetails extends AssetDetails {
                                 .ownerUsers(details.getOwnerUsers())
                                 .ownerGroups(details.getOwnerGroups())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyViews.put(view.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyViews.put(view.getQualifiedName(), details.getAtlanTags());
                         }
                         batchContainers.add(view);
                     }
@@ -231,8 +231,8 @@ public class ContainerDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyMVs.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyMVs.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             batchContainers.add(toUpdate);
                         } catch (NotFoundException e) {
@@ -251,8 +251,8 @@ public class ContainerDetails extends AssetDetails {
                                 .ownerUsers(details.getOwnerUsers())
                                 .ownerGroups(details.getOwnerGroups())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyMVs.put(mv.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyMVs.put(mv.getQualifiedName(), details.getAtlanTags());
                         }
                         batchContainers.add(mv);
                     }
@@ -266,9 +266,9 @@ public class ContainerDetails extends AssetDetails {
         batchContainers.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassifyTables, Table.TYPE_NAME);
-        appendClassifications(toClassifyViews, View.TYPE_NAME);
-        appendClassifications(toClassifyMVs, MaterializedView.TYPE_NAME);
+        appendAtlanTags(toClassifyTables, Table.TYPE_NAME);
+        appendAtlanTags(toClassifyViews, View.TYPE_NAME);
+        appendAtlanTags(toClassifyMVs, MaterializedView.TYPE_NAME);
 
         return parents;
     }

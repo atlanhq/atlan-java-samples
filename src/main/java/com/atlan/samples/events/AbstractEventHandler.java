@@ -5,8 +5,8 @@ package com.atlan.samples.events;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Catalog;
-import com.atlan.model.assets.LineageProcess;
+import com.atlan.model.assets.ICatalog;
+import com.atlan.model.assets.ILineageProcess;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.events.AtlanEventPayload;
@@ -100,20 +100,16 @@ public abstract class AbstractEventHandler extends MapHandler {
      * @param event containing details about an asset
      * @param limitedToAttributes the limited set of attributes to retrieve about the asset
      * @param includeMeanings if true, include any assigned terms
-     * @param includeClassifications if true, include any assigned classifications
+     * @param includeAtlanTags if true, include any assigned Atlan tags
      * @return the current information about the asset in Atlan, limited to what was requested
      * @throws AtlanException on any issues communicating with the API
      */
     static Asset getCurrentViewOfAsset(
-            AtlanEvent event,
-            Collection<String> limitedToAttributes,
-            boolean includeMeanings,
-            boolean includeClassifications)
+            AtlanEvent event, Collection<String> limitedToAttributes, boolean includeMeanings, boolean includeAtlanTags)
             throws AtlanException {
         AtlanEventPayload payload = event.getPayload();
         if (payload != null && payload.getAsset() != null) {
-            return getCurrentViewOfAsset(
-                    payload.getAsset(), limitedToAttributes, includeMeanings, includeClassifications);
+            return getCurrentViewOfAsset(payload.getAsset(), limitedToAttributes, includeMeanings, includeAtlanTags);
         }
         return null;
     }
@@ -129,15 +125,12 @@ public abstract class AbstractEventHandler extends MapHandler {
      * @param fromEvent details of the asset in the event
      * @param limitedToAttributes the limited set of attributes to retrieve about the asset
      * @param includeMeanings if true, include any assigned terms
-     * @param includeClassifications if true, include any assigned classifications
+     * @param includeAtlanTags if true, include any assigned Atlan tags
      * @return the current information about the asset in Atlan, limited to what was requested
      * @throws AtlanException on any issues communicating with the API
      */
     static Asset getCurrentViewOfAsset(
-            Asset fromEvent,
-            Collection<String> limitedToAttributes,
-            boolean includeMeanings,
-            boolean includeClassifications)
+            Asset fromEvent, Collection<String> limitedToAttributes, boolean includeMeanings, boolean includeAtlanTags)
             throws AtlanException {
         IndexSearchRequest request = IndexSearchRequest.builder()
                 .dsl(IndexSearchDSL.builder()
@@ -149,7 +142,7 @@ public abstract class AbstractEventHandler extends MapHandler {
                                 .build()
                                 ._toQuery())
                         .build())
-                .excludeClassifications(!includeClassifications)
+                .excludeAtlanTags(!includeAtlanTags)
                 .excludeMeanings(!includeMeanings)
                 .attributes(limitedToAttributes == null ? Collections.emptySet() : limitedToAttributes)
                 // Include attributes that are mandatory for updates, for some asset types
@@ -209,13 +202,13 @@ public abstract class AbstractEventHandler extends MapHandler {
     }
 
     /**
-     * Check if the asset has any classifications.
+     * Check if the asset has any Atlan tags.
      *
-     * @param asset to check for the presence of a classification
-     * @return true if there is at least one assigned classification
+     * @param asset to check for the presence of an Atlan tag
+     * @return true if there is at least one assigned Atlan tag
      */
-    static boolean hasClassifications(Asset asset) {
-        return asset.getClassifications() != null && !asset.getClassifications().isEmpty();
+    static boolean hasAtlanTags(Asset asset) {
+        return asset.getAtlanTags() != null && !asset.getAtlanTags().isEmpty();
     }
 
     /**
@@ -225,11 +218,11 @@ public abstract class AbstractEventHandler extends MapHandler {
      * @return true if the asset is input to or output from at least one process
      */
     static boolean hasLineage(Asset asset) {
-        if (asset instanceof Catalog) {
+        if (asset instanceof ICatalog) {
             // If possible, look directly on inputs and outputs rather than the __hasLineage flag
-            Catalog details = (Catalog) asset;
-            Set<LineageProcess> downstream = details.getInputToProcesses();
-            Set<LineageProcess> upstream = details.getOutputFromProcesses();
+            ICatalog details = (ICatalog) asset;
+            Set<ILineageProcess> downstream = details.getInputToProcesses();
+            Set<ILineageProcess> upstream = details.getOutputFromProcesses();
             return (downstream != null && !downstream.isEmpty()) || (upstream != null && !upstream.isEmpty());
         } else {
             return asset.getHasLineage();

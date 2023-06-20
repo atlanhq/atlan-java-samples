@@ -86,7 +86,7 @@ public class DaapScoreCalculator extends AbstractEventHandler {
         int sDescription = hasDescription(asset) ? 1 : 0;
         int sOwner = hasOwner(asset) ? 1 : 0;
         int sTerms = hasAssignedTerms(asset) ? 1 : 0;
-        int sClassifications = hasClassifications(asset) ? 1 : 0;
+        int sClassifications = hasAtlanTags(asset) ? 1 : 0;
         int sLineage = hasLineage(asset) ? 1 : 0;
 
         // 5. Calculate the score

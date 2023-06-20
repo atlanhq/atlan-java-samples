@@ -30,7 +30,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
     private static final Set<String> autoSizeSheets = new HashSet<>();
 
     private static final HashMap<String, Long> assetToSlackDiscussions = new HashMap<>();
-    private static final HashMap<String, Asset> guidToLinkedAsset = new HashMap<>();
+    private static final HashMap<String, IAsset> guidToLinkedAsset = new HashMap<>();
 
     public static void main(String[] args) {
         SlackDiscussionReporter sdr = new SlackDiscussionReporter();
@@ -141,7 +141,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
         for (Map.Entry<String, Long> entry : assetToSlackDiscussions.entrySet()) {
             String assetGuid = entry.getKey();
             Long linkCount = entry.getValue();
-            Asset asset = guidToLinkedAsset.get(assetGuid);
+            IAsset asset = guidToLinkedAsset.get(assetGuid);
             if (asset != null) {
                 xlsx.appendRow(
                         sheet,

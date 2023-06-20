@@ -119,8 +119,8 @@ public class DatabaseDetails extends AssetDetails {
                             .ownerUsers(details.getOwnerUsers())
                             .ownerGroups(details.getOwnerGroups())
                             .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    if (!details.getAtlanTags().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                     }
                     batch.add(toUpdate);
                 } catch (NotFoundException e) {
@@ -139,8 +139,8 @@ public class DatabaseDetails extends AssetDetails {
                         .ownerUsers(details.getOwnerUsers())
                         .ownerGroups(details.getOwnerGroups())
                         .build();
-                if (!details.getClassifications().isEmpty()) {
-                    toClassify.put(database.getQualifiedName(), details.getClassifications());
+                if (!details.getAtlanTags().isEmpty()) {
+                    toClassify.put(database.getQualifiedName(), details.getAtlanTags());
                 }
                 batch.add(database);
             }
@@ -149,6 +149,6 @@ public class DatabaseDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, Database.TYPE_NAME);
+        appendAtlanTags(toClassify, Database.TYPE_NAME);
     }
 }
