@@ -5,7 +5,7 @@ package com.atlan.samples.loaders.models;
 import com.atlan.api.EntityUniqueAttributesEndpoint;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
-import com.atlan.model.core.Classification;
+import com.atlan.model.core.AtlanTag;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.CertificateStatus;
@@ -35,7 +35,7 @@ public abstract class AssetDetails {
     private static final String COL_ANN_MESSAGE = "ANNOUNCEMENT MESSAGE";
     private static final String COL_OWN_USERS = "OWNER USERS";
     private static final String COL_OWN_GROUPS = "OWNER GROUPS";
-    private static final String COL_CLASSIFICATIONS = "CLASSIFICATIONS";
+    private static final String COL_ATLAN_TAGS = "ATLAN TAGS";
 
     @ToString.Include
     private String description;
@@ -65,7 +65,7 @@ public abstract class AssetDetails {
 
     @ToString.Include
     @Builder.Default
-    private List<String> classifications = Collections.emptyList();
+    private List<String> atlanTags = Collections.emptyList();
 
     @ToString.Include
     @Builder.Default
@@ -94,7 +94,7 @@ public abstract class AssetDetails {
                 .announcementMessage(row.get(COL_ANN_MESSAGE))
                 .ownerUsers(getMultiValuedList(row.get(COL_OWN_USERS), delim))
                 .ownerGroups(getMultiValuedList(row.get(COL_OWN_GROUPS), delim))
-                .classifications(getMultiValuedList(row.get(COL_CLASSIFICATIONS), delim));
+                .atlanTags(getMultiValuedList(row.get(COL_ATLAN_TAGS), delim));
 
         String certificate = row.get(COL_CERTIFICATE);
         String announcement = row.get(COL_ANNOUNCEMENT);
@@ -177,47 +177,47 @@ public abstract class AssetDetails {
     }
 
     /**
-     * Retrieve a mapping of the assets that need to be reclassified.
-     * The method will first look up the provided assets to determine only the missing classifications
-     * that need to be appended (rather than attempting to blindly append all classifications).
+     * Retrieve a mapping of the assets that need to be retagged.
+     * The method will first look up the provided assets to determine only the missing Atlan tag
+     * that need to be appended (rather than attempting to blindly append all Atlan tags).
      *
-     * @param assetMap mapping of assets to consider, keyed by qualifiedName with the value a list of classification names to add the asset to
+     * @param assetMap mapping of assets to consider, keyed by qualifiedName with the value a list of Atlan tag names to add the asset to
      * @param typeName of all the assets
      */
-    protected static void appendClassifications(Map<String, List<String>> assetMap, String typeName) {
-        Map<String, List<String>> toReclassify = new HashMap<>();
+    protected static void appendAtlanTags(Map<String, List<String>> assetMap, String typeName) {
+        Map<String, List<String>> toRetag = new HashMap<>();
         if (!assetMap.isEmpty()) {
             for (Map.Entry<String, List<String>> details : assetMap.entrySet()) {
                 String qn = details.getKey();
-                List<String> classifications = new ArrayList<>(details.getValue());
+                List<String> atlanTags = new ArrayList<>(details.getValue());
                 try {
                     Asset column = Asset.retrieveMinimal(typeName, qn);
-                    Set<Classification> existing = column.getClassifications();
+                    Set<AtlanTag> existing = column.getAtlanTags();
                     List<String> toRemove = new ArrayList<>();
-                    for (Classification one : existing) {
-                        if (classifications.contains(one.getTypeName())) {
+                    for (AtlanTag one : existing) {
+                        if (atlanTags.contains(one.getTypeName())) {
                             toRemove.add(one.getTypeName());
                         }
                     }
-                    classifications.removeAll(toRemove);
-                    if (!classifications.isEmpty()) {
-                        toReclassify.put(qn, classifications);
+                    atlanTags.removeAll(toRemove);
+                    if (!atlanTags.isEmpty()) {
+                        toRetag.put(qn, atlanTags);
                     }
                 } catch (AtlanException e) {
-                    log.error("Unable to find {} {} — cannot reclassify it.", typeName, qn, e);
+                    log.error("Unable to find {} {} — cannot retag it.", typeName, qn, e);
                 }
             }
         }
-        if (!toReclassify.isEmpty()) {
-            log.info("... classifying {} {}s:", toReclassify.size(), typeName);
-            for (Map.Entry<String, List<String>> details : toReclassify.entrySet()) {
+        if (!toRetag.isEmpty()) {
+            log.info("... tagging {} {}s:", toRetag.size(), typeName);
+            for (Map.Entry<String, List<String>> details : toRetag.entrySet()) {
                 String qn = details.getKey();
-                List<String> classifications = details.getValue();
+                List<String> atlanTags = details.getValue();
                 try {
-                    log.info("...... classifying: {}", qn);
-                    EntityUniqueAttributesEndpoint.addClassifications(typeName, qn, classifications);
+                    log.info("...... tagging: {}", qn);
+                    EntityUniqueAttributesEndpoint.addAtlanTags(typeName, qn, atlanTags);
                 } catch (AtlanException e) {
-                    log.error("Unable to classify {} {} with: {}", typeName, qn, classifications, e);
+                    log.error("Unable to tag {} {} with: {}", typeName, qn, atlanTags, e);
                 }
             }
         }

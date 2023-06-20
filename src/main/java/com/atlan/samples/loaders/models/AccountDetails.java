@@ -117,8 +117,8 @@ public class AccountDetails extends AssetDetails {
                             .ownerUsers(details.getOwnerUsers())
                             .ownerGroups(details.getOwnerGroups())
                             .build();
-                    if (!details.getClassifications().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getClassifications());
+                    if (!details.getAtlanTags().isEmpty()) {
+                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                     }
                     batch.add(toUpdate);
                 } catch (NotFoundException e) {
@@ -137,8 +137,8 @@ public class AccountDetails extends AssetDetails {
                         .ownerUsers(details.getOwnerUsers())
                         .ownerGroups(details.getOwnerGroups())
                         .build();
-                if (!details.getClassifications().isEmpty()) {
-                    toClassify.put(account.getQualifiedName(), details.getClassifications());
+                if (!details.getAtlanTags().isEmpty()) {
+                    toClassify.put(account.getQualifiedName(), details.getAtlanTags());
                 }
                 batch.add(account);
             }
@@ -147,6 +147,6 @@ public class AccountDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, ADLSAccount.TYPE_NAME);
+        appendAtlanTags(toClassify, ADLSAccount.TYPE_NAME);
     }
 }

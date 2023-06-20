@@ -4,8 +4,7 @@ package com.atlan.samples.reporters;
 
 import com.atlan.Atlan;
 import com.atlan.model.assets.*;
-import com.atlan.model.core.Classification;
-import com.atlan.model.relations.Reference;
+import com.atlan.model.core.AtlanTag;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -103,7 +102,7 @@ public abstract class AbstractReporter {
         return getDelimitedList(asset.getOwnerGroups(), delimiter);
     }
 
-    protected static <T extends Reference> int getCount(Collection<T> collection) {
+    protected static int getCount(Collection<?> collection) {
         if (collection == null) {
             return 0;
         } else {
@@ -112,7 +111,7 @@ public abstract class AbstractReporter {
     }
 
     protected static String getREADME(Asset asset) {
-        Readme readme = asset.getReadme();
+        IReadme readme = asset.getReadme();
         if (readme != null) {
             String content = readme.getDescription();
             if (content != null && content.length() > 0) {
@@ -123,45 +122,45 @@ public abstract class AbstractReporter {
     }
 
     /**
-     * Retrieve a comma-separated list of all classifications assigned to the provided asset,
+     * Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
      * whether directly or through propagation.
      *
-     * @param asset for which to find classifications
+     * @param asset for which to find Atlan tags
      * @param delimiter the separator to use between multiple values
-     * @return comma-separated list of the classifications
+     * @return comma-separated list of the Atlan tags
      */
-    protected static String getClassifications(Asset asset, String delimiter) {
-        Set<Classification> classifications = asset.getClassifications();
-        if (classifications != null) {
-            Set<String> classificationNames =
-                    classifications.stream().map(Classification::getTypeName).collect(Collectors.toSet());
-            return getDelimitedList(classificationNames, delimiter);
+    protected static String getAtlanTags(Asset asset, String delimiter) {
+        Set<AtlanTag> atlanTags = asset.getAtlanTags();
+        if (atlanTags != null) {
+            Set<String> atlanTagNames =
+                    atlanTags.stream().map(AtlanTag::getTypeName).collect(Collectors.toSet());
+            return getDelimitedList(atlanTagNames, delimiter);
         }
         return "";
     }
 
     /**
-     * Retrieve a comma-separated list of only the directly-assigned (not propagated) classifications
+     * Retrieve a comma-separated list of only the directly-assigned (not propagated) Atlan tags
      * to the provided asset.
      *
-     * @param asset for which to find direct classifications
+     * @param asset for which to find direct Atlan tags
      * @param delimiter the separator to use between multiple values
-     * @return comma-separated list of the direct classifications
+     * @return comma-separated list of the direct Atlan tags
      */
-    protected static String getDirectClassifications(Asset asset, String delimiter) {
-        Set<String> classificationNames = new TreeSet<>();
+    protected static String getDirectAtlanTags(Asset asset, String delimiter) {
+        Set<String> atlanTagNames = new TreeSet<>();
         if (asset != null) {
-            Set<Classification> classifications = asset.getClassifications();
-            if (classifications != null) {
-                for (Classification classification : classifications) {
+            Set<AtlanTag> atlanTags = asset.getAtlanTags();
+            if (atlanTags != null) {
+                for (AtlanTag classification : atlanTags) {
                     String classifiedEntity = classification.getEntityGuid();
                     if (asset.getGuid().equals(classifiedEntity)) {
-                        classificationNames.add(classification.getTypeName());
+                        atlanTagNames.add(classification.getTypeName());
                     }
                 }
             }
         }
-        return getDelimitedList(classificationNames, delimiter);
+        return getDelimitedList(atlanTagNames, delimiter);
     }
 
     /**

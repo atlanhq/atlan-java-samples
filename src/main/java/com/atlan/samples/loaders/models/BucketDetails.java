@@ -65,7 +65,7 @@ public class BucketDetails extends AssetDetails {
             case S3:
                 String bucketARN = row.get(COL_BUCKET_ARN);
                 if (bucketARN != null && bucketARN.length() > 0 && bucketName != null && bucketName.length() > 0) {
-                    return S3.generateQualifiedName(connectionQualifiedName, bucketARN);
+                    return IS3.generateQualifiedName(connectionQualifiedName, bucketARN);
                 }
                 break;
             case GCS:
@@ -140,7 +140,7 @@ public class BucketDetails extends AssetDetails {
                 case S3:
                     if (bucketARN != null && bucketARN.length() > 0) {
                         if (updateOnly) {
-                            String qualifiedName = S3Bucket.generateQualifiedName(connectionQualifiedName, bucketARN);
+                            String qualifiedName = IS3.generateQualifiedName(connectionQualifiedName, bucketARN);
                             try {
                                 Asset.retrieveMinimal(S3Bucket.TYPE_NAME, qualifiedName);
                                 S3Bucket toUpdate = S3Bucket.updater(qualifiedName, bucketName)
@@ -153,8 +153,8 @@ public class BucketDetails extends AssetDetails {
                                         .ownerUsers(details.getOwnerUsers())
                                         .ownerGroups(details.getOwnerGroups())
                                         .build();
-                                if (!details.getClassifications().isEmpty()) {
-                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getClassifications());
+                                if (!details.getAtlanTags().isEmpty()) {
+                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 batch.add(toUpdate);
                             } catch (NotFoundException e) {
@@ -173,8 +173,8 @@ public class BucketDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyS3.put(s3.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
                             }
                             batch.add(s3);
                         }
@@ -197,8 +197,8 @@ public class BucketDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             batch.add(toUpdate);
                         } catch (NotFoundException e) {
@@ -217,8 +217,8 @@ public class BucketDetails extends AssetDetails {
                                 .ownerUsers(details.getOwnerUsers())
                                 .ownerGroups(details.getOwnerGroups())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyGCS.put(gcs.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
                         }
                         batch.add(gcs);
                     }
@@ -240,8 +240,8 @@ public class BucketDetails extends AssetDetails {
                                         .ownerUsers(details.getOwnerUsers())
                                         .ownerGroups(details.getOwnerGroups())
                                         .build();
-                                if (!details.getClassifications().isEmpty()) {
-                                    toClassifyADLS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                                if (!details.getAtlanTags().isEmpty()) {
+                                    toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 batch.add(toUpdate);
                             } catch (NotFoundException e) {
@@ -260,8 +260,8 @@ public class BucketDetails extends AssetDetails {
                                     .ownerUsers(details.getOwnerUsers())
                                     .ownerGroups(details.getOwnerGroups())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyADLS.put(adls.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
                             }
                             batch.add(adls);
                         }
@@ -278,8 +278,8 @@ public class BucketDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassifyS3, S3Bucket.TYPE_NAME);
-        appendClassifications(toClassifyGCS, GCSBucket.TYPE_NAME);
-        appendClassifications(toClassifyADLS, ADLSContainer.TYPE_NAME);
+        appendAtlanTags(toClassifyS3, S3Bucket.TYPE_NAME);
+        appendAtlanTags(toClassifyGCS, GCSBucket.TYPE_NAME);
+        appendAtlanTags(toClassifyADLS, ADLSContainer.TYPE_NAME);
     }
 }

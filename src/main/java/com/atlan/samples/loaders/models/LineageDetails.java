@@ -2,12 +2,11 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
-import com.atlan.model.assets.Catalog;
+import com.atlan.model.assets.ICatalog;
 import com.atlan.model.assets.LineageProcess;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.CertificateStatus;
-import com.atlan.samples.loaders.*;
 import com.atlan.util.AssetBatch;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -215,13 +214,13 @@ public class LineageDetails extends AssetDetails {
      */
     public static void upsert(Map<String, Set<LineageDetails>> processes, int batchSize) {
         AssetBatch batch = new AssetBatch(LineageProcess.TYPE_NAME, batchSize);
-        Map<String, List<String>> toClassify = new HashMap<>();
+        Map<String, List<String>> toTag = new HashMap<>();
 
         for (Map.Entry<String, Set<LineageDetails>> entry : processes.entrySet()) {
             Set<LineageDetails> assets = entry.getValue();
-            Set<Catalog> inputs = new HashSet<>();
-            Set<Catalog> outputs = new HashSet<>();
-            Set<String> classificationNames = new HashSet<>();
+            Set<ICatalog> inputs = new HashSet<>();
+            Set<ICatalog> outputs = new HashSet<>();
+            Set<String> atlanTagNames = new HashSet<>();
             String description = null;
             CertificateStatus certificate = null;
             String certificateMessage = null;
@@ -239,8 +238,8 @@ public class LineageDetails extends AssetDetails {
                 processConnectionQN = details.getProcessConnectionQualifiedName();
                 AssetHeader source = details.getSourceAsset();
                 AssetHeader target = details.getTargetAsset();
-                Catalog input = Catalog.getLineageReference(source.getTypeName(), source.getQualifiedName());
-                Catalog output = Catalog.getLineageReference(target.getTypeName(), target.getQualifiedName());
+                ICatalog input = ICatalog.getLineageReference(source.getTypeName(), source.getQualifiedName());
+                ICatalog output = ICatalog.getLineageReference(target.getTypeName(), target.getQualifiedName());
                 inputs.add(input);
                 outputs.add(output);
                 if (details.getDescription() != null && details.getDescription().length() > 0) {
@@ -276,8 +275,8 @@ public class LineageDetails extends AssetDetails {
                 if (details.getProcessUrl() != null && details.getProcessUrl().length() > 0) {
                     processUrl = details.getProcessUrl();
                 }
-                if (details.getClassifications() != null) {
-                    classificationNames.addAll(details.getClassifications());
+                if (details.getAtlanTags() != null) {
+                    atlanTagNames.addAll(details.getAtlanTags());
                 }
             }
             if (processConnectionQN != null) {
@@ -300,8 +299,8 @@ public class LineageDetails extends AssetDetails {
                         .code(sqlCode)
                         .sourceURL(processUrl);
                 LineageProcess process = builder.build();
-                if (!classificationNames.isEmpty()) {
-                    toClassify.put(process.getQualifiedName(), new ArrayList<>(classificationNames));
+                if (!atlanTagNames.isEmpty()) {
+                    toTag.put(process.getQualifiedName(), new ArrayList<>(atlanTagNames));
                 }
                 batch.add(process);
             }
@@ -309,8 +308,8 @@ public class LineageDetails extends AssetDetails {
         // And don't forget to flush out any that remain
         batch.flush();
 
-        // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassify, LineageProcess.TYPE_NAME);
+        // Atlan tags must be added in a second pass, after the asset exists
+        appendAtlanTags(toTag, LineageProcess.TYPE_NAME);
     }
 
     @Getter

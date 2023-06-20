@@ -127,7 +127,7 @@ public class ObjectDetails extends AssetDetails {
                     String connectionQN = details.getConnectionQualifiedName();
                     if (objectARN != null && objectARN.length() > 0) {
                         if (updateOnly) {
-                            String qualifiedName = S3Object.generateQualifiedName(connectionQN, objectARN);
+                            String qualifiedName = IS3.generateQualifiedName(connectionQN, objectARN);
                             try {
                                 Asset.retrieveMinimal(S3Object.TYPE_NAME, qualifiedName);
                                 S3Object toUpdate = S3Object.updater(qualifiedName, objectName)
@@ -143,8 +143,8 @@ public class ObjectDetails extends AssetDetails {
                                         .s3ObjectSize(details.getSize())
                                         .s3ObjectContentType(details.getContentType())
                                         .build();
-                                if (!details.getClassifications().isEmpty()) {
-                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getClassifications());
+                                if (!details.getAtlanTags().isEmpty()) {
+                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 parents.add(parentQN);
                                 batch.add(toUpdate);
@@ -167,8 +167,8 @@ public class ObjectDetails extends AssetDetails {
                                     .s3ObjectSize(details.getSize())
                                     .s3ObjectContentType(details.getContentType())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyS3.put(s3.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
                             batch.add(s3);
@@ -195,8 +195,8 @@ public class ObjectDetails extends AssetDetails {
                                     .gcsObjectSize(details.getSize())
                                     .gcsObjectContentType(details.getContentType())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
                             batch.add(toUpdate);
@@ -219,8 +219,8 @@ public class ObjectDetails extends AssetDetails {
                                 .gcsObjectSize(details.getSize())
                                 .gcsObjectContentType(details.getContentType())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyGCS.put(gcs.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
                         }
                         parents.add(parentQN);
                         batch.add(gcs);
@@ -244,8 +244,8 @@ public class ObjectDetails extends AssetDetails {
                                     .adlsObjectSize(details.getSize())
                                     .adlsObjectContentType(details.getContentType())
                                     .build();
-                            if (!details.getClassifications().isEmpty()) {
-                                toClassifyADLS.put(toUpdate.getQualifiedName(), details.getClassifications());
+                            if (!details.getAtlanTags().isEmpty()) {
+                                toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
                             batch.add(toUpdate);
@@ -268,8 +268,8 @@ public class ObjectDetails extends AssetDetails {
                                 .adlsObjectSize(details.getSize())
                                 .adlsObjectContentType(details.getContentType())
                                 .build();
-                        if (!details.getClassifications().isEmpty()) {
-                            toClassifyADLS.put(adls.getQualifiedName(), details.getClassifications());
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
                         }
                         parents.add(parentQN);
                         batch.add(adls);
@@ -284,9 +284,9 @@ public class ObjectDetails extends AssetDetails {
         batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
-        appendClassifications(toClassifyS3, S3Object.TYPE_NAME);
-        appendClassifications(toClassifyGCS, GCSObject.TYPE_NAME);
-        appendClassifications(toClassifyADLS, ADLSObject.TYPE_NAME);
+        appendAtlanTags(toClassifyS3, S3Object.TYPE_NAME);
+        appendAtlanTags(toClassifyGCS, GCSObject.TYPE_NAME);
+        appendAtlanTags(toClassifyADLS, ADLSObject.TYPE_NAME);
 
         return parents;
     }
