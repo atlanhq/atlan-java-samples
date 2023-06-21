@@ -939,7 +939,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 }
                 break;
             case TableauDatasource.TYPE_NAME:
-                for (ITableauCalculatedField field : ((TableauDatasource) asset).getFields()) {
+                for (ITableauField field : ((TableauDatasource) asset).getFields()) {
                     childAssets.add((Asset) field);
                 }
                 break;
