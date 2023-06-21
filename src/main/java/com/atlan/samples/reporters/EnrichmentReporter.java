@@ -650,302 +650,302 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         switch (assetType) {
             case Table.TYPE_NAME:
                 for (IColumn column : ((Table) asset).getColumns()) {
-                    childAssets.add((Column) column);
+                    childAssets.add((Asset) column);
                 }
                 break;
             case View.TYPE_NAME:
                 for (IColumn column : ((View) asset).getColumns()) {
-                    childAssets.add((Column) column);
+                    childAssets.add((Asset) column);
                 }
                 break;
             case MaterializedView.TYPE_NAME:
                 for (IColumn column : ((MaterializedView) asset).getColumns()) {
-                    childAssets.add((Column) column);
+                    childAssets.add((Asset) column);
                 }
                 break;
             case LookerDashboard.TYPE_NAME:
                 LookerDashboard dashboard = (LookerDashboard) asset;
                 for (ILookerTile tile : dashboard.getTiles()) {
-                    childAssets.add((LookerTile) tile);
+                    childAssets.add((Asset) tile);
                 }
                 for (ILookerLook look : dashboard.getLooks()) {
-                    childAssets.add((LookerLook) look);
+                    childAssets.add((Asset) look);
                 }
                 break;
             case LookerModel.TYPE_NAME:
                 LookerModel model = (LookerModel) asset;
                 for (ILookerExplore explore : model.getExplores()) {
-                    childAssets.add((LookerExplore) explore);
+                    childAssets.add((Asset) explore);
                 }
                 for (ILookerField field : model.getFields()) {
-                    childAssets.add((LookerField) field);
+                    childAssets.add((Asset) field);
                 }
                 for (ILookerQuery query : model.getQueries()) {
-                    childAssets.add((LookerQuery) query);
+                    childAssets.add((Asset) query);
                 }
                 break;
             case LookerProject.TYPE_NAME:
                 LookerProject project = (LookerProject) asset;
                 for (ILookerModel lModel : project.getModels()) {
-                    childAssets.add((LookerModel) lModel);
+                    childAssets.add((Asset) lModel);
                 }
                 for (ILookerExplore explore : project.getExplores()) {
-                    childAssets.add((LookerExplore) explore);
+                    childAssets.add((Asset) explore);
                 }
                 for (ILookerField field : project.getFields()) {
-                    childAssets.add((LookerField) field);
+                    childAssets.add((Asset) field);
                 }
                 for (ILookerView view : project.getViews()) {
-                    childAssets.add((LookerView) view);
+                    childAssets.add((Asset) view);
                 }
                 break;
             case LookerExplore.TYPE_NAME:
                 for (ILookerField field : ((LookerExplore) asset).getFields()) {
-                    childAssets.add((LookerField) field);
+                    childAssets.add((Asset) field);
                 }
                 break;
             case LookerQuery.TYPE_NAME:
                 LookerQuery query = (LookerQuery) asset;
                 for (ILookerTile tile : query.getTiles()) {
-                    childAssets.add((LookerTile) tile);
+                    childAssets.add((Asset) tile);
                 }
                 for (ILookerLook look : query.getLooks()) {
-                    childAssets.add((LookerLook) look);
+                    childAssets.add((Asset) look);
                 }
                 break;
             case LookerView.TYPE_NAME:
                 for (ILookerField field : ((LookerView) asset).getFields()) {
-                    childAssets.add((LookerField) field);
+                    childAssets.add((Asset) field);
                 }
                 break;
             case MetabaseCollection.TYPE_NAME:
                 MetabaseCollection collection = (MetabaseCollection) asset;
                 for (IMetabaseDashboard mDashboard : collection.getMetabaseDashboards()) {
-                    childAssets.add((MetabaseDashboard) mDashboard);
+                    childAssets.add((Asset) mDashboard);
                 }
                 for (IMetabaseQuestion question : collection.getMetabaseQuestions()) {
-                    childAssets.add((MetabaseQuestion) question);
+                    childAssets.add((Asset) question);
                 }
                 break;
             case MetabaseDashboard.TYPE_NAME:
                 for (IMetabaseQuestion question : ((MetabaseDashboard) asset).getMetabaseQuestions()) {
-                    childAssets.add((MetabaseQuestion) question);
+                    childAssets.add((Asset) question);
                 }
                 break;
             case MetabaseQuestion.TYPE_NAME:
                 for (IMetabaseDashboard mDashboard : ((MetabaseQuestion) asset).getMetabaseDashboards()) {
-                    childAssets.add((MetabaseDashboard) mDashboard);
+                    childAssets.add((Asset) mDashboard);
                 }
                 break;
             case ModeWorkspace.TYPE_NAME:
                 for (IModeCollection mCollection : ((ModeWorkspace) asset).getModeCollections()) {
-                    childAssets.add((ModeCollection) mCollection);
+                    childAssets.add((Asset) mCollection);
                 }
                 break;
             case ModeCollection.TYPE_NAME:
                 for (IModeReport report : ((ModeCollection) asset).getModeReports()) {
-                    childAssets.add((ModeReport) report);
+                    childAssets.add((Asset) report);
                 }
                 break;
             case ModeQuery.TYPE_NAME:
                 for (IModeChart chart : ((ModeQuery) asset).getModeCharts()) {
-                    childAssets.add((ModeChart) chart);
+                    childAssets.add((Asset) chart);
                 }
                 break;
             case ModeReport.TYPE_NAME:
                 ModeReport modeReport = (ModeReport) asset;
                 for (IModeCollection mCollection : modeReport.getModeCollections()) {
-                    childAssets.add((ModeCollection) mCollection);
+                    childAssets.add((Asset) mCollection);
                 }
                 for (IModeQuery mQuery : modeReport.getModeQueries()) {
-                    childAssets.add((ModeQuery) mQuery);
+                    childAssets.add((Asset) mQuery);
                 }
                 break;
             case PowerBIWorkspace.TYPE_NAME:
                 PowerBIWorkspace workspace = (PowerBIWorkspace) asset;
                 for (IPowerBIReport report : workspace.getReports()) {
-                    childAssets.add((PowerBIReport) report);
+                    childAssets.add((Asset) report);
                 }
                 for (IPowerBIDataset dataset : workspace.getDatasets()) {
-                    childAssets.add((PowerBIDataset) dataset);
+                    childAssets.add((Asset) dataset);
                 }
                 for (IPowerBIDashboard pDashboard : workspace.getDashboards()) {
-                    childAssets.add((PowerBIDashboard) pDashboard);
+                    childAssets.add((Asset) pDashboard);
                 }
                 for (IPowerBIDataflow dataflow : workspace.getDataflows()) {
-                    childAssets.add((PowerBIDataflow) dataflow);
+                    childAssets.add((Asset) dataflow);
                 }
                 break;
             case PowerBIDashboard.TYPE_NAME:
                 for (IPowerBITile tile : ((PowerBIDashboard) asset).getTiles()) {
-                    childAssets.add((PowerBITile) tile);
+                    childAssets.add((Asset) tile);
                 }
                 break;
             case PowerBIDataflow.TYPE_NAME:
                 for (IPowerBIDataset dataset : ((PowerBIDataflow) asset).getDatasets()) {
-                    childAssets.add((PowerBIDataset) dataset);
+                    childAssets.add((Asset) dataset);
                 }
                 break;
             case PowerBIDataset.TYPE_NAME:
                 PowerBIDataset dataset = (PowerBIDataset) asset;
                 for (IPowerBIReport report : dataset.getReports()) {
-                    childAssets.add((PowerBIReport) report);
+                    childAssets.add((Asset) report);
                 }
                 for (IPowerBITile tile : dataset.getTiles()) {
-                    childAssets.add((PowerBITile) tile);
+                    childAssets.add((Asset) tile);
                 }
                 for (IPowerBITable table : dataset.getTables()) {
-                    childAssets.add((PowerBITable) table);
+                    childAssets.add((Asset) table);
                 }
                 for (IPowerBIDatasource datasource : dataset.getDatasources()) {
-                    childAssets.add((PowerBIDatasource) datasource);
+                    childAssets.add((Asset) datasource);
                 }
                 for (IPowerBIDataflow dataflow : dataset.getDataflows()) {
-                    childAssets.add((PowerBIDataflow) dataflow);
+                    childAssets.add((Asset) dataflow);
                 }
                 break;
             case PowerBIDatasource.TYPE_NAME:
                 for (IPowerBIDataset pDataset : ((PowerBIDatasource) asset).getDatasets()) {
-                    childAssets.add((PowerBIDataset) pDataset);
+                    childAssets.add((Asset) pDataset);
                 }
                 break;
             case PowerBIReport.TYPE_NAME:
                 PowerBIReport pbiReport = (PowerBIReport) asset;
                 for (IPowerBITile tile : pbiReport.getTiles()) {
-                    childAssets.add((PowerBITile) tile);
+                    childAssets.add((Asset) tile);
                 }
                 for (IPowerBIPage page : pbiReport.getPages()) {
-                    childAssets.add((PowerBIPage) page);
+                    childAssets.add((Asset) page);
                 }
                 break;
             case PowerBITable.TYPE_NAME:
                 PowerBITable pbiTable = (PowerBITable) asset;
                 for (IPowerBIMeasure measure : pbiTable.getMeasures()) {
-                    childAssets.add((PowerBIMeasure) measure);
+                    childAssets.add((Asset) measure);
                 }
                 for (IPowerBIColumn column : pbiTable.getColumns()) {
-                    childAssets.add((PowerBIColumn) column);
+                    childAssets.add((Asset) column);
                 }
                 break;
             case PresetWorkspace.TYPE_NAME:
                 for (IPresetDashboard pDashboard : ((PresetWorkspace) asset).getPresetDashboards()) {
-                    childAssets.add((PresetDashboard) pDashboard);
+                    childAssets.add((Asset) pDashboard);
                 }
                 break;
             case PresetDashboard.TYPE_NAME:
                 PresetDashboard presetDashboard = (PresetDashboard) asset;
                 for (IPresetDataset pDataset : presetDashboard.getPresetDatasets()) {
-                    childAssets.add((PresetDataset) pDataset);
+                    childAssets.add((Asset) pDataset);
                 }
                 for (IPresetChart chart : presetDashboard.getPresetCharts()) {
-                    childAssets.add((PresetChart) chart);
+                    childAssets.add((Asset) chart);
                 }
                 break;
             case ADLSContainer.TYPE_NAME:
                 for (IADLSObject object : ((ADLSContainer) asset).getAdlsObjects()) {
-                    childAssets.add((ADLSObject) object);
+                    childAssets.add((Asset) object);
                 }
                 break;
             case GCSBucket.TYPE_NAME:
                 for (IGCSObject object : ((GCSBucket) asset).getGcsObjects()) {
-                    childAssets.add((GCSObject) object);
+                    childAssets.add((Asset) object);
                 }
                 break;
             case S3Bucket.TYPE_NAME:
                 for (IS3Object object : ((S3Bucket) asset).getObjects()) {
-                    childAssets.add((S3Object) object);
+                    childAssets.add((Asset) object);
                 }
                 break;
             case SalesforceOrganization.TYPE_NAME:
                 SalesforceOrganization org = (SalesforceOrganization) asset;
                 for (ISalesforceReport report : org.getReports()) {
-                    childAssets.add((SalesforceReport) report);
+                    childAssets.add((Asset) report);
                 }
                 for (ISalesforceObject object : org.getObjects()) {
-                    childAssets.add((SalesforceObject) object);
+                    childAssets.add((Asset) object);
                 }
                 for (ISalesforceDashboard sDashboard : org.getDashboards()) {
-                    childAssets.add((SalesforceDashboard) sDashboard);
+                    childAssets.add((Asset) sDashboard);
                 }
                 break;
             case SalesforceDashboard.TYPE_NAME:
                 for (ISalesforceReport report : ((SalesforceDashboard) asset).getReports()) {
-                    childAssets.add((SalesforceReport) report);
+                    childAssets.add((Asset) report);
                 }
                 break;
             case SalesforceReport.TYPE_NAME:
                 for (ISalesforceDashboard sDashboard : ((SalesforceReport) asset).getDashboards()) {
-                    childAssets.add((SalesforceDashboard) sDashboard);
+                    childAssets.add((Asset) sDashboard);
                 }
                 break;
             case SalesforceObject.TYPE_NAME:
                 SalesforceObject object = (SalesforceObject) asset;
                 for (ISalesforceField field : object.getLookupFields()) {
-                    childAssets.add((SalesforceField) field);
+                    childAssets.add((Asset) field);
                 }
                 for (ISalesforceField field : object.getFields()) {
-                    childAssets.add((SalesforceField) field);
+                    childAssets.add((Asset) field);
                 }
                 break;
             case TableauSite.TYPE_NAME:
                 for (ITableauProject tProject : ((TableauSite) asset).getProjects()) {
-                    childAssets.add((TableauProject) tProject);
+                    childAssets.add((Asset) tProject);
                 }
                 break;
             case TableauProject.TYPE_NAME:
                 TableauProject tableauProject = (TableauProject) asset;
                 for (ITableauWorkbook workbook : tableauProject.getWorkbooks()) {
-                    childAssets.add((TableauWorkbook) workbook);
+                    childAssets.add((Asset) workbook);
                 }
                 for (ITableauDatasource datasource : tableauProject.getDatasources()) {
-                    childAssets.add((TableauDatasource) datasource);
+                    childAssets.add((Asset) datasource);
                 }
                 for (ITableauFlow flow : tableauProject.getFlows()) {
-                    childAssets.add((TableauFlow) flow);
+                    childAssets.add((Asset) flow);
                 }
                 break;
             case TableauWorkbook.TYPE_NAME:
                 TableauWorkbook tableauWorkbook = (TableauWorkbook) asset;
                 for (ITableauWorksheet worksheet : tableauWorkbook.getWorksheets()) {
-                    childAssets.add((TableauWorksheet) worksheet);
+                    childAssets.add((Asset) worksheet);
                 }
                 for (ITableauDatasource datasource : tableauWorkbook.getDatasources()) {
-                    childAssets.add((TableauDatasource) datasource);
+                    childAssets.add((Asset) datasource);
                 }
                 for (ITableauDashboard tDashboard : tableauWorkbook.getDashboards()) {
-                    childAssets.add((TableauDashboard) tDashboard);
+                    childAssets.add((Asset) tDashboard);
                 }
                 break;
             case TableauWorksheet.TYPE_NAME:
                 TableauWorksheet worksheet = (TableauWorksheet) asset;
                 for (ITableauDatasourceField field : worksheet.getDatasourceFields()) {
-                    childAssets.add((TableauDatasourceField) field);
+                    childAssets.add((Asset) field);
                 }
                 for (ITableauCalculatedField field : worksheet.getCalculatedFields()) {
-                    childAssets.add((TableauCalculatedField) field);
+                    childAssets.add((Asset) field);
                 }
                 for (ITableauDashboard tDashboard : worksheet.getDashboards()) {
-                    childAssets.add((TableauDashboard) tDashboard);
+                    childAssets.add((Asset) tDashboard);
                 }
                 break;
             case TableauCalculatedField.TYPE_NAME:
                 for (ITableauWorksheet tWorksheet : ((TableauCalculatedField) asset).getWorksheets()) {
-                    childAssets.add((TableauWorksheet) tWorksheet);
+                    childAssets.add((Asset) tWorksheet);
                 }
                 break;
             case TableauDashboard.TYPE_NAME:
                 for (ITableauWorksheet tWorksheet : ((TableauDashboard) asset).getWorksheets()) {
-                    childAssets.add((TableauWorksheet) tWorksheet);
+                    childAssets.add((Asset) tWorksheet);
                 }
                 break;
             case TableauDatasource.TYPE_NAME:
                 for (ITableauCalculatedField field : ((TableauDatasource) asset).getFields()) {
-                    childAssets.add((TableauCalculatedField) field);
+                    childAssets.add((Asset) field);
                 }
                 break;
             case TableauDatasourceField.TYPE_NAME:
                 for (ITableauWorksheet tWorksheet : ((TableauDatasourceField) asset).getWorksheets()) {
-                    childAssets.add((TableauWorksheet) tWorksheet);
+                    childAssets.add((Asset) tWorksheet);
                 }
                 break;
             case DataStudioAsset.TYPE_NAME:
