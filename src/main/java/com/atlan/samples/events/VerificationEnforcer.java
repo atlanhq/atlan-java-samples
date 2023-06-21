@@ -2,23 +2,21 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
+import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.enums.CertificateStatus;
-import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.interfaces.Datum;
-import io.numaproj.numaflow.function.types.MessageList;
+import com.atlan.model.events.AtlanEvent;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 
 /**
  * An example to automatically revert any asset that is marked VERIFIED if it does not
  * at least have: a description, at least one owner, and lineage.
  */
-@Slf4j
-public class VerificationEnforcer extends AbstractEventHandler {
+public interface VerificationEnforcer {
 
-    private static final List<String> REQUIRED_ATTRS = List.of(
+    List<String> REQUIRED_ATTRS = List.of(
             "description",
             "userDescription",
             "ownerUsers",
@@ -30,55 +28,46 @@ public class VerificationEnforcer extends AbstractEventHandler {
             "awsArn", // required attribute for AWS objects
             "anchor"); // required attribute for terms and categories
 
-    private static final String ENFORCEMENT_MESSAGE =
-            "To be verified, an asset must have a description, at least one owner, and lineage.";
+    String ENFORCEMENT_MESSAGE = "To be verified, an asset must have a description, at least one owner, and lineage.";
 
     /**
-     * Logic to apply to each event we receive.
+     * Validate the necessary inputs for enforcement are present in the payload.
      *
-     * @param keys unique key of the event
-     * @param data details of the event (including its payload)
-     * @return an array of messages that can be passed to further vertexes in the pipeline
+     * @param event the event from Atlan
+     * @return true only if there is an asset in the event
      */
-    public MessageList processMessage(String[] keys, Datum data) {
+    static boolean validatePrerequisites(AtlanEvent event) {
+        return event != null && event.getPayload() != null && event.getPayload().getAsset() != null;
+    }
 
-        // 1. Ensure there's an Atlan event payload present
-        Asset fromEvent = getAssetFromEvent(data);
-        if (fromEvent == null) {
-            return failed(keys, data);
-        }
+    /**
+     * Check if the asset is verified and can remain verified, and if not revert its status to draft.
+     *
+     * @param fromEvent the asset to check verification against
+     * @param log for logging information
+     * @return true if a verification change was required and applied, false if there was no change to apply
+     * @throws AtlanException on any issues retrieving the asset or enforcing its verification
+     */
+    static boolean enforceVerification(Asset fromEvent, Logger log) throws AtlanException {
 
-        // 2. Retrieve the current details about the asset from Atlan
-        //    (in case the processing of this event was delayed or a later retry and
-        //    the asset has since changed in Atlan — don't want to calculate based on
-        //    stale information)
-        Asset asset;
-        try {
-            asset = getCurrentViewOfAsset(fromEvent, REQUIRED_ATTRS, false, false);
-        } catch (AtlanException e) {
-            log.error("Unable to find the asset in Atlan: {}", fromEvent.getQualifiedName(), e);
-            return failed(keys, data);
-        }
-        if (asset == null) {
-            log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
-            return failed(keys, data);
-        }
+        // Retrieve the current details about the asset from Atlan
+        // (in case the processing of this event was delayed or a later retry and
+        // the asset has since changed in Atlan — don't want to calculate based on
+        // stale information)
+        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, REQUIRED_ATTRS, false, false);
 
-        // 3. We only need to consider enforcement if the asset is currently verified
+        // We only need to consider enforcement if the asset is currently verified
         if (asset.getCertificateStatus() == CertificateStatus.VERIFIED) {
-            if (!hasDescription(asset) || !hasOwner(asset) || !hasLineage(asset)) {
-                try {
-                    Asset toUpdate = asset.trimToRequired()
-                            .certificateStatus(CertificateStatus.DRAFT)
-                            .certificateStatusMessage(ENFORCEMENT_MESSAGE)
-                            .build();
-                    toUpdate.upsert();
-                    log.info("Enforced verification reversal on: {}", asset.getQualifiedName());
-                    return succeeded(keys, data);
-                } catch (AtlanException e) {
-                    log.error("Unable to update the asset's certificate: {}", asset.getQualifiedName(), e);
-                    return failed(keys, data);
-                }
+            if (!AtlanEventHandler.hasDescription(asset)
+                    || !AtlanEventHandler.hasOwner(asset)
+                    || !AtlanEventHandler.hasLineage(asset)) {
+                Asset toUpdate = asset.trimToRequired()
+                        .certificateStatus(CertificateStatus.DRAFT)
+                        .certificateStatusMessage(ENFORCEMENT_MESSAGE)
+                        .build();
+                toUpdate.upsert();
+                log.info("Enforced verification reversal on: {}", asset.getQualifiedName());
+                return true;
             }
             log.info(
                     "Asset has all required information present to be verified, no enforcement required: {}",
@@ -86,16 +75,6 @@ public class VerificationEnforcer extends AbstractEventHandler {
         } else {
             log.info("Asset is no longer verified, no enforcement action to consider: {}", asset.getQualifiedName());
         }
-        return drop();
-    }
-
-    /**
-     * Register the event processing function.
-     *
-     * @param args (unused)
-     * @throws Exception on any errors starting the event processor
-     */
-    public static void main(String[] args) throws Exception {
-        new FunctionServer().registerMapHandler(new VerificationEnforcer()).start();
+        return false;
     }
 }

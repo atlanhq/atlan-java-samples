@@ -6,6 +6,8 @@ import static com.atlan.util.QueryFactory.*;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.api.PlaybooksEndpoint;
+import com.atlan.events.AbstractNumaflowHandler;
+import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetMutationResponse;
@@ -33,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  * flowing through events.
  */
 @Slf4j
-public class PlaybookRunner extends AbstractEventHandler {
+public class PlaybookRunner extends AbstractNumaflowHandler {
 
     private static final List<String> MUTABLE_ATTRS = List.of(
             "description",
@@ -44,17 +46,11 @@ public class PlaybookRunner extends AbstractEventHandler {
             "meanings",
             "classifications");
 
-    /**
-     * Logic to apply to each event we receive.
-     *
-     * @param keys unique key of the event
-     * @param data details of the event (including its payload)
-     * @return an array of messages that can be passed to further vertexes in the pipeline
-     */
-    public MessageList processMessage(String[] keys, Datum data) {
+    /** {@inheritDoc} */
+    @Override
+    public MessageList processEvent(AtlanEvent event, String[] keys, Datum data) {
 
         // 1. Ensure there's an Atlan event payload present
-        AtlanEvent event = getAtlanEvent(data);
         if (event == null) {
             return failed(keys, data);
         }
@@ -62,7 +58,7 @@ public class PlaybookRunner extends AbstractEventHandler {
         // 2. Retrieve the current view of the asset
         Asset original;
         try {
-            original = getCurrentFullAsset(event);
+            original = AtlanEventHandler.getCurrentFullAsset(event);
         } catch (AtlanException e) {
             log.error("Unable to find the asset in Atlan: {}", event.getPayload(), e);
             return failed(keys, data);
@@ -203,16 +199,6 @@ public class PlaybookRunner extends AbstractEventHandler {
                 return failed(keys, data);
             }
         }
-    }
-
-    /**
-     * Register the event processing function.
-     *
-     * @param args (unused)
-     * @throws Exception on any errors starting the event processor
-     */
-    public static void main(String[] args) throws Exception {
-        new FunctionServer().registerMapHandler(new PlaybookRunner()).start();
     }
 
     /**
@@ -373,5 +359,15 @@ public class PlaybookRunner extends AbstractEventHandler {
                     break;
             }
         }
+    }
+
+    /**
+     * Register the event processing function.
+     *
+     * @param args (unused)
+     * @throws Exception on any errors starting the event processor
+     */
+    public static void main(String[] args) throws Exception {
+        new FunctionServer().registerMapHandler(new PlaybookRunner()).start();
     }
 }
