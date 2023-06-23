@@ -318,97 +318,105 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
         }
 
         // Then go through and create any the READMEs linked to these assets...
-        AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
-        for (Map.Entry<String, String> entry : readmes.entrySet()) {
-            String termIdentity = entry.getKey();
-            String readmeContent = entry.getValue();
-            Asset term = termIdentityToResult.get(termIdentity);
-            if (term != null) {
-                Readme readme =
-                        Readme.creator(term, term.getName(), readmeContent).build();
-                readmeBatch.add(readme);
-            } else {
-                log.error("Unable to find term GUID for {} — cannot add README.", termIdentity);
-            }
-        }
-        readmeBatch.flush();
-
-        // And finally go through and create any term-to-term relationships
-        AssetBatch termToTermBatch = new AssetBatch("term-to-term relationship", batchSize);
-        for (Map.Entry<String, TermEnrichmentDetails> entry : termToTerm.entrySet()) {
-            String identity = entry.getKey();
-            TermEnrichmentDetails t2tDetails = entry.getValue();
-            Asset asset = termIdentityToResult.get(identity);
-            if (asset instanceof GlossaryTerm) {
-                GlossaryTerm term = (GlossaryTerm) asset;
-                try {
-                    GlossaryTerm.GlossaryTermBuilder<?, ?> toUpdate = term.trimToRequired();
-                    for (String t2tRelated : t2tDetails.getRelatedTerms()) {
-                        Asset related = termIdentityToResult.get(t2tRelated);
-                        if (related != null) {
-                            toUpdate = toUpdate.seeAlsoOne(GlossaryTerm.refByGuid(related.getGuid()));
-                        } else {
-                            log.warn("Unable to find related term: {}", t2tRelated);
-                        }
-                    }
-                    for (String t2tRecommended : t2tDetails.getRecommendedTerms()) {
-                        Asset recommended = termIdentityToResult.get(t2tRecommended);
-                        if (recommended != null) {
-                            toUpdate = toUpdate.preferredTerm(GlossaryTerm.refByGuid(recommended.getGuid()));
-                        } else {
-                            log.warn("Unable to find recommended term: {}", t2tRecommended);
-                        }
-                    }
-                    for (String t2tSynonym : t2tDetails.getSynonyms()) {
-                        Asset synonym = termIdentityToResult.get(t2tSynonym);
-                        if (synonym != null) {
-                            toUpdate = toUpdate.synonym(GlossaryTerm.refByGuid(synonym.getGuid()));
-                        } else {
-                            log.warn("Unable to find synonym: {}", t2tSynonym);
-                        }
-                    }
-                    for (String t2tAntonym : t2tDetails.getAntonyms()) {
-                        Asset antonym = termIdentityToResult.get(t2tAntonym);
-                        if (antonym != null) {
-                            toUpdate = toUpdate.antonym(GlossaryTerm.refByGuid(antonym.getGuid()));
-                        } else {
-                            log.warn("Unable to find antonym: {}", t2tAntonym);
-                        }
-                    }
-                    for (String t2tTranslated : t2tDetails.getTranslatedTerms()) {
-                        Asset translated = termIdentityToResult.get(t2tTranslated);
-                        if (translated != null) {
-                            toUpdate = toUpdate.translatedTerm(GlossaryTerm.refByGuid(translated.getGuid()));
-                        } else {
-                            log.warn("Unable to find translated term: {}", t2tTranslated);
-                        }
-                    }
-                    for (String t2tValidFor : t2tDetails.getValidValuesFor()) {
-                        Asset valid = termIdentityToResult.get(t2tValidFor);
-                        if (valid != null) {
-                            toUpdate = toUpdate.validValueFor(GlossaryTerm.refByGuid(valid.getGuid()));
-                        } else {
-                            log.warn("Unable to find related valid values for: {}", t2tValidFor);
-                        }
-                    }
-                    for (String t2tClassifies : t2tDetails.getClassifies()) {
-                        Asset classifies = termIdentityToResult.get(t2tClassifies);
-                        if (classifies != null) {
-                            toUpdate = toUpdate.classify(GlossaryTerm.refByGuid(classifies.getGuid()));
-                        } else {
-                            log.warn("Unable to find related classifies: {}", t2tClassifies);
-                        }
-                    }
-                    termToTermBatch.add(toUpdate.build());
-                } catch (InvalidRequestException e) {
-                    log.error(
-                            "Missing key information to be able to set term-to-term relationships for: {}",
-                            identity,
-                            e);
+        try {
+            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            for (Map.Entry<String, String> entry : readmes.entrySet()) {
+                String termIdentity = entry.getKey();
+                String readmeContent = entry.getValue();
+                Asset term = termIdentityToResult.get(termIdentity);
+                if (term != null) {
+                    Readme readme =
+                            Readme.creator(term, term.getName(), readmeContent).build();
+                    readmeBatch.add(readme);
+                } else {
+                    log.error("Unable to find term GUID for {} — cannot add README.", termIdentity);
                 }
             }
+            readmeBatch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert READMEs for terms.", e);
         }
-        termToTermBatch.flush();
+
+        // And finally go through and create any term-to-term relationships
+        try {
+            AssetBatch termToTermBatch = new AssetBatch("term-to-term relationship", batchSize);
+            for (Map.Entry<String, TermEnrichmentDetails> entry : termToTerm.entrySet()) {
+                String identity = entry.getKey();
+                TermEnrichmentDetails t2tDetails = entry.getValue();
+                Asset asset = termIdentityToResult.get(identity);
+                if (asset instanceof GlossaryTerm) {
+                    GlossaryTerm term = (GlossaryTerm) asset;
+                    try {
+                        GlossaryTerm.GlossaryTermBuilder<?, ?> toUpdate = term.trimToRequired();
+                        for (String t2tRelated : t2tDetails.getRelatedTerms()) {
+                            Asset related = termIdentityToResult.get(t2tRelated);
+                            if (related != null) {
+                                toUpdate = toUpdate.seeAlsoOne(GlossaryTerm.refByGuid(related.getGuid()));
+                            } else {
+                                log.warn("Unable to find related term: {}", t2tRelated);
+                            }
+                        }
+                        for (String t2tRecommended : t2tDetails.getRecommendedTerms()) {
+                            Asset recommended = termIdentityToResult.get(t2tRecommended);
+                            if (recommended != null) {
+                                toUpdate = toUpdate.preferredTerm(GlossaryTerm.refByGuid(recommended.getGuid()));
+                            } else {
+                                log.warn("Unable to find recommended term: {}", t2tRecommended);
+                            }
+                        }
+                        for (String t2tSynonym : t2tDetails.getSynonyms()) {
+                            Asset synonym = termIdentityToResult.get(t2tSynonym);
+                            if (synonym != null) {
+                                toUpdate = toUpdate.synonym(GlossaryTerm.refByGuid(synonym.getGuid()));
+                            } else {
+                                log.warn("Unable to find synonym: {}", t2tSynonym);
+                            }
+                        }
+                        for (String t2tAntonym : t2tDetails.getAntonyms()) {
+                            Asset antonym = termIdentityToResult.get(t2tAntonym);
+                            if (antonym != null) {
+                                toUpdate = toUpdate.antonym(GlossaryTerm.refByGuid(antonym.getGuid()));
+                            } else {
+                                log.warn("Unable to find antonym: {}", t2tAntonym);
+                            }
+                        }
+                        for (String t2tTranslated : t2tDetails.getTranslatedTerms()) {
+                            Asset translated = termIdentityToResult.get(t2tTranslated);
+                            if (translated != null) {
+                                toUpdate = toUpdate.translatedTerm(GlossaryTerm.refByGuid(translated.getGuid()));
+                            } else {
+                                log.warn("Unable to find translated term: {}", t2tTranslated);
+                            }
+                        }
+                        for (String t2tValidFor : t2tDetails.getValidValuesFor()) {
+                            Asset valid = termIdentityToResult.get(t2tValidFor);
+                            if (valid != null) {
+                                toUpdate = toUpdate.validValueFor(GlossaryTerm.refByGuid(valid.getGuid()));
+                            } else {
+                                log.warn("Unable to find related valid values for: {}", t2tValidFor);
+                            }
+                        }
+                        for (String t2tClassifies : t2tDetails.getClassifies()) {
+                            Asset classifies = termIdentityToResult.get(t2tClassifies);
+                            if (classifies != null) {
+                                toUpdate = toUpdate.classify(GlossaryTerm.refByGuid(classifies.getGuid()));
+                            } else {
+                                log.warn("Unable to find related classifies: {}", t2tClassifies);
+                            }
+                        }
+                        termToTermBatch.add(toUpdate.build());
+                    } catch (InvalidRequestException e) {
+                        log.error(
+                                "Missing key information to be able to set term-to-term relationships for: {}",
+                                identity,
+                                e);
+                    }
+                }
+            }
+            termToTermBatch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert term-to-term relationships.", e);
+        }
 
         return termIdentityToResult;
     }

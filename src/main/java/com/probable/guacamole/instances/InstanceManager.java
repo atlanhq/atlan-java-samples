@@ -85,29 +85,33 @@ public class InstanceManager extends AtlanRunner {
         } catch (AtlanException e) {
             log.error("Failed to create new guacamole table.", e);
         }
-        AssetBatch batch = new AssetBatch(GuacamoleColumn.TYPE_NAME, 20);
-        GuacamoleColumn child1 = GuacamoleColumn.builder()
-                .connectionQualifiedName(connection.getQualifiedName())
-                .connectorType(AtlanConnectorType.MONGODB)
-                .name("column1")
-                .qualifiedName(table.getQualifiedName() + "/column1")
-                .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
-                .guacamoleConceptualized(123456789L)
-                .guacamoleWidth(100L)
-                .build();
-        batch.add(child1);
-        GuacamoleColumn child2 = GuacamoleColumn.builder()
-                .connectionQualifiedName(connection.getQualifiedName())
-                .connectorType(AtlanConnectorType.MONGODB)
-                .name("column2")
-                .qualifiedName(table.getQualifiedName() + "/column2")
-                .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
-                .guacamoleConceptualized(1234567890L)
-                .guacamoleWidth(200L)
-                .build();
-        batch.add(child2);
-        AssetMutationResponse response = batch.flush();
-        log.info("Created child entities: {}", response);
+        try {
+            AssetBatch batch = new AssetBatch(GuacamoleColumn.TYPE_NAME, 20);
+            GuacamoleColumn child1 = GuacamoleColumn.builder()
+                    .connectionQualifiedName(connection.getQualifiedName())
+                    .connectorType(AtlanConnectorType.MONGODB)
+                    .name("column1")
+                    .qualifiedName(table.getQualifiedName() + "/column1")
+                    .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
+                    .guacamoleConceptualized(123456789L)
+                    .guacamoleWidth(100L)
+                    .build();
+            batch.add(child1);
+            GuacamoleColumn child2 = GuacamoleColumn.builder()
+                    .connectionQualifiedName(connection.getQualifiedName())
+                    .connectorType(AtlanConnectorType.MONGODB)
+                    .name("column2")
+                    .qualifiedName(table.getQualifiedName() + "/column2")
+                    .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
+                    .guacamoleConceptualized(1234567890L)
+                    .guacamoleWidth(200L)
+                    .build();
+            batch.add(child2);
+            AssetMutationResponse response = batch.flush();
+            log.info("Created child entities: {}", response);
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert Guacamole columns.", e);
+        }
     }
 
     void readEntities() {

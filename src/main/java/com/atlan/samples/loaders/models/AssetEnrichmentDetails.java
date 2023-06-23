@@ -117,69 +117,74 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
         Map<String, String> readmes = new HashMap<>();
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 
-        for (AssetEnrichmentDetails details : assets.values()) {
-            Asset.AssetBuilder<?, ?> builder = null;
-            if (updateOnly) {
-                String typeName = details.getType();
-                String qualifiedName = details.getQualifiedName();
-                try {
-                    Asset.retrieveMinimal(typeName, qualifiedName);
-                    builder = IndistinctAsset.builder().typeName(typeName).qualifiedName(qualifiedName);
-                } catch (NotFoundException e) {
-                    log.warn("Unable to find existing asset — skipping: {}", qualifiedName);
-                } catch (AtlanException e) {
-                    log.error("Unable to lookup whether asset exists or not.", e);
+        try {
+            for (AssetEnrichmentDetails details : assets.values()) {
+                Asset.AssetBuilder<?, ?> builder = null;
+                if (updateOnly) {
+                    String typeName = details.getType();
+                    String qualifiedName = details.getQualifiedName();
+                    try {
+                        Asset.retrieveMinimal(typeName, qualifiedName);
+                        builder = IndistinctAsset.builder().typeName(typeName).qualifiedName(qualifiedName);
+                    } catch (NotFoundException e) {
+                        log.warn("Unable to find existing asset — skipping: {}", qualifiedName);
+                    } catch (AtlanException e) {
+                        log.error("Unable to lookup whether asset exists or not.", e);
+                    }
+                } else {
+                    builder = IndistinctAsset.builder()
+                            .typeName(details.getType())
+                            .qualifiedName(details.getQualifiedName());
                 }
-            } else {
-                builder =
-                        IndistinctAsset.builder().typeName(details.getType()).qualifiedName(details.getQualifiedName());
+                if (builder != null) {
+                    builder.name(details.getName())
+                            .description(details.getDescription())
+                            .userDescription(details.getUserDescription())
+                            .certificateStatus(details.getCertificate())
+                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                            .announcementType(details.getAnnouncementType())
+                            .announcementTitle(details.getAnnouncementTitle())
+                            .announcementMessage(details.getAnnouncementMessage())
+                            .ownerUsers(details.getOwnerUsers())
+                            .ownerGroups(details.getOwnerGroups());
+                    for (Asset term : details.getTerms()) {
+                        builder = builder.assignedTerm(GlossaryTerm.refByGuid(term.getGuid()));
+                    }
+                    if (details.getCustomMetadataValues() != null) {
+                        builder = builder.customMetadataSets(details.getCustomMetadataValues());
+                    }
+                    if (details.getAtlanTags() != null) {
+                        List<String> clsNames = details.getAtlanTags();
+                        for (String clsName : clsNames) {
+                            builder = builder.atlanTag(AtlanTag.of(clsName));
+                        }
+                    }
+                    Asset asset = builder.build();
+                    if (!replaceAtlanTags && !details.getAtlanTags().isEmpty()) {
+                        if (!toTagMap.containsKey(details.getType())) {
+                            toTagMap.put(details.getType(), new HashMap<>());
+                        }
+                        List<String> existing =
+                                toTagMap.get(details.getType()).put(details.getQualifiedName(), details.getAtlanTags());
+                        if (existing != null) {
+                            log.warn("Multiple entries with the same qualifiedName: {}", details.getQualifiedName());
+                        }
+                    }
+                    String readmeContents = details.getReadme();
+                    if (readmeContents != null && readmeContents.length() > 0) {
+                        readmes.put(details.getIdentity(), readmeContents);
+                        assetIdentityToResult.put(details.getIdentity(), asset);
+                    }
+                    cacheResult(assetIdentityToResult, batch.add(asset), asset);
+                    if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
+                        cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
+                    }
+                }
             }
-            if (builder != null) {
-                builder.name(details.getName())
-                        .description(details.getDescription())
-                        .userDescription(details.getUserDescription())
-                        .certificateStatus(details.getCertificate())
-                        .certificateStatusMessage(details.getCertificateStatusMessage())
-                        .announcementType(details.getAnnouncementType())
-                        .announcementTitle(details.getAnnouncementTitle())
-                        .announcementMessage(details.getAnnouncementMessage())
-                        .ownerUsers(details.getOwnerUsers())
-                        .ownerGroups(details.getOwnerGroups());
-                for (Asset term : details.getTerms()) {
-                    builder = builder.assignedTerm(GlossaryTerm.refByGuid(term.getGuid()));
-                }
-                if (details.getCustomMetadataValues() != null) {
-                    builder = builder.customMetadataSets(details.getCustomMetadataValues());
-                }
-                if (details.getAtlanTags() != null) {
-                    List<String> clsNames = details.getAtlanTags();
-                    for (String clsName : clsNames) {
-                        builder = builder.atlanTag(AtlanTag.of(clsName));
-                    }
-                }
-                Asset asset = builder.build();
-                if (!replaceAtlanTags && !details.getAtlanTags().isEmpty()) {
-                    if (!toTagMap.containsKey(details.getType())) {
-                        toTagMap.put(details.getType(), new HashMap<>());
-                    }
-                    List<String> existing =
-                            toTagMap.get(details.getType()).put(details.getQualifiedName(), details.getAtlanTags());
-                    if (existing != null) {
-                        log.warn("Multiple entries with the same qualifiedName: {}", details.getQualifiedName());
-                    }
-                }
-                String readmeContents = details.getReadme();
-                if (readmeContents != null && readmeContents.length() > 0) {
-                    readmes.put(details.getIdentity(), readmeContents);
-                    assetIdentityToResult.put(details.getIdentity(), asset);
-                }
-                cacheResult(assetIdentityToResult, batch.add(asset), asset);
-                if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
-                    cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
-                }
-            }
+            cacheResult(assetIdentityToResult, batch.flush(), null);
+        } catch (AtlanException e) {
+            log.error("Unable to batch-upsert assets.", e);
         }
-        cacheResult(assetIdentityToResult, batch.flush(), null);
 
         // If we did not replace the Atlan tags, they must be added in a second pass, after the asset exists
         if (!replaceAtlanTags) {
@@ -206,21 +211,25 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
             selectivelyUpdateCustomMetadata(toUpdate);
         }
 
-        // Then go through and create any the READMEs linked to these assets...
-        AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
-        for (Map.Entry<String, String> entry : readmes.entrySet()) {
-            String assetIdentity = entry.getKey();
-            String readmeContent = entry.getValue();
-            Asset asset = assetIdentityToResult.get(assetIdentity);
-            if (asset != null) {
-                Readme readme =
-                        Readme.creator(asset, asset.getName(), readmeContent).build();
-                readmeBatch.add(readme);
-            } else {
-                log.error("Unable to find asset GUID for {} — cannot add README.", assetIdentity);
+        // Then go through and create any of the READMEs linked to these assets...
+        try {
+            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            for (Map.Entry<String, String> entry : readmes.entrySet()) {
+                String assetIdentity = entry.getKey();
+                String readmeContent = entry.getValue();
+                Asset asset = assetIdentityToResult.get(assetIdentity);
+                if (asset != null) {
+                    Readme readme = Readme.creator(asset, asset.getName(), readmeContent)
+                            .build();
+                    readmeBatch.add(readme);
+                } else {
+                    log.error("Unable to find asset GUID for {} — cannot add README.", assetIdentity);
+                }
             }
+            readmeBatch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert the READMEs for assets.", e);
         }
-        readmeBatch.flush();
     }
 
     private static void cacheResult(Map<String, Asset> cache, AssetMutationResponse response, Asset asset) {

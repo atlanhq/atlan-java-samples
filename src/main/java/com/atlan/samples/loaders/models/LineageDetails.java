@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.ICatalog;
 import com.atlan.model.assets.LineageProcess;
 import com.atlan.model.enums.AtlanAnnouncementType;
@@ -216,97 +217,103 @@ public class LineageDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(LineageProcess.TYPE_NAME, batchSize);
         Map<String, List<String>> toTag = new HashMap<>();
 
-        for (Map.Entry<String, Set<LineageDetails>> entry : processes.entrySet()) {
-            Set<LineageDetails> assets = entry.getValue();
-            Set<ICatalog> inputs = new HashSet<>();
-            Set<ICatalog> outputs = new HashSet<>();
-            Set<String> atlanTagNames = new HashSet<>();
-            String description = null;
-            CertificateStatus certificate = null;
-            String certificateMessage = null;
-            AtlanAnnouncementType announcementType = null;
-            String announcementTitle = null;
-            String announcementMessage = null;
-            Set<String> ownerUsers = new HashSet<>();
-            Set<String> ownerGroups = new HashSet<>();
-            String sqlCode = null;
-            String processUrl = null;
-            String processId = null;
-            String processConnectionQN = null;
-            for (LineageDetails details : assets) {
-                processId = details.getProcessId();
-                processConnectionQN = details.getProcessConnectionQualifiedName();
-                AssetHeader source = details.getSourceAsset();
-                AssetHeader target = details.getTargetAsset();
-                ICatalog input = ICatalog.getLineageReference(source.getTypeName(), source.getQualifiedName());
-                ICatalog output = ICatalog.getLineageReference(target.getTypeName(), target.getQualifiedName());
-                inputs.add(input);
-                outputs.add(output);
-                if (details.getDescription() != null && details.getDescription().length() > 0) {
-                    description = details.getDescription();
+        try {
+            for (Map.Entry<String, Set<LineageDetails>> entry : processes.entrySet()) {
+                Set<LineageDetails> assets = entry.getValue();
+                Set<ICatalog> inputs = new HashSet<>();
+                Set<ICatalog> outputs = new HashSet<>();
+                Set<String> atlanTagNames = new HashSet<>();
+                String description = null;
+                CertificateStatus certificate = null;
+                String certificateMessage = null;
+                AtlanAnnouncementType announcementType = null;
+                String announcementTitle = null;
+                String announcementMessage = null;
+                Set<String> ownerUsers = new HashSet<>();
+                Set<String> ownerGroups = new HashSet<>();
+                String sqlCode = null;
+                String processUrl = null;
+                String processId = null;
+                String processConnectionQN = null;
+                for (LineageDetails details : assets) {
+                    processId = details.getProcessId();
+                    processConnectionQN = details.getProcessConnectionQualifiedName();
+                    AssetHeader source = details.getSourceAsset();
+                    AssetHeader target = details.getTargetAsset();
+                    ICatalog input = ICatalog.getLineageReference(source.getTypeName(), source.getQualifiedName());
+                    ICatalog output = ICatalog.getLineageReference(target.getTypeName(), target.getQualifiedName());
+                    inputs.add(input);
+                    outputs.add(output);
+                    if (details.getDescription() != null
+                            && details.getDescription().length() > 0) {
+                        description = details.getDescription();
+                    }
+                    if (details.getCertificate() != null) {
+                        certificate = details.getCertificate();
+                    }
+                    if (details.getCertificateStatusMessage() != null
+                            && details.getCertificateStatusMessage().length() > 0) {
+                        certificateMessage = details.getCertificateStatusMessage();
+                    }
+                    if (details.getAnnouncementType() != null) {
+                        announcementType = details.getAnnouncementType();
+                    }
+                    if (details.getAnnouncementTitle() != null
+                            && details.getAnnouncementTitle().length() > 0) {
+                        announcementTitle = details.getAnnouncementTitle();
+                    }
+                    if (details.getAnnouncementMessage() != null
+                            && details.getAnnouncementMessage().length() > 0) {
+                        announcementMessage = details.getAnnouncementMessage();
+                    }
+                    if (details.getOwnerUsers() != null) {
+                        ownerUsers.addAll(details.getOwnerUsers());
+                    }
+                    if (details.getOwnerGroups() != null) {
+                        ownerGroups.addAll(details.getOwnerGroups());
+                    }
+                    if (details.getSqlCode() != null && details.getSqlCode().length() > 0) {
+                        sqlCode = details.getSqlCode();
+                    }
+                    if (details.getProcessUrl() != null
+                            && details.getProcessUrl().length() > 0) {
+                        processUrl = details.getProcessUrl();
+                    }
+                    if (details.getAtlanTags() != null) {
+                        atlanTagNames.addAll(details.getAtlanTags());
+                    }
                 }
-                if (details.getCertificate() != null) {
-                    certificate = details.getCertificate();
-                }
-                if (details.getCertificateStatusMessage() != null
-                        && details.getCertificateStatusMessage().length() > 0) {
-                    certificateMessage = details.getCertificateStatusMessage();
-                }
-                if (details.getAnnouncementType() != null) {
-                    announcementType = details.getAnnouncementType();
-                }
-                if (details.getAnnouncementTitle() != null
-                        && details.getAnnouncementTitle().length() > 0) {
-                    announcementTitle = details.getAnnouncementTitle();
-                }
-                if (details.getAnnouncementMessage() != null
-                        && details.getAnnouncementMessage().length() > 0) {
-                    announcementMessage = details.getAnnouncementMessage();
-                }
-                if (details.getOwnerUsers() != null) {
-                    ownerUsers.addAll(details.getOwnerUsers());
-                }
-                if (details.getOwnerGroups() != null) {
-                    ownerGroups.addAll(details.getOwnerGroups());
-                }
-                if (details.getSqlCode() != null && details.getSqlCode().length() > 0) {
-                    sqlCode = details.getSqlCode();
-                }
-                if (details.getProcessUrl() != null && details.getProcessUrl().length() > 0) {
-                    processUrl = details.getProcessUrl();
-                }
-                if (details.getAtlanTags() != null) {
-                    atlanTagNames.addAll(details.getAtlanTags());
+                if (processConnectionQN != null) {
+                    LineageProcess.LineageProcessBuilder<?, ?> builder = LineageProcess.creator(
+                                    processId,
+                                    processConnectionQN,
+                                    processId,
+                                    new ArrayList<>(inputs),
+                                    new ArrayList<>(outputs),
+                                    null)
+                            .description(description)
+                            .certificateStatus(certificate)
+                            .certificateStatusMessage(certificateMessage)
+                            .announcementType(announcementType)
+                            .announcementTitle(announcementTitle)
+                            .announcementMessage(announcementMessage)
+                            .ownerUsers(ownerUsers)
+                            .ownerGroups(ownerGroups)
+                            .sql(sqlCode)
+                            .code(sqlCode)
+                            .sourceURL(processUrl);
+                    LineageProcess process = builder.build();
+                    if (!atlanTagNames.isEmpty()) {
+                        toTag.put(process.getQualifiedName(), new ArrayList<>(atlanTagNames));
+                    }
+                    batch.add(process);
                 }
             }
-            if (processConnectionQN != null) {
-                LineageProcess.LineageProcessBuilder<?, ?> builder = LineageProcess.creator(
-                                processId,
-                                processConnectionQN,
-                                processId,
-                                new ArrayList<>(inputs),
-                                new ArrayList<>(outputs),
-                                null)
-                        .description(description)
-                        .certificateStatus(certificate)
-                        .certificateStatusMessage(certificateMessage)
-                        .announcementType(announcementType)
-                        .announcementTitle(announcementTitle)
-                        .announcementMessage(announcementMessage)
-                        .ownerUsers(ownerUsers)
-                        .ownerGroups(ownerGroups)
-                        .sql(sqlCode)
-                        .code(sqlCode)
-                        .sourceURL(processUrl);
-                LineageProcess process = builder.build();
-                if (!atlanTagNames.isEmpty()) {
-                    toTag.put(process.getQualifiedName(), new ArrayList<>(atlanTagNames));
-                }
-                batch.add(process);
-            }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert lineage processes.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Atlan tags must be added in a second pass, after the asset exists
         appendAtlanTags(toTag, LineageProcess.TYPE_NAME);

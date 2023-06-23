@@ -4,6 +4,7 @@ package com.atlan.samples.loaders.models;
 
 import com.atlan.cache.RoleCache;
 import com.atlan.exception.AtlanException;
+import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Connection;
 import com.atlan.model.core.AssetMutationResponse;
@@ -157,74 +158,83 @@ public class ConnectionDetails extends AssetDetails {
         //    are not automatically idempotent across create and update)
         AssetBatch batch = new AssetBatch(Connection.TYPE_NAME, batchSize);
         log.info("... looking for existing ({}) connections...", connections.size());
-        for (ConnectionDetails details : connections.values()) {
-            String name = details.getName();
-            AtlanConnectorType type = details.getType();
-            ConnectionDetails header = getHeader(name, type);
-            // Only continue if we have not already processed this connection...
-            if (!cache.containsKey(header)) {
-                try {
-                    findAndCache(cache, name, type);
-                    Connection toUpdate = Connection.updater(cache.get(header), name)
-                            .description(details.getDescription())
-                            .certificateStatus(details.getCertificate())
-                            .certificateStatusMessage(details.getCertificateStatusMessage())
-                            .announcementType(details.getAnnouncementType())
-                            .announcementTitle(details.getAnnouncementTitle())
-                            .announcementMessage(details.getAnnouncementMessage())
-                            .build();
-                    batch.add(toUpdate);
-                    // No need to re-cache, the qualifiedName won't change
-                } catch (AtlanException e) {
-                    if (!updateOnly) {
-                        try {
-                            List<String> leftOverGroups = new ArrayList<>();
-                            List<String> ownerRoles = new ArrayList<>();
-                            List<String> ownerUsers = details.getOwnerUsers();
-                            List<String> ownerGroups = details.getOwnerGroups();
-                            if (!ownerGroups.isEmpty()) {
-                                for (String groupName : ownerGroups) {
-                                    if (groupName.startsWith("$")) {
-                                        ownerRoles.add(RoleCache.getIdForName(groupName));
-                                    } else {
-                                        leftOverGroups.add(groupName);
+        try {
+            for (ConnectionDetails details : connections.values()) {
+                String name = details.getName();
+                AtlanConnectorType type = details.getType();
+                ConnectionDetails header = getHeader(name, type);
+                // Only continue if we have not already processed this connection...
+                if (!cache.containsKey(header)) {
+                    try {
+                        findAndCache(cache, name, type);
+                        Connection toUpdate = Connection.updater(cache.get(header), name)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .build();
+                        batch.add(toUpdate);
+                        // No need to re-cache, the qualifiedName won't change
+                    } catch (NotFoundException e) {
+                        if (!updateOnly) {
+                            try {
+                                List<String> leftOverGroups = new ArrayList<>();
+                                List<String> ownerRoles = new ArrayList<>();
+                                List<String> ownerUsers = details.getOwnerUsers();
+                                List<String> ownerGroups = details.getOwnerGroups();
+                                if (!ownerGroups.isEmpty()) {
+                                    for (String groupName : ownerGroups) {
+                                        if (groupName.startsWith("$")) {
+                                            ownerRoles.add(RoleCache.getIdForName(groupName));
+                                        } else {
+                                            leftOverGroups.add(groupName);
+                                        }
                                     }
                                 }
+                                if (leftOverGroups.isEmpty() && ownerRoles.isEmpty() && ownerUsers.isEmpty()) {
+                                    // If no owners have been specified at all (no connection admins),
+                                    // then fallback to setting All Admins as the connection owner
+                                    ownerRoles.add(RoleCache.getIdForName("$admin"));
+                                }
+                                Connection toCreate = Connection.creator(
+                                                header.getName(),
+                                                header.getType(),
+                                                ownerRoles,
+                                                leftOverGroups,
+                                                ownerUsers)
+                                        .description(details.getDescription())
+                                        .certificateStatus(details.getCertificate())
+                                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                                        .announcementType(details.getAnnouncementType())
+                                        .announcementTitle(details.getAnnouncementTitle())
+                                        .announcementMessage(details.getAnnouncementMessage())
+                                        .build();
+                                AssetMutationResponse response = batch.add(toCreate);
+                                cacheConnections(cache, response);
+                                // Need to add some delay, otherwise the connections will overlap as they could be
+                                // created
+                                // within the
+                                // same millisecond (same qualifiedName)
+                                Thread.sleep(2000);
+                            } catch (AtlanException | InterruptedException inner) {
+                                log.error(
+                                        "Unexpected exception while trying to create connection ({}) or batch: {}",
+                                        header,
+                                        batch,
+                                        inner);
                             }
-                            if (leftOverGroups.isEmpty() && ownerRoles.isEmpty() && ownerUsers.isEmpty()) {
-                                // If no owners have been specified at all (no connection admins),
-                                // then fallback to setting All Admins as the connection owner
-                                ownerRoles.add(RoleCache.getIdForName("$admin"));
-                            }
-                            Connection toCreate = Connection.creator(
-                                            header.getName(), header.getType(), ownerRoles, leftOverGroups, ownerUsers)
-                                    .description(details.getDescription())
-                                    .certificateStatus(details.getCertificate())
-                                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                                    .announcementType(details.getAnnouncementType())
-                                    .announcementTitle(details.getAnnouncementTitle())
-                                    .announcementMessage(details.getAnnouncementMessage())
-                                    .build();
-                            AssetMutationResponse response = batch.add(toCreate);
-                            cacheConnections(cache, response);
-                            // Need to add some delay, otherwise the connections will overlap as they could be created
-                            // within the
-                            // same millisecond (same qualifiedName)
-                            Thread.sleep(2000);
-                        } catch (AtlanException | InterruptedException inner) {
-                            log.error(
-                                    "Unexpected exception while trying to create connection ({}) or batch: {}",
-                                    header,
-                                    batch,
-                                    inner);
+                        } else {
+                            log.warn("Unable to find existing connection — skipping: {}/{}", type, name);
                         }
-                    } else {
-                        log.warn("Unable to find existing connection — skipping: {}/{}", type, name);
                     }
                 }
             }
             AssetMutationResponse response = batch.flush();
             cacheConnections(cache, response);
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert connection details.", e);
         }
 
         // 3. Retrieve each connection in turn to ensure async permissions have been set for them
