@@ -152,6 +152,15 @@ spotless {
     }
 }
 
+task uberJar(type: Jar) {
+    archiveBaseName = 'uber'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
 shadowJar {
     archiveClassifier = 'jar-with-dependencies'
     dependencies {
@@ -161,12 +170,18 @@ shadowJar {
 }
 
 task openApiJar(type: Jar) {
+    archiveClassifier = 'openapi-loader'
     manifest {
         attributes("Main-Class": "com.atlan.samples.loaders.OpenAPISpecLoader")
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
 }
 
-shadowJar {
+/*shadowJar {
     archiveClassifier = 'openapi-loader'
     dependencies {
         include(dependency('com.atlan:atlan-java:.*'))
@@ -208,7 +223,7 @@ shadowJar {
     manifest {
         inheritFrom(project.tasks.openApiJar.manifest)
     }
-}
+}*/
 
 gitPublish {
     repoUri = 'https://github.com/atlanhq/atlan-java-samples.git'
