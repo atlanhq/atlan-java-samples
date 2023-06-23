@@ -4,17 +4,21 @@ package com.atlan.samples.events;
 
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
+import com.atlan.exception.ErrorCode;
+import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.enums.CertificateStatus;
-import com.atlan.model.events.AtlanEvent;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 
 /**
  * An example to automatically revert any asset that is marked VERIFIED if it does not
  * at least have: a description, at least one owner, and lineage.
  */
-public interface VerificationEnforcer {
+public class VerificationEnforcer implements AtlanEventHandler {
 
     List<String> REQUIRED_ATTRS = List.of(
             "description",
@@ -30,51 +34,53 @@ public interface VerificationEnforcer {
 
     String ENFORCEMENT_MESSAGE = "To be verified, an asset must have a description, at least one owner, and lineage.";
 
-    /**
-     * Validate the necessary inputs for enforcement are present in the payload.
-     *
-     * @param event the event from Atlan
-     * @return true only if there is an asset in the event
-     */
-    static boolean validatePrerequisites(AtlanEvent event) {
-        return event != null && event.getPayload() != null && event.getPayload().getAsset() != null;
+    /** Singleton for reuse */
+    private static final VerificationEnforcer INSTANCE = createInstance();
+
+    private static VerificationEnforcer createInstance() {
+        return new VerificationEnforcer();
     }
 
-    /**
-     * Check if the asset is verified and can remain verified, and if not revert its status to draft.
-     *
-     * @param fromEvent the asset to check verification against
-     * @param log for logging information
-     * @return true if a verification change was required and applied, false if there was no change to apply
-     * @throws AtlanException on any issues retrieving the asset or enforcing its verification
-     */
-    static boolean enforceVerification(Asset fromEvent, Logger log) throws AtlanException {
+    public static VerificationEnforcer getInstance() {
+        return INSTANCE;
+    }
 
-        // Retrieve the current details about the asset from Atlan
-        // (in case the processing of this event was delayed or a later retry and
-        // the asset has since changed in Atlan — don't want to calculate based on
-        // stale information)
+    // Note: we can just re-use the default validatePrerequisites
+
+    /** {@inheritDoc} */
+    @Override
+    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
         Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, REQUIRED_ATTRS, false, false);
+        if (asset == null) {
+            throw new NotFoundException(
+                    ErrorCode.ASSET_NOT_FOUND_BY_QN, fromEvent.getQualifiedName(), fromEvent.getTypeName());
+        }
+        return asset;
+    }
 
+    /** {@inheritDoc} */
+    @Override
+    public Collection<Asset> calculateChanges(Asset asset, Logger log) throws AtlanException {
         // We only need to consider enforcement if the asset is currently verified
         if (asset.getCertificateStatus() == CertificateStatus.VERIFIED) {
             if (!AtlanEventHandler.hasDescription(asset)
                     || !AtlanEventHandler.hasOwner(asset)
                     || !AtlanEventHandler.hasLineage(asset)) {
-                Asset toUpdate = asset.trimToRequired()
+                return Set.of(asset.trimToRequired()
                         .certificateStatus(CertificateStatus.DRAFT)
                         .certificateStatusMessage(ENFORCEMENT_MESSAGE)
-                        .build();
-                toUpdate.upsert();
-                log.info("Enforced verification reversal on: {}", asset.getQualifiedName());
-                return true;
+                        .build());
+            } else {
+                log.info(
+                        "Asset has all required information present to be verified, no enforcement required: {}",
+                        asset.getQualifiedName());
             }
-            log.info(
-                    "Asset has all required information present to be verified, no enforcement required: {}",
-                    asset.getQualifiedName());
         } else {
             log.info("Asset is no longer verified, no enforcement action to consider: {}", asset.getQualifiedName());
         }
-        return false;
+        return Collections.emptySet();
     }
+
+    // Note: we can just re-use the default hasChanges
+    // Note: we can just re-use the default upsertChanges
 }

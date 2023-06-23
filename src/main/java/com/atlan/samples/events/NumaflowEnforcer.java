@@ -3,11 +3,7 @@
 package com.atlan.samples.events;
 
 import com.atlan.events.AbstractNumaflowHandler;
-import com.atlan.exception.AtlanException;
-import com.atlan.model.events.AtlanEvent;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.interfaces.Datum;
-import io.numaproj.numaflow.function.types.MessageList;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,28 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NumaflowEnforcer extends AbstractNumaflowHandler {
     /**
-     * {@inheritDoc}
+     * Default constructor - pass handler up to superclass.
      */
-    @Override
-    public MessageList processEvent(AtlanEvent event, String[] keys, Datum data) {
-        if (!VerificationEnforcer.validatePrerequisites(event)) {
-            return failed(keys, data);
-        }
-        try {
-            boolean changed =
-                    VerificationEnforcer.enforceVerification(event.getPayload().getAsset(), log);
-            if (changed) {
-                return succeeded(keys, data);
-            } else {
-                return drop();
-            }
-        } catch (AtlanException e) {
-            log.error(
-                    "Unable to update the asset's certificate: {}",
-                    event.getPayload().getAsset().getQualifiedName(),
-                    e);
-            return failed(keys, data);
-        }
+    public NumaflowEnforcer() {
+        super(VerificationEnforcer.getInstance());
     }
 
     /**

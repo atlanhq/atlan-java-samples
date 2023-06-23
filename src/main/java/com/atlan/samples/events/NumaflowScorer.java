@@ -3,11 +3,7 @@
 package com.atlan.samples.events;
 
 import com.atlan.events.AbstractNumaflowHandler;
-import com.atlan.exception.AtlanException;
-import com.atlan.model.events.AtlanEvent;
 import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.interfaces.Datum;
-import io.numaproj.numaflow.function.types.MessageList;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,30 +11,12 @@ import lombok.extern.slf4j.Slf4j;
  * the level of enrichment of an asset.
  */
 @Slf4j
-public class NumaflowScorer extends AbstractNumaflowHandler implements DaapScoreCalculator {
+public class NumaflowScorer extends AbstractNumaflowHandler {
     /**
-     * {@inheritDoc}
+     * Default constructor - pass handler up to superclass.
      */
-    @Override
-    public MessageList processEvent(AtlanEvent event, String[] keys, Datum data) {
-        if (!DaapScoreCalculator.validatePrerequisites(event, log)) {
-            return failed(keys, data);
-        }
-        try {
-            boolean changed =
-                    DaapScoreCalculator.calculateScore(event.getPayload().getAsset(), log);
-            if (changed) {
-                return succeeded(keys, data);
-            } else {
-                return drop();
-            }
-        } catch (AtlanException e) {
-            log.error(
-                    "Unable to update DaaP completeness score for: {}",
-                    event.getPayload().getAsset().getQualifiedName(),
-                    e);
-            return failed(keys, data);
-        }
+    public NumaflowScorer() {
+        super(DaapScoreCalculator.getInstance());
     }
 
     /**

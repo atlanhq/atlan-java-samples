@@ -7,16 +7,16 @@ import io.numaproj.numaflow.function.FunctionServer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Very basic example of logging a deserialized event and then passing it on to all
- * subsequent vertexes, unchanged.
+ * An experiment to dynamically run through (a subset of) playbook actions and apply them to any
+ * of the assets flowing through events.
  */
 @Slf4j
-public class NumaflowLogger extends AbstractNumaflowHandler {
+public class NumaflowPlaybookRunner extends AbstractNumaflowHandler {
     /**
      * Default constructor - pass handler up to superclass.
      */
-    public NumaflowLogger() {
-        super(EventLogger.getInstance());
+    public NumaflowPlaybookRunner() {
+        super(PlaybookRunner.getInstance());
     }
 
     /**
@@ -26,6 +26,6 @@ public class NumaflowLogger extends AbstractNumaflowHandler {
      * @throws Exception on any errors starting the event processor
      */
     public static void main(String[] args) throws Exception {
-        new FunctionServer().registerMapHandler(new NumaflowLogger()).start();
+        new FunctionServer().registerMapHandler(new NumaflowPlaybookRunner()).start();
     }
 }

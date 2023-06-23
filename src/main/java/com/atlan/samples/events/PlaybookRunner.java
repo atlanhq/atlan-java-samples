@@ -2,20 +2,18 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
-import static com.atlan.util.QueryFactory.*;
+import static com.atlan.util.QueryFactory.CompoundQuery;
+import static com.atlan.util.QueryFactory.have;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.api.PlaybooksEndpoint;
-import com.atlan.events.AbstractNumaflowHandler;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
-import com.atlan.model.assets.*;
-import com.atlan.model.core.AssetMutationResponse;
+import com.atlan.model.assets.Asset;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.enums.PlaybookActionOperator;
 import com.atlan.model.enums.PlaybookActionType;
-import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.search.IndexSearchDSL;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
@@ -23,19 +21,17 @@ import com.atlan.model.workflow.*;
 import com.atlan.net.HttpClient;
 import com.atlan.serde.Serde;
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.interfaces.Datum;
-import io.numaproj.numaflow.function.types.MessageList;
 import java.io.IOException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 
 /**
  * An experiment to dynamically run through playbooks and apply them to any of the assets
  * flowing through events.
  */
 @Slf4j
-public class PlaybookRunner extends AbstractNumaflowHandler {
+public class PlaybookRunner implements AtlanEventHandler {
 
     private static final List<String> MUTABLE_ATTRS = List.of(
             "description",
@@ -46,51 +42,39 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
             "meanings",
             "classifications");
 
+    /** Singleton for reuse */
+    private static final PlaybookRunner INSTANCE = createInstance();
+
+    private static PlaybookRunner createInstance() {
+        return new PlaybookRunner();
+    }
+
+    public static PlaybookRunner getInstance() {
+        return INSTANCE;
+    }
+
+    // Note: can just reuse the default validatePrerequisites
+
     /** {@inheritDoc} */
     @Override
-    public MessageList processEvent(AtlanEvent event, String[] keys, Datum data) {
+    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
+        return Asset.retrieveFull(fromEvent.getGuid());
+    }
 
-        // 1. Ensure there's an Atlan event payload present
-        if (event == null) {
-            return failed(keys, data);
-        }
-
-        // 2. Retrieve the current view of the asset
-        Asset original;
-        try {
-            original = AtlanEventHandler.getCurrentFullAsset(event);
-        } catch (AtlanException e) {
-            log.error("Unable to find the asset in Atlan: {}", event.getPayload(), e);
-            return failed(keys, data);
-        }
-        if (original == null) {
-            log.error(
-                    "No current view of asset found (deleted or not yet available in search index): {}",
-                    event.getPayload().getAsset());
-            return failed(keys, data);
-        }
+    /** {@inheritDoc} */
+    @Override
+    public Collection<Asset> calculateChanges(Asset original, Logger log) throws AtlanException {
 
         long start = System.currentTimeMillis();
 
+        // Prep assets for later comparison
         log.info("Picked up event for: {}", original.getQualifiedName());
         Asset.AssetBuilder<?, ?> full = (Asset.AssetBuilder<?, ?>) original.toBuilder();
-        Asset.AssetBuilder<?, ?> trimmed;
-        try {
-            trimmed = original.trimToRequired();
-        } catch (AtlanException e) {
-            log.error("Unable to produce update-able version of the asset: {}", original.getQualifiedName(), e);
-            return failed(keys, data);
-        }
+        Asset.AssetBuilder<?, ?> trimmed = original.trimToRequired();
 
-        // 3. Retrieve the playbooks
+        // Retrieve the playbooks
         // TODO: cache them...
-        Map<String, List<PlaybookRule>> playbooks;
-        try {
-            playbooks = fetchPlaybooks();
-        } catch (AtlanException e) {
-            log.error("Unable to retrieve playbooks from Atlan.", e);
-            return failed(keys, data);
-        }
+        Map<String, List<PlaybookRule>> playbooks = fetchPlaybooks();
 
         long elapsed = System.currentTimeMillis() - start;
 
@@ -105,16 +89,16 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
             }
         }
 
-        // 4. Iterate through the playbooks
+        // Iterate through the playbooks
         for (Map.Entry<String, List<PlaybookRule>> entry : playbooks.entrySet()) {
             String playbookName = entry.getKey();
             List<PlaybookRule> rules = entry.getValue();
-            // 5. Iterate through the rules in each playbook
+            // Iterate through the rules in each playbook
             for (PlaybookRule rule : rules) {
                 IndexSearchRequest filter = rule.getConfig().getQuery();
                 Query query = filter.getDsl().getQuery();
-                // 6. Add the asset in the event to the search criteria of the rule
-                //  to confirm there is a match (that we should apply the associated actions)
+                // Add the asset in the event to the search criteria of the rule,
+                // to confirm there is a match (that we should apply the associated actions)
                 IndexSearchRequest match = IndexSearchRequest.builder()
                         .dsl(IndexSearchDSL.builder()
                                 .query(CompoundQuery.builder()
@@ -125,16 +109,11 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
                                 .build())
                         .build();
                 Asset asset = null;
-                try {
-                    IndexSearchResponse response = match.search();
-                    if (response != null
-                            && response.getAssets() != null
-                            && !response.getAssets().isEmpty()) {
-                        asset = response.getAssets().get(0);
-                    }
-                } catch (AtlanException e) {
-                    log.error("Unable to search for asset {}, sending to a retry.", original.getGuid());
-                    return failed(keys, data);
+                IndexSearchResponse response = match.search();
+                if (response != null
+                        && response.getAssets() != null
+                        && !response.getAssets().isEmpty()) {
+                    asset = response.getAssets().get(0);
                 }
                 if (asset == null) {
                     // If there is no match, skip any actions for that rule
@@ -144,7 +123,7 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
                             playbookName,
                             rule.getName());
                 } else {
-                    // 6. If there is a match, run the actions against the asset
+                    // If there is a match, run the actions against the asset
                     List<PlaybookAction> actions = rule.getActions();
                     for (PlaybookAction action : actions) {
                         PlaybookActionType type = action.getType();
@@ -167,39 +146,11 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
                 }
             }
         }
-
-        // 7. If the asset is unchanged after the actions, drop it; otherwise
-        //  upsert the changed asset
-        Asset mutated = full.build();
-        if (original.equals(mutated)) {
-            log.info("No change in asset: {}", original.getQualifiedName());
-            return drop();
-        } else {
-            try {
-                log.info("Updating changed asset: {}", original.getQualifiedName());
-                AssetMutationResponse response = trimmed.build().upsert();
-                if (response != null
-                        && response.getUpdatedAssets() != null
-                        && !response.getUpdatedAssets().isEmpty()) {
-                    boolean updated = false;
-                    for (Asset candidate : response.getUpdatedAssets()) {
-                        if (mutated.getGuid().equals(candidate.getGuid())) {
-                            updated = true;
-                            break;
-                        }
-                    }
-                    if (updated) {
-                        return succeeded(keys, data);
-                    }
-                }
-                log.error("Failed to update the asset: {}", mutated.getQualifiedName());
-                return failed(keys, data);
-            } catch (AtlanException e) {
-                log.error("Unable to update asset: {}", mutated.getQualifiedName(), e);
-                return failed(keys, data);
-            }
-        }
+        return hasChanges(original, full.build(), log) ? Set.of(trimmed.build()) : Collections.emptySet();
     }
+
+    // Note: can reuse default hasChanges
+    // Note: can reuse default upsertChanges
 
     /**
      * Fetch the playbooks that exist in Atlan.
@@ -359,15 +310,5 @@ public class PlaybookRunner extends AbstractNumaflowHandler {
                     break;
             }
         }
-    }
-
-    /**
-     * Register the event processing function.
-     *
-     * @param args (unused)
-     * @throws Exception on any errors starting the event processor
-     */
-    public static void main(String[] args) throws Exception {
-        new FunctionServer().registerMapHandler(new PlaybookRunner()).start();
     }
 }

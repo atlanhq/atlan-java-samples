@@ -6,15 +6,15 @@ import com.atlan.events.AbstractLambdaHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * An example to calculate a Data as a Product (DaaP) completeness score based on
- * the level of enrichment of an asset.
+ * An experiment to dynamically run through (a subset of) playbook actions and apply them to any
+ * of the assets flowing through events.
  */
 @Slf4j
-public class LambdaScorer extends AbstractLambdaHandler {
+public class LambdaPlaybookRunner extends AbstractLambdaHandler {
     /**
      * Default constructor - pass handler up to superclass.
      */
-    public LambdaScorer() {
-        super(DaapScoreCalculator.getInstance());
+    public LambdaPlaybookRunner() {
+        super(PlaybookRunner.getInstance());
     }
 }
