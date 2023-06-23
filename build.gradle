@@ -152,15 +152,6 @@ spotless {
     }
 }
 
-task uberJar(type: Jar) {
-    archiveBaseName = 'uber'
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar
-}
-
 shadowJar {
     archiveClassifier = 'jar-with-dependencies'
     dependencies {
@@ -241,7 +232,7 @@ task buildZip(type: Zip) {
     from compileJava
     from processResources
     into('lib') {
-        from configurations.runtimeClasspath
+        from shadowJar
     }
 }
 
