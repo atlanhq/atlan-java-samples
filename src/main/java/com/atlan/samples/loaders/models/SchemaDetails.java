@@ -104,14 +104,36 @@ public class SchemaDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Schema.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
-        for (SchemaDetails details : schemas.values()) {
-            String databaseQualifiedName = details.getDatabaseQualifiedName();
-            String schemaName = details.getName();
-            if (updateOnly) {
-                String qualifiedName = Schema.generateQualifiedName(schemaName, databaseQualifiedName);
-                try {
-                    Asset.retrieveMinimal(Schema.TYPE_NAME, qualifiedName);
-                    Schema toUpdate = Schema.updater(qualifiedName, schemaName)
+        try {
+            for (SchemaDetails details : schemas.values()) {
+                String databaseQualifiedName = details.getDatabaseQualifiedName();
+                String schemaName = details.getName();
+                if (updateOnly) {
+                    String qualifiedName = Schema.generateQualifiedName(schemaName, databaseQualifiedName);
+                    try {
+                        Asset.retrieveMinimal(Schema.TYPE_NAME, qualifiedName);
+                        Schema toUpdate = Schema.updater(qualifiedName, schemaName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        }
+                        batch.add(toUpdate);
+                        parents.add(databaseQualifiedName);
+                    } catch (NotFoundException e) {
+                        log.warn("Unable to find existing schema — skipping: {}", qualifiedName, e);
+                    } catch (AtlanException e) {
+                        log.error("Unable to lookup whether schema exists or not.", e);
+                    }
+                } else {
+                    Schema schema = Schema.creator(schemaName, databaseQualifiedName)
                             .description(details.getDescription())
                             .certificateStatus(details.getCertificate())
                             .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -122,35 +144,17 @@ public class SchemaDetails extends AssetDetails {
                             .ownerGroups(details.getOwnerGroups())
                             .build();
                     if (!details.getAtlanTags().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        toClassify.put(schema.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(toUpdate);
+                    batch.add(schema);
                     parents.add(databaseQualifiedName);
-                } catch (NotFoundException e) {
-                    log.warn("Unable to find existing schema — skipping: {}", qualifiedName, e);
-                } catch (AtlanException e) {
-                    log.error("Unable to lookup whether schema exists or not.", e);
                 }
-            } else {
-                Schema schema = Schema.creator(schemaName, databaseQualifiedName)
-                        .description(details.getDescription())
-                        .certificateStatus(details.getCertificate())
-                        .certificateStatusMessage(details.getCertificateStatusMessage())
-                        .announcementType(details.getAnnouncementType())
-                        .announcementTitle(details.getAnnouncementTitle())
-                        .announcementMessage(details.getAnnouncementMessage())
-                        .ownerUsers(details.getOwnerUsers())
-                        .ownerGroups(details.getOwnerGroups())
-                        .build();
-                if (!details.getAtlanTags().isEmpty()) {
-                    toClassify.put(schema.getQualifiedName(), details.getAtlanTags());
-                }
-                batch.add(schema);
-                parents.add(databaseQualifiedName);
             }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert schema details.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
         appendAtlanTags(toClassify, Schema.TYPE_NAME);

@@ -117,16 +117,42 @@ public class ColumnDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Column.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
-        for (ColumnDetails details : columns.values()) {
-            String parentQualifiedName = details.getParentQualifiedName();
-            String parentType = details.getParentType();
-            String columnName = details.getName();
-            parents.add(ContainerDetails.getHeader(parentQualifiedName, parentType));
-            if (updateOnly) {
-                String qualifiedName = Column.generateQualifiedName(columnName, parentQualifiedName);
-                try {
-                    Asset.retrieveMinimal(Column.TYPE_NAME, qualifiedName);
-                    Column toUpdate = Column.updater(qualifiedName, columnName)
+        try {
+            for (ColumnDetails details : columns.values()) {
+                String parentQualifiedName = details.getParentQualifiedName();
+                String parentType = details.getParentType();
+                String columnName = details.getName();
+                parents.add(ContainerDetails.getHeader(parentQualifiedName, parentType));
+                if (updateOnly) {
+                    String qualifiedName = Column.generateQualifiedName(columnName, parentQualifiedName);
+                    try {
+                        Asset.retrieveMinimal(Column.TYPE_NAME, qualifiedName);
+                        Column toUpdate = Column.updater(qualifiedName, columnName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .isPrimary(details.getPrimaryKey())
+                                .isForeign(details.getForeignKey())
+                                .build();
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        }
+                        batch.add(toUpdate);
+                    } catch (NotFoundException e) {
+                        log.warn("Unable to find existing column — skipping: {}", qualifiedName, e);
+                    } catch (AtlanException e) {
+                        log.error("Unable to lookup whether column exists or not.", e);
+                    }
+                } else {
+                    String mappedType = details.getMappedType();
+                    String rawType = details.getRawType();
+                    Column.ColumnBuilder<?, ?> builder = Column.creator(
+                                    columnName, parentType, parentQualifiedName, details.getIndex())
                             .description(details.getDescription())
                             .certificateStatus(details.getCertificate())
                             .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -135,55 +161,33 @@ public class ColumnDetails extends AssetDetails {
                             .announcementMessage(details.getAnnouncementMessage())
                             .ownerUsers(details.getOwnerUsers())
                             .ownerGroups(details.getOwnerGroups())
+                            .dataType(mappedType)
                             .isPrimary(details.getPrimaryKey())
-                            .isForeign(details.getForeignKey())
-                            .build();
-                    if (!details.getAtlanTags().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                            .isForeign(details.getForeignKey());
+                    Long maxLength = DataTypeMapper.getMaxLength(rawType);
+                    Integer precision = DataTypeMapper.getPrecision(rawType);
+                    Double scale = DataTypeMapper.getScale(rawType);
+                    if (maxLength != null) {
+                        builder = builder.maxLength(maxLength);
                     }
-                    batch.add(toUpdate);
-                } catch (NotFoundException e) {
-                    log.warn("Unable to find existing column — skipping: {}", qualifiedName, e);
-                } catch (AtlanException e) {
-                    log.error("Unable to lookup whether column exists or not.", e);
+                    if (precision != null) {
+                        builder = builder.precision(precision);
+                    }
+                    if (scale != null) {
+                        builder = builder.numericScale(scale);
+                    }
+                    Column column = builder.build();
+                    if (!details.getAtlanTags().isEmpty()) {
+                        toClassify.put(column.getQualifiedName(), details.getAtlanTags());
+                    }
+                    batch.add(column);
                 }
-            } else {
-                String mappedType = details.getMappedType();
-                String rawType = details.getRawType();
-                Column.ColumnBuilder<?, ?> builder = Column.creator(
-                                columnName, parentType, parentQualifiedName, details.getIndex())
-                        .description(details.getDescription())
-                        .certificateStatus(details.getCertificate())
-                        .certificateStatusMessage(details.getCertificateStatusMessage())
-                        .announcementType(details.getAnnouncementType())
-                        .announcementTitle(details.getAnnouncementTitle())
-                        .announcementMessage(details.getAnnouncementMessage())
-                        .ownerUsers(details.getOwnerUsers())
-                        .ownerGroups(details.getOwnerGroups())
-                        .dataType(mappedType)
-                        .isPrimary(details.getPrimaryKey())
-                        .isForeign(details.getForeignKey());
-                Long maxLength = DataTypeMapper.getMaxLength(rawType);
-                Integer precision = DataTypeMapper.getPrecision(rawType);
-                Double scale = DataTypeMapper.getScale(rawType);
-                if (maxLength != null) {
-                    builder = builder.maxLength(maxLength);
-                }
-                if (precision != null) {
-                    builder = builder.precision(precision);
-                }
-                if (scale != null) {
-                    builder = builder.numericScale(scale);
-                }
-                Column column = builder.build();
-                if (!details.getAtlanTags().isEmpty()) {
-                    toClassify.put(column.getQualifiedName(), details.getAtlanTags());
-                }
-                batch.add(column);
             }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert columns.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
         appendAtlanTags(toClassify, Column.TYPE_NAME);

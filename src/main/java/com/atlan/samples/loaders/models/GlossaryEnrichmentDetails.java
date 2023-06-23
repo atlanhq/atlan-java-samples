@@ -170,20 +170,24 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
         }
 
         // Then go through and create any the READMEs linked to these assets...
-        AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
-        for (Map.Entry<String, String> entry : readmes.entrySet()) {
-            String glossaryName = entry.getKey();
-            String readmeContent = entry.getValue();
-            Asset glossary = glossaryNameToResult.get(glossaryName);
-            if (glossary != null) {
-                Readme readme =
-                        Readme.creator(glossary, glossaryName, readmeContent).build();
-                readmeBatch.add(readme);
-            } else {
-                log.error("Unable to find glossary GUID for {} — cannot add README.", glossaryName);
+        try {
+            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            for (Map.Entry<String, String> entry : readmes.entrySet()) {
+                String glossaryName = entry.getKey();
+                String readmeContent = entry.getValue();
+                Asset glossary = glossaryNameToResult.get(glossaryName);
+                if (glossary != null) {
+                    Readme readme = Readme.creator(glossary, glossaryName, readmeContent)
+                            .build();
+                    readmeBatch.add(readme);
+                } else {
+                    log.error("Unable to find glossary GUID for {} — cannot add README.", glossaryName);
+                }
             }
+            readmeBatch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert READMEs for glossaries.", e);
         }
-        readmeBatch.flush();
 
         return glossaryNameToResult;
     }

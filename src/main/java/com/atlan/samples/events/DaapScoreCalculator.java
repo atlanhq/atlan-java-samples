@@ -3,33 +3,30 @@
 package com.atlan.samples.events;
 
 import com.atlan.cache.CustomMetadataCache;
+import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ConflictException;
+import com.atlan.exception.ErrorCode;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.*;
+import com.atlan.model.assets.Asset;
+import com.atlan.model.assets.Badge;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanCustomAttributePrimitiveType;
 import com.atlan.model.enums.BadgeComparisonOperator;
 import com.atlan.model.enums.BadgeConditionColor;
+import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.structs.BadgeCondition;
 import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.model.typedefs.CustomMetadataDef;
 import com.atlan.model.typedefs.CustomMetadataOptions;
-import io.numaproj.numaflow.function.FunctionServer;
-import io.numaproj.numaflow.function.interfaces.Datum;
-import io.numaproj.numaflow.function.types.MessageList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+import org.slf4j.Logger;
 
 /**
  * An example to calculate a Data as a Product (DaaP) completeness score based on
  * the level of enrichment of an asset.
  */
-@Slf4j
-public class DaapScoreCalculator extends AbstractEventHandler {
+public class DaapScoreCalculator implements AtlanEventHandler {
 
     private static final String CM_DAAP = "DaaP";
     private static final String CM_ATTR_DAAP_SCORE = "Score";
@@ -44,53 +41,51 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             "inputToProcesses",
             "outputFromProcesses");
 
-    /**
-     * Logic to apply to each event we receive.
-     *
-     * @param keys unique key of the event
-     * @param data details of the event (including its payload)
-     * @return an array of messages that can be passed to further vertexes in the pipeline
-     */
-    public MessageList processMessage(String[] keys, Datum data) {
+    /** Singleton for reuse */
+    private static final DaapScoreCalculator INSTANCE = createInstance();
 
-        // 1. Ensure the DaaP custom metadata exists
-        if (createCMIfNotExists() == null) {
-            return failed(keys, data);
-        }
+    private static DaapScoreCalculator createInstance() {
+        return new DaapScoreCalculator();
+    }
 
-        // 2. Ensure there's an Atlan event payload present
-        Asset fromEvent = getAssetFromEvent(data);
-        if (fromEvent == null) {
-            return failed(keys, data);
-        }
+    public static DaapScoreCalculator getInstance() {
+        return INSTANCE;
+    }
 
-        // 3. Retrieve the current details about the asset from Atlan
-        //    (in case the processing of this event was delayed or a later retry and
-        //    the asset has since changed in Atlan — don't want to calculate based on
-        //    stale information)
-        Asset asset;
-        try {
-            Set<String> searchAttrs = new HashSet<>(SCORED_ATTRS);
-            searchAttrs.addAll(CustomMetadataCache.getAttributesForSearchResults(CM_DAAP));
-            asset = getCurrentViewOfAsset(fromEvent, searchAttrs, true, true);
-        } catch (AtlanException e) {
-            log.error("Unable to find the asset in Atlan: {}", fromEvent.getQualifiedName(), e);
-            return failed(keys, data);
-        }
+    /** {@inheritDoc} */
+    @Override
+    public boolean validatePrerequisites(AtlanEvent event, Logger log) {
+        return createCMIfNotExists(log) != null
+                && event.getPayload() != null
+                && event.getPayload().getAsset() != null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
+        Set<String> searchAttrs = new HashSet<>(SCORED_ATTRS);
+        searchAttrs.addAll(CustomMetadataCache.getAttributesForSearchResults(CM_DAAP));
+        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, searchAttrs, true, true);
         if (asset == null) {
-            log.error("No current view of asset found (deleted or not yet available in search index): {}", fromEvent);
-            return failed(keys, data);
+            throw new NotFoundException(
+                    ErrorCode.ASSET_NOT_FOUND_BY_QN, fromEvent.getQualifiedName(), fromEvent.getTypeName());
         }
+        return asset;
+    }
 
-        // 4. Look at each individual component that should make up the score
-        int sDescription = hasDescription(asset) ? 1 : 0;
-        int sOwner = hasOwner(asset) ? 1 : 0;
-        int sTerms = hasAssignedTerms(asset) ? 1 : 0;
-        int sClassifications = hasAtlanTags(asset) ? 1 : 0;
-        int sLineage = hasLineage(asset) ? 1 : 0;
+    /** {@inheritDoc} */
+    @Override
+    public Collection<Asset> calculateChanges(Asset asset, Logger log) throws AtlanException {
 
-        // 5. Calculate the score
-        //    (glossary objects cannot have lineage, so exclude lineage from their score)
+        // Look at each individual component that should make up the score
+        int sDescription = AtlanEventHandler.hasDescription(asset) ? 1 : 0;
+        int sOwner = AtlanEventHandler.hasOwner(asset) ? 1 : 0;
+        int sTerms = AtlanEventHandler.hasAssignedTerms(asset) ? 1 : 0;
+        int sClassifications = AtlanEventHandler.hasAtlanTags(asset) ? 1 : 0;
+        int sLineage = AtlanEventHandler.hasLineage(asset) ? 1 : 0;
+
+        // Calculate the score
+        // (glossary objects cannot have lineage, so exclude lineage from their score)
         double score;
         if (asset.getTypeName().startsWith("AtlasGlossary")) {
             score = ((sDescription + sOwner + sTerms + sClassifications) / 4.0) * 100;
@@ -98,44 +93,42 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             score = ((sDescription + sOwner + sLineage + sTerms + sClassifications) / 5.0) * 100;
         }
 
-        // 6. Only attempt to update the asset if the score has changed
-        //    (otherwise we will create an infinite loop of updating the asset, Atlan
-        //    generating a new event from that update, and so on)
-        if (!scoreHasChanged(asset, score)) {
-            log.info("No change in DaaP completeness score for: {}", asset.getQualifiedName());
-            return drop();
-        } else {
-            CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
-                    .attribute(CM_ATTR_DAAP_SCORE, score)
-                    .build();
-            try {
-                Asset.updateCustomMetadataAttributes(asset.getGuid(), CM_DAAP, cma);
-                log.info("Updated DaaP completeness score for {} to: {}", asset.getQualifiedName(), score);
-                return succeeded(keys, data);
-            } catch (AtlanException e) {
-                log.error("Unable to update DaaP completeness score for {} to: {}", asset.getQualifiedName(), score, e);
-                return failed(keys, data);
-            }
-        }
+        CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
+                .attribute(CM_ATTR_DAAP_SCORE, score)
+                .build();
+
+        Asset revised = asset.trimToRequired().customMetadata(CM_DAAP, cma).build();
+        return hasChanges(asset, revised, log) ? Set.of(revised) : Collections.emptySet();
     }
 
-    /**
-     * Register the event processing function.
-     *
-     * @param args (unused)
-     * @throws Exception on any errors starting the event processor
-     */
-    public static void main(String[] args) throws Exception {
-        new FunctionServer().registerMapHandler(new DaapScoreCalculator()).start();
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasChanges(Asset original, Asset modified, Logger log) {
+        double scoreOriginal = -1.0;
+        double scoreModified = -1.0;
+        Map<String, CustomMetadataAttributes> customMetadata = original.getCustomMetadataSets();
+        if (customMetadata != null && customMetadata.containsKey(CM_DAAP)) {
+            Map<String, Object> attrs = customMetadata.get(CM_DAAP).getAttributes();
+            scoreOriginal = (Double) attrs.getOrDefault(CM_ATTR_DAAP_SCORE, -1.0);
+        }
+        customMetadata = modified.getCustomMetadataSets();
+        if (customMetadata != null && customMetadata.containsKey(CM_DAAP)) {
+            Map<String, Object> attrs = customMetadata.get(CM_DAAP).getAttributes();
+            scoreModified = (Double) attrs.getOrDefault(CM_ATTR_DAAP_SCORE, -1.0);
+        }
+        return scoreOriginal != scoreModified;
     }
+
+    // Note: can reuse default upsertChanges
 
     /**
      * Check if the custom metadata already exists, and if so simply return.
      * If not, go ahead and create the custom metadata structure and an associated badge.
      *
+     * @param log for logging information
      * @return the internal hashed-string name of the custom metadata
      */
-    private String createCMIfNotExists() {
+    static String createCMIfNotExists(Logger log) {
         try {
             return CustomMetadataCache.getIdForName(CM_DAAP);
         } catch (NotFoundException e) {
@@ -183,22 +176,5 @@ public class DaapScoreCalculator extends AbstractEventHandler {
             log.error("Unable to look up DaaP custom metadata.", e);
         }
         return null;
-    }
-
-    /**
-     * Check if the score calculated for the asset has changed.
-     *
-     * @param asset to check the score against
-     * @param score calculated by this latest event
-     * @return true if the score calculated by this event is different from what is already present on the asset
-     */
-    private boolean scoreHasChanged(Asset asset, double score) {
-        Map<String, CustomMetadataAttributes> customMetadata = asset.getCustomMetadataSets();
-        if (customMetadata != null && customMetadata.containsKey(CM_DAAP)) {
-            Map<String, Object> attrs = customMetadata.get(CM_DAAP).getAttributes();
-            return attrs.containsKey(CM_ATTR_DAAP_SCORE)
-                    && !attrs.get(CM_ATTR_DAAP_SCORE).equals(score);
-        }
-        return true;
     }
 }

@@ -102,14 +102,35 @@ public class DatabaseDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Database.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
-        for (DatabaseDetails details : databases.values()) {
-            String connectionQualifiedName = details.getConnectionQualifiedName();
-            String databaseName = details.getName();
-            if (updateOnly) {
-                String qualifiedName = Database.generateQualifiedName(databaseName, connectionQualifiedName);
-                try {
-                    Asset.retrieveMinimal(Database.TYPE_NAME, qualifiedName);
-                    Database toUpdate = Database.updater(qualifiedName, databaseName)
+        try {
+            for (DatabaseDetails details : databases.values()) {
+                String connectionQualifiedName = details.getConnectionQualifiedName();
+                String databaseName = details.getName();
+                if (updateOnly) {
+                    String qualifiedName = Database.generateQualifiedName(databaseName, connectionQualifiedName);
+                    try {
+                        Asset.retrieveMinimal(Database.TYPE_NAME, qualifiedName);
+                        Database toUpdate = Database.updater(qualifiedName, databaseName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        }
+                        batch.add(toUpdate);
+                    } catch (NotFoundException e) {
+                        log.warn("Unable to find existing database — skipping: {}", qualifiedName, e);
+                    } catch (AtlanException e) {
+                        log.error("Unable to lookup whether database exists or not.", e);
+                    }
+                } else {
+                    Database database = Database.creator(databaseName, connectionQualifiedName)
                             .description(details.getDescription())
                             .certificateStatus(details.getCertificate())
                             .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -120,33 +141,16 @@ public class DatabaseDetails extends AssetDetails {
                             .ownerGroups(details.getOwnerGroups())
                             .build();
                     if (!details.getAtlanTags().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        toClassify.put(database.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(toUpdate);
-                } catch (NotFoundException e) {
-                    log.warn("Unable to find existing database — skipping: {}", qualifiedName, e);
-                } catch (AtlanException e) {
-                    log.error("Unable to lookup whether database exists or not.", e);
+                    batch.add(database);
                 }
-            } else {
-                Database database = Database.creator(databaseName, connectionQualifiedName)
-                        .description(details.getDescription())
-                        .certificateStatus(details.getCertificate())
-                        .certificateStatusMessage(details.getCertificateStatusMessage())
-                        .announcementType(details.getAnnouncementType())
-                        .announcementTitle(details.getAnnouncementTitle())
-                        .announcementMessage(details.getAnnouncementMessage())
-                        .ownerUsers(details.getOwnerUsers())
-                        .ownerGroups(details.getOwnerGroups())
-                        .build();
-                if (!details.getAtlanTags().isEmpty()) {
-                    toClassify.put(database.getQualifiedName(), details.getAtlanTags());
-                }
-                batch.add(database);
             }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert database details.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
         appendAtlanTags(toClassify, Database.TYPE_NAME);

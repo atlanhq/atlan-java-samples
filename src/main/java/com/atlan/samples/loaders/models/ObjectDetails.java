@@ -116,21 +116,46 @@ public class ObjectDetails extends AssetDetails {
         Map<String, List<String>> toClassifyGCS = new HashMap<>();
         Map<String, List<String>> toClassifyADLS = new HashMap<>();
 
-        for (ObjectDetails details : objects.values()) {
-            String parentQN = details.getContainerQualifiedName();
-            String bucketName = details.getBucketName();
-            String objectName = details.getName();
-            String objectARN = details.getArn();
-            AtlanConnectorType objectType = Connection.getConnectorTypeFromQualifiedName(parentQN);
-            switch (objectType) {
-                case S3:
-                    String connectionQN = details.getConnectionQualifiedName();
-                    if (objectARN != null && objectARN.length() > 0) {
-                        if (updateOnly) {
-                            String qualifiedName = IS3.generateQualifiedName(connectionQN, objectARN);
-                            try {
-                                Asset.retrieveMinimal(S3Object.TYPE_NAME, qualifiedName);
-                                S3Object toUpdate = S3Object.updater(qualifiedName, objectName)
+        try {
+            for (ObjectDetails details : objects.values()) {
+                String parentQN = details.getContainerQualifiedName();
+                String bucketName = details.getBucketName();
+                String objectName = details.getName();
+                String objectARN = details.getArn();
+                AtlanConnectorType objectType = Connection.getConnectorTypeFromQualifiedName(parentQN);
+                switch (objectType) {
+                    case S3:
+                        String connectionQN = details.getConnectionQualifiedName();
+                        if (objectARN != null && objectARN.length() > 0) {
+                            if (updateOnly) {
+                                String qualifiedName = IS3.generateQualifiedName(connectionQN, objectARN);
+                                try {
+                                    Asset.retrieveMinimal(S3Object.TYPE_NAME, qualifiedName);
+                                    S3Object toUpdate = S3Object.updater(qualifiedName, objectName)
+                                            .description(details.getDescription())
+                                            .certificateStatus(details.getCertificate())
+                                            .certificateStatusMessage(details.getCertificateStatusMessage())
+                                            .announcementType(details.getAnnouncementType())
+                                            .announcementTitle(details.getAnnouncementTitle())
+                                            .announcementMessage(details.getAnnouncementMessage())
+                                            .ownerUsers(details.getOwnerUsers())
+                                            .ownerGroups(details.getOwnerGroups())
+                                            .s3ObjectKey(details.getPath())
+                                            .s3ObjectSize(details.getSize())
+                                            .s3ObjectContentType(details.getContentType())
+                                            .build();
+                                    if (!details.getAtlanTags().isEmpty()) {
+                                        toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                                    }
+                                    parents.add(parentQN);
+                                    batch.add(toUpdate);
+                                } catch (NotFoundException e) {
+                                    log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
+                                } catch (AtlanException e) {
+                                    log.error("Unable to lookup whether object exists or not.", e);
+                                }
+                            } else {
+                                S3Object s3 = S3Object.creator(objectName, parentQN, bucketName, objectARN)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())
                                         .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -144,7 +169,35 @@ public class ObjectDetails extends AssetDetails {
                                         .s3ObjectContentType(details.getContentType())
                                         .build();
                                 if (!details.getAtlanTags().isEmpty()) {
-                                    toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                                    toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
+                                }
+                                parents.add(parentQN);
+                                batch.add(s3);
+                            }
+                        } else {
+                            log.error("Unable to create an S3 object without an ARN: {}", details);
+                        }
+                        break;
+                    case GCS:
+                        if (updateOnly) {
+                            String qualifiedName = GCSObject.generateQualifiedName(objectName, parentQN);
+                            try {
+                                Asset.retrieveMinimal(GCSObject.TYPE_NAME, qualifiedName);
+                                GCSObject toUpdate = GCSObject.updater(qualifiedName, objectName)
+                                        .description(details.getDescription())
+                                        .certificateStatus(details.getCertificate())
+                                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                                        .announcementType(details.getAnnouncementType())
+                                        .announcementTitle(details.getAnnouncementTitle())
+                                        .announcementMessage(details.getAnnouncementMessage())
+                                        .ownerUsers(details.getOwnerUsers())
+                                        .ownerGroups(details.getOwnerGroups())
+                                        .gcsObjectKey(details.getPath())
+                                        .gcsObjectSize(details.getSize())
+                                        .gcsObjectContentType(details.getContentType())
+                                        .build();
+                                if (!details.getAtlanTags().isEmpty()) {
+                                    toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 parents.add(parentQN);
                                 batch.add(toUpdate);
@@ -154,35 +207,7 @@ public class ObjectDetails extends AssetDetails {
                                 log.error("Unable to lookup whether object exists or not.", e);
                             }
                         } else {
-                            S3Object s3 = S3Object.creator(objectName, parentQN, bucketName, objectARN)
-                                    .description(details.getDescription())
-                                    .certificateStatus(details.getCertificate())
-                                    .certificateStatusMessage(details.getCertificateStatusMessage())
-                                    .announcementType(details.getAnnouncementType())
-                                    .announcementTitle(details.getAnnouncementTitle())
-                                    .announcementMessage(details.getAnnouncementMessage())
-                                    .ownerUsers(details.getOwnerUsers())
-                                    .ownerGroups(details.getOwnerGroups())
-                                    .s3ObjectKey(details.getPath())
-                                    .s3ObjectSize(details.getSize())
-                                    .s3ObjectContentType(details.getContentType())
-                                    .build();
-                            if (!details.getAtlanTags().isEmpty()) {
-                                toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
-                            }
-                            parents.add(parentQN);
-                            batch.add(s3);
-                        }
-                    } else {
-                        log.error("Unable to create an S3 object without an ARN: {}", details);
-                    }
-                    break;
-                case GCS:
-                    if (updateOnly) {
-                        String qualifiedName = GCSObject.generateQualifiedName(objectName, parentQN);
-                        try {
-                            Asset.retrieveMinimal(GCSObject.TYPE_NAME, qualifiedName);
-                            GCSObject toUpdate = GCSObject.updater(qualifiedName, objectName)
+                            GCSObject gcs = GCSObject.creator(objectName, parentQN)
                                     .description(details.getDescription())
                                     .certificateStatus(details.getCertificate())
                                     .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -196,42 +221,42 @@ public class ObjectDetails extends AssetDetails {
                                     .gcsObjectContentType(details.getContentType())
                                     .build();
                             if (!details.getAtlanTags().isEmpty()) {
-                                toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                                toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
-                            batch.add(toUpdate);
-                        } catch (NotFoundException e) {
-                            log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
-                        } catch (AtlanException e) {
-                            log.error("Unable to lookup whether object exists or not.", e);
+                            batch.add(gcs);
                         }
-                    } else {
-                        GCSObject gcs = GCSObject.creator(objectName, parentQN)
-                                .description(details.getDescription())
-                                .certificateStatus(details.getCertificate())
-                                .certificateStatusMessage(details.getCertificateStatusMessage())
-                                .announcementType(details.getAnnouncementType())
-                                .announcementTitle(details.getAnnouncementTitle())
-                                .announcementMessage(details.getAnnouncementMessage())
-                                .ownerUsers(details.getOwnerUsers())
-                                .ownerGroups(details.getOwnerGroups())
-                                .gcsObjectKey(details.getPath())
-                                .gcsObjectSize(details.getSize())
-                                .gcsObjectContentType(details.getContentType())
-                                .build();
-                        if (!details.getAtlanTags().isEmpty()) {
-                            toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
-                        }
-                        parents.add(parentQN);
-                        batch.add(gcs);
-                    }
-                    break;
-                case ADLS:
-                    if (updateOnly) {
-                        String qualifiedName = ADLSObject.generateQualifiedName(objectName, parentQN);
-                        try {
-                            Asset.retrieveMinimal(ADLSObject.TYPE_NAME, qualifiedName);
-                            ADLSObject toUpdate = ADLSObject.updater(qualifiedName, objectName)
+                        break;
+                    case ADLS:
+                        if (updateOnly) {
+                            String qualifiedName = ADLSObject.generateQualifiedName(objectName, parentQN);
+                            try {
+                                Asset.retrieveMinimal(ADLSObject.TYPE_NAME, qualifiedName);
+                                ADLSObject toUpdate = ADLSObject.updater(qualifiedName, objectName)
+                                        .description(details.getDescription())
+                                        .certificateStatus(details.getCertificate())
+                                        .certificateStatusMessage(details.getCertificateStatusMessage())
+                                        .announcementType(details.getAnnouncementType())
+                                        .announcementTitle(details.getAnnouncementTitle())
+                                        .announcementMessage(details.getAnnouncementMessage())
+                                        .ownerUsers(details.getOwnerUsers())
+                                        .ownerGroups(details.getOwnerGroups())
+                                        .adlsObjectUrl(details.getPath())
+                                        .adlsObjectSize(details.getSize())
+                                        .adlsObjectContentType(details.getContentType())
+                                        .build();
+                                if (!details.getAtlanTags().isEmpty()) {
+                                    toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                                }
+                                parents.add(parentQN);
+                                batch.add(toUpdate);
+                            } catch (NotFoundException e) {
+                                log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
+                            } catch (AtlanException e) {
+                                log.error("Unable to lookup whether object exists or not.", e);
+                            }
+                        } else {
+                            ADLSObject adls = ADLSObject.creator(objectName, parentQN)
                                     .description(details.getDescription())
                                     .certificateStatus(details.getCertificate())
                                     .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -245,43 +270,22 @@ public class ObjectDetails extends AssetDetails {
                                     .adlsObjectContentType(details.getContentType())
                                     .build();
                             if (!details.getAtlanTags().isEmpty()) {
-                                toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                                toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
-                            batch.add(toUpdate);
-                        } catch (NotFoundException e) {
-                            log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
-                        } catch (AtlanException e) {
-                            log.error("Unable to lookup whether object exists or not.", e);
+                            batch.add(adls);
                         }
-                    } else {
-                        ADLSObject adls = ADLSObject.creator(objectName, parentQN)
-                                .description(details.getDescription())
-                                .certificateStatus(details.getCertificate())
-                                .certificateStatusMessage(details.getCertificateStatusMessage())
-                                .announcementType(details.getAnnouncementType())
-                                .announcementTitle(details.getAnnouncementTitle())
-                                .announcementMessage(details.getAnnouncementMessage())
-                                .ownerUsers(details.getOwnerUsers())
-                                .ownerGroups(details.getOwnerGroups())
-                                .adlsObjectUrl(details.getPath())
-                                .adlsObjectSize(details.getSize())
-                                .adlsObjectContentType(details.getContentType())
-                                .build();
-                        if (!details.getAtlanTags().isEmpty()) {
-                            toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
-                        }
-                        parents.add(parentQN);
-                        batch.add(adls);
-                    }
-                    break;
-                default:
-                    log.error("Invalid object type ({}) — skipping: {}", objectType, details);
-                    break;
+                        break;
+                    default:
+                        log.error("Invalid object type ({}) — skipping: {}", objectType, details);
+                        break;
+                }
             }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert object details.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
         appendAtlanTags(toClassifyS3, S3Object.TYPE_NAME);

@@ -273,20 +273,24 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
         }
 
         // Then go through and create any the READMEs linked to these assets...
-        AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
-        for (Map.Entry<String, String> entry : readmes.entrySet()) {
-            String categoryIdentity = entry.getKey();
-            String readmeContent = entry.getValue();
-            Asset category = categoryCache.get(categoryIdentity);
-            if (category != null) {
-                Readme readme = Readme.creator(category, category.getName(), readmeContent)
-                        .build();
-                readmeBatch.add(readme);
-            } else {
-                log.error("Unable to find category GUID for {} — cannot add README.", categoryIdentity);
+        try {
+            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            for (Map.Entry<String, String> entry : readmes.entrySet()) {
+                String categoryIdentity = entry.getKey();
+                String readmeContent = entry.getValue();
+                Asset category = categoryCache.get(categoryIdentity);
+                if (category != null) {
+                    Readme readme = Readme.creator(category, category.getName(), readmeContent)
+                            .build();
+                    readmeBatch.add(readme);
+                } else {
+                    log.error("Unable to find category GUID for {} — cannot add README.", categoryIdentity);
+                }
             }
+            readmeBatch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert READMEs for categories.", e);
         }
-        readmeBatch.flush();
 
         // And then recurse on the leftovers...
         if (!leftovers.isEmpty()) {

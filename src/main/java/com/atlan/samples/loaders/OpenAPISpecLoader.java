@@ -157,47 +157,51 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
         Paths apiPaths = parser.getPaths();
         if (apiPaths != null && !apiPaths.isEmpty()) {
             log.info("Creating an APIPath for each path defined within the spec: {}", apiPaths.size());
-            for (Map.Entry<String, PathItem> apiPath : apiPaths.entrySet()) {
-                String pathUrl = apiPath.getKey();
-                PathItem pathDetails = apiPath.getValue();
-                List<String> operations = new ArrayList<>();
-                StringBuilder desc = new StringBuilder();
-                desc.append("| Method | Summary |\n|---|---|\n");
-                Operation get = pathDetails.getGet();
-                if (get != null) {
-                    operations.add("GET");
-                    desc.append("| `GET` | ").append(get.getSummary()).append(" |\n");
+            try {
+                for (Map.Entry<String, PathItem> apiPath : apiPaths.entrySet()) {
+                    String pathUrl = apiPath.getKey();
+                    PathItem pathDetails = apiPath.getValue();
+                    List<String> operations = new ArrayList<>();
+                    StringBuilder desc = new StringBuilder();
+                    desc.append("| Method | Summary |\n|---|---|\n");
+                    Operation get = pathDetails.getGet();
+                    if (get != null) {
+                        operations.add("GET");
+                        desc.append("| `GET` | ").append(get.getSummary()).append(" |\n");
+                    }
+                    Operation post = pathDetails.getPost();
+                    if (post != null) {
+                        operations.add("POST");
+                        desc.append("| `POST` | ").append(post.getSummary()).append(" |\n");
+                    }
+                    Operation put = pathDetails.getPut();
+                    if (put != null) {
+                        operations.add("PUT");
+                        desc.append("| `PUT` | ").append(put.getSummary()).append(" |\n");
+                    }
+                    Operation patch = pathDetails.getPatch();
+                    if (patch != null) {
+                        operations.add("PATCH");
+                        desc.append("| `PATCH` | ").append(patch.getSummary()).append(" |\n");
+                    }
+                    Operation delete = pathDetails.getDelete();
+                    if (delete != null) {
+                        operations.add("DELETE");
+                        desc.append("| `DELETE` | ").append(delete.getSummary()).append(" |\n");
+                    }
+                    APIPath path = APIPath.creator(pathUrl, specQualifiedName)
+                            .description(desc.toString())
+                            .apiPathRawURI(pathUrl)
+                            .apiPathSummary(pathDetails.getSummary())
+                            .apiPathAvailableOperations(operations)
+                            .apiPathIsTemplated(pathUrl.contains("{") && pathUrl.contains("}"))
+                            .build();
+                    logResult(batch.add(path));
                 }
-                Operation post = pathDetails.getPost();
-                if (post != null) {
-                    operations.add("POST");
-                    desc.append("| `POST` | ").append(post.getSummary()).append(" |\n");
-                }
-                Operation put = pathDetails.getPut();
-                if (put != null) {
-                    operations.add("PUT");
-                    desc.append("| `PUT` | ").append(put.getSummary()).append(" |\n");
-                }
-                Operation patch = pathDetails.getPatch();
-                if (patch != null) {
-                    operations.add("PATCH");
-                    desc.append("| `PATCH` | ").append(patch.getSummary()).append(" |\n");
-                }
-                Operation delete = pathDetails.getDelete();
-                if (delete != null) {
-                    operations.add("DELETE");
-                    desc.append("| `DELETE` | ").append(delete.getSummary()).append(" |\n");
-                }
-                APIPath path = APIPath.creator(pathUrl, specQualifiedName)
-                        .description(desc.toString())
-                        .apiPathRawURI(pathUrl)
-                        .apiPathSummary(pathDetails.getSummary())
-                        .apiPathAvailableOperations(operations)
-                        .apiPathIsTemplated(pathUrl.contains("{") && pathUrl.contains("}"))
-                        .build();
-                logResult(batch.add(path));
+                logResult(batch.flush());
+            } catch (AtlanException e) {
+                log.error("Unable to bulk-upsert API paths.", e);
             }
-            logResult(batch.flush());
         }
         return _specUrl;
     }

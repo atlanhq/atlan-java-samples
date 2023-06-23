@@ -184,7 +184,11 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 log.error("Unable to re-calculate schemas in database: {}", databaseQualifiedName, e);
             }
         }
-        databasesToUpdate.flush();
+        try {
+            databasesToUpdate.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to update schema counts for all databases.", e);
+        }
 
         AssetBatch schemasToUpdate = new AssetBatch(Schema.TYPE_NAME, getBatchSize());
         for (String schemaQualifiedName : schemaCountsToUpdate) {
@@ -201,7 +205,11 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 log.error("Unable to re-calculate tables and views in schema: {}", schemaQualifiedName, e);
             }
         }
-        schemasToUpdate.flush();
+        try {
+            schemasToUpdate.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to update table and view counts for all schemas.", e);
+        }
 
         AssetBatch containersToUpdate = new AssetBatch("container", getBatchSize());
         for (ContainerDetails container : containerCountsToUpdate) {
@@ -236,7 +244,11 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 log.error("Unable to re-calculate columns in container: {}", containerQN, e);
             }
         }
-        containersToUpdate.flush();
+        try {
+            containersToUpdate.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to update column counts for all tables and views.", e);
+        }
     }
 
     public void processObjectStoreAssets(ExcelReader xlsx) throws IOException {
@@ -339,7 +351,11 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 log.error("Unable to re-calculate objects in bucket: {}", bucketQualifiedName, e);
             }
         }
-        bucketsToUpdate.flush();
+        try {
+            bucketsToUpdate.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to update object counts for all buckets.", e);
+        }
     }
 
     public void processLineage(ExcelReader xlsx) throws IOException {

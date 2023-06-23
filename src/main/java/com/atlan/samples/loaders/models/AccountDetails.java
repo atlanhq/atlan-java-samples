@@ -100,14 +100,35 @@ public class AccountDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(ADLSAccount.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
-        for (AccountDetails details : accounts.values()) {
-            String connectionQualifiedName = details.getConnectionQualifiedName();
-            String accountName = details.getName();
-            if (updateOnly) {
-                String qualifiedName = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
-                try {
-                    Asset.retrieveMinimal(ADLSAccount.TYPE_NAME, qualifiedName);
-                    ADLSAccount toUpdate = ADLSAccount.updater(qualifiedName, accountName)
+        try {
+            for (AccountDetails details : accounts.values()) {
+                String connectionQualifiedName = details.getConnectionQualifiedName();
+                String accountName = details.getName();
+                if (updateOnly) {
+                    String qualifiedName = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
+                    try {
+                        Asset.retrieveMinimal(ADLSAccount.TYPE_NAME, qualifiedName);
+                        ADLSAccount toUpdate = ADLSAccount.updater(qualifiedName, accountName)
+                                .description(details.getDescription())
+                                .certificateStatus(details.getCertificate())
+                                .certificateStatusMessage(details.getCertificateStatusMessage())
+                                .announcementType(details.getAnnouncementType())
+                                .announcementTitle(details.getAnnouncementTitle())
+                                .announcementMessage(details.getAnnouncementMessage())
+                                .ownerUsers(details.getOwnerUsers())
+                                .ownerGroups(details.getOwnerGroups())
+                                .build();
+                        if (!details.getAtlanTags().isEmpty()) {
+                            toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        }
+                        batch.add(toUpdate);
+                    } catch (NotFoundException e) {
+                        log.warn("Unable to find existing account — skipping: {}", qualifiedName, e);
+                    } catch (AtlanException e) {
+                        log.error("Unable to lookup whether account exists or not.", e);
+                    }
+                } else {
+                    ADLSAccount account = ADLSAccount.creator(accountName, connectionQualifiedName)
                             .description(details.getDescription())
                             .certificateStatus(details.getCertificate())
                             .certificateStatusMessage(details.getCertificateStatusMessage())
@@ -118,33 +139,16 @@ public class AccountDetails extends AssetDetails {
                             .ownerGroups(details.getOwnerGroups())
                             .build();
                     if (!details.getAtlanTags().isEmpty()) {
-                        toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
+                        toClassify.put(account.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(toUpdate);
-                } catch (NotFoundException e) {
-                    log.warn("Unable to find existing account — skipping: {}", qualifiedName, e);
-                } catch (AtlanException e) {
-                    log.error("Unable to lookup whether account exists or not.", e);
+                    batch.add(account);
                 }
-            } else {
-                ADLSAccount account = ADLSAccount.creator(accountName, connectionQualifiedName)
-                        .description(details.getDescription())
-                        .certificateStatus(details.getCertificate())
-                        .certificateStatusMessage(details.getCertificateStatusMessage())
-                        .announcementType(details.getAnnouncementType())
-                        .announcementTitle(details.getAnnouncementTitle())
-                        .announcementMessage(details.getAnnouncementMessage())
-                        .ownerUsers(details.getOwnerUsers())
-                        .ownerGroups(details.getOwnerGroups())
-                        .build();
-                if (!details.getAtlanTags().isEmpty()) {
-                    toClassify.put(account.getQualifiedName(), details.getAtlanTags());
-                }
-                batch.add(account);
             }
+            // And don't forget to flush out any that remain
+            batch.flush();
+        } catch (AtlanException e) {
+            log.error("Unable to bulk-upsert account details.", e);
         }
-        // And don't forget to flush out any that remain
-        batch.flush();
 
         // Classifications must be added in a second pass, after the asset exists
         appendAtlanTags(toClassify, ADLSAccount.TYPE_NAME);
