@@ -28,9 +28,7 @@ public class VerificationEnforcer implements AtlanEventHandler {
             "__hasLineage",
             "inputToProcesses",
             "outputFromProcesses",
-            "certificateStatus",
-            "awsArn", // required attribute for AWS objects
-            "anchor"); // required attribute for terms and categories
+            "certificateStatus");
 
     String ENFORCEMENT_MESSAGE = "To be verified, an asset must have a description, at least one owner, and lineage.";
 
@@ -65,7 +63,7 @@ public class VerificationEnforcer implements AtlanEventHandler {
         if (asset.getCertificateStatus() == CertificateStatus.VERIFIED) {
             if (!AtlanEventHandler.hasDescription(asset)
                     || !AtlanEventHandler.hasOwner(asset)
-                    || !AtlanEventHandler.hasLineage(asset)) {
+                    || (!asset.getTypeName().startsWith("AtlasGlossary") && !AtlanEventHandler.hasLineage(asset))) {
                 return Set.of(asset.trimToRequired()
                         .certificateStatus(CertificateStatus.DRAFT)
                         .certificateStatusMessage(ENFORCEMENT_MESSAGE)

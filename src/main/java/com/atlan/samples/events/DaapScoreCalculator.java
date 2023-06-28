@@ -8,12 +8,12 @@ import com.atlan.exception.AtlanException;
 import com.atlan.exception.ConflictException;
 import com.atlan.exception.ErrorCode;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Badge;
+import com.atlan.model.assets.*;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.enums.AtlanCustomAttributePrimitiveType;
 import com.atlan.model.enums.BadgeComparisonOperator;
 import com.atlan.model.enums.BadgeConditionColor;
+import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.events.AtlanEvent;
 import com.atlan.model.structs.BadgeCondition;
 import com.atlan.model.typedefs.AttributeDef;
@@ -39,7 +39,10 @@ public class DaapScoreCalculator implements AtlanEventHandler {
             "__hasLineage",
             "classifications",
             "inputToProcesses",
-            "outputFromProcesses");
+            "outputFromProcesses",
+            "assignedEntities",
+            "seeAlso",
+            "links");
 
     /** Singleton for reuse */
     private static final DaapScoreCalculator INSTANCE = createInstance();
@@ -77,28 +80,58 @@ public class DaapScoreCalculator implements AtlanEventHandler {
     @Override
     public Collection<Asset> calculateChanges(Asset asset, Logger log) throws AtlanException {
 
-        // Look at each individual component that should make up the score
-        int sDescription = AtlanEventHandler.hasDescription(asset) ? 1 : 0;
-        int sOwner = AtlanEventHandler.hasOwner(asset) ? 1 : 0;
-        int sTerms = AtlanEventHandler.hasAssignedTerms(asset) ? 1 : 0;
-        int sClassifications = AtlanEventHandler.hasAtlanTags(asset) ? 1 : 0;
-        int sLineage = AtlanEventHandler.hasLineage(asset) ? 1 : 0;
-
         // Calculate the score
-        // (glossary objects cannot have lineage, so exclude lineage from their score)
-        double score;
-        if (asset.getTypeName().startsWith("AtlasGlossary")) {
-            score = ((sDescription + sOwner + sTerms + sClassifications) / 4.0) * 100;
-        } else {
-            score = ((sDescription + sOwner + sLineage + sTerms + sClassifications) / 5.0) * 100;
+        double score = -1.0;
+        if (asset instanceof GlossaryTerm) {
+            GlossaryTerm term = (GlossaryTerm) asset;
+            int sDescription = AtlanEventHandler.hasDescription(term) ? 15 : 0;
+            int sRelatedTerm = (term.getSeeAlso() != null && !term.getSeeAlso().isEmpty()) ? 10 : 0;
+            int sLinks = (term.getLinks() != null && !term.getLinks().isEmpty()) ? 10 : 0;
+            int sRelatedAsset = (term.getAssignedEntities() != null
+                            && !term.getAssignedEntities().isEmpty())
+                    ? 20
+                    : 0;
+            int sCertificate = 0;
+            if (asset.getCertificateStatus() == CertificateStatus.DRAFT) {
+                sCertificate = 15;
+            } else if (asset.getCertificateStatus() == CertificateStatus.VERIFIED) {
+                sCertificate = 25;
+            }
+            int sReadme = 0;
+            IReadme readme = asset.getReadme();
+            if (readme != null && readme.getGuid() != null) {
+                readme = Readme.retrieveByGuid(readme.getGuid());
+                String description = readme.getDescription();
+                if (description != null) {
+                    if (description.length() > 1000) {
+                        sReadme = 20;
+                    } else if (description.length() > 500) {
+                        sReadme = 10;
+                    } else if (description.length() > 100) {
+                        sReadme = 5;
+                    }
+                }
+            }
+            score = (sDescription + sRelatedTerm + sLinks + sRelatedAsset + sCertificate + sReadme);
+        } else if (!asset.getTypeName().startsWith("AtlasGlossary")) {
+            // We will not score glossaries or categories
+            int sDescription = AtlanEventHandler.hasDescription(asset) ? 20 : 0;
+            int sOwner = AtlanEventHandler.hasOwner(asset) ? 20 : 0;
+            int sTerms = AtlanEventHandler.hasAssignedTerms(asset) ? 20 : 0;
+            int sTags = AtlanEventHandler.hasAtlanTags(asset) ? 20 : 0;
+            int sLineage = AtlanEventHandler.hasLineage(asset) ? 20 : 0;
+            score = (sDescription + sOwner + sLineage + sTerms + sTags);
         }
 
-        CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
-                .attribute(CM_ATTR_DAAP_SCORE, score)
-                .build();
-
-        Asset revised = asset.trimToRequired().customMetadata(CM_DAAP, cma).build();
-        return hasChanges(asset, revised, log) ? Set.of(revised) : Collections.emptySet();
+        if (score >= 0) {
+            CustomMetadataAttributes cma = CustomMetadataAttributes.builder()
+                    .attribute(CM_ATTR_DAAP_SCORE, score)
+                    .build();
+            Asset revised = asset.trimToRequired().customMetadata(CM_DAAP, cma).build();
+            return hasChanges(asset, revised, log) ? Set.of(revised) : Collections.emptySet();
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     /** {@inheritDoc} */
