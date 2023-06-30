@@ -39,7 +39,7 @@ public abstract class AbstractLoader {
                 _batchSize = 50;
             }
             String updateOnly = event.getOrDefault("UPDATE_ONLY", "false");
-            _updateOnly = updateOnly.toUpperCase().equals("TRUE");
+            _updateOnly = updateOnly.toUpperCase(Locale.ROOT).equals("TRUE");
             _delimiter = event.getOrDefault("DELIMITER", "|");
             String region = event.getOrDefault("REGION", "ap-south-1");
             _region = Region.of(region);

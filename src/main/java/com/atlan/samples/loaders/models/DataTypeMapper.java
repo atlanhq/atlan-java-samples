@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,9 +44,9 @@ public class DataTypeMapper {
     public static String getTypeOnly(String sqlType) {
         if (sqlType != null) {
             if (sqlType.contains("(")) {
-                return sqlType.substring(0, sqlType.indexOf("(")).trim().toUpperCase();
+                return sqlType.substring(0, sqlType.indexOf("(")).trim().toUpperCase(Locale.ROOT);
             } else {
-                return sqlType.toUpperCase();
+                return sqlType.toUpperCase(Locale.ROOT);
             }
         }
         return null;

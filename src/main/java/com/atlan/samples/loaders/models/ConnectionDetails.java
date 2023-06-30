@@ -96,13 +96,13 @@ public class ConnectionDetails extends AssetDetails {
             String name = row.get(COL_CONNECTION);
             if (getRequiredEmptyFields(row, REQUIRED_EMPTY).isEmpty()) {
                 return getFromRow(ConnectionDetails.builder(), row, delim)
-                        .type(AtlanConnectorType.fromValue(type.toLowerCase()))
+                        .type(AtlanConnectorType.fromValue(type.toLowerCase(Locale.ROOT)))
                         .name(name)
                         .stub(false)
                         .build();
             } else {
                 return ConnectionDetails.builder()
-                        .type(AtlanConnectorType.fromValue(type.toLowerCase()))
+                        .type(AtlanConnectorType.fromValue(type.toLowerCase(Locale.ROOT)))
                         .name(name)
                         .stub(true)
                         .build();
@@ -123,7 +123,7 @@ public class ConnectionDetails extends AssetDetails {
         if (getMissingFields(row, List.of(connectorCol, connectionCol)).isEmpty()) {
             return getHeader(
                     row.get(connectionCol),
-                    AtlanConnectorType.fromValue(row.get(connectorCol).toLowerCase()));
+                    AtlanConnectorType.fromValue(row.get(connectorCol).toLowerCase(Locale.ROOT)));
         } else {
             return null;
         }

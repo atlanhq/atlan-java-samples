@@ -39,10 +39,6 @@ tasks.withType(JavaCompile) {
         // to fix by adding the missing summaries.
         disable("MissingSummary")
 
-        // This check is disabled because multiple nested classes may have the same name in a given
-        // file. (In particular the EqualsAndHashCode from Lombok will create this in many places.)
-        disable("SameNameButDifferent")
-
         // This check is disabled because of how we have object-based inheritance setup, and the
         // inability of Lombok to generate Overrides on its generated builder-related methods.
         disable("MissingOverride")
@@ -78,22 +74,31 @@ repositories {
     }
 }
 
+configurations {
+    logable {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    logable.extendsFrom(runtimeClasspath)
+}
+
 dependencies {
-    errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
+    errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.20.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
     implementation group: "com.atlan", name: "atlan-java", "version": "0.8.0"
     implementation "io.numaproj.numaflow:numaflow-java:0.4.6"
-    implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
+    implementation group: "org.slf4j", name: "slf4j-api", version: "2.0.7"
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
-    implementation platform('software.amazon.awssdk:bom:2.18.21')
-    implementation 'software.amazon.awssdk:s3:2.18.24'
+    implementation platform('software.amazon.awssdk:bom:2.20.96')
+    implementation 'software.amazon.awssdk:s3:2.20.96'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
-    implementation 'io.swagger.parser.v3:swagger-parser:2.1.12'
-    runtimeOnly group: 'ch.qos.logback', name: 'logback-core', version: '1.2.11'
-    runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
-    testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
-    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+    implementation 'io.swagger.parser.v3:swagger-parser:2.1.16'
+    runtimeOnly group: 'ch.qos.logback', name: 'logback-core', version: '1.4.8'
+    runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
+    logable group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
+    testImplementation group: 'org.testng', name: 'testng', version: '7.8.0'
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
 }
 
@@ -127,8 +132,8 @@ testing {
             useTestNG()
             dependencies {
                 implementation project
-                implementation group: 'org.testng', name: 'testng', version: '7.7.0'
-                implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+                implementation group: 'org.testng', name: 'testng', version: '7.8.0'
+                implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
                 implementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
             }
             sources {
@@ -165,9 +170,9 @@ task openApiJar(type: Jar) {
     manifest {
         attributes("Main-Class": "com.atlan.samples.loaders.OpenAPISpecLoader")
     }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.logable.collect { it.isDirectory() ? it : zipTree(it) }
     }
     with jar
 }

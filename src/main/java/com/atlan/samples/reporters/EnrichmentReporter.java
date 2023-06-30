@@ -31,8 +31,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     private static final String CM_DELIMITER = "|";
 
-    private static LinkedHashMap<String, List<String>> CM_ATTRIBUTE_ORDER;
-    private static LinkedHashMap<String, String> CM_ATTRIBUTE_HEADERS;
+    private static Map<String, List<String>> CM_ATTRIBUTE_ORDER;
+    private static Map<String, String> CM_ATTRIBUTE_HEADERS;
     private static Set<String> CM_ATTRIBUTES_FOR_SEARCH;
     private static Set<String> autoSizeSheets = new HashSet<>();
 
@@ -182,9 +182,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         if (event != null) {
             setFilenameWithPrefix(event, "enrichment-report");
             String filterBy = event.getOrDefault("FILTER_BY", "GROUP");
-            if (filterBy.toUpperCase().equals("GROUP")) {
+            if (filterBy.toUpperCase(Locale.ROOT).equals("GROUP")) {
                 FILTER_TYPE = FilterType.BY_GROUP;
-            } else if (filterBy.toUpperCase().equals("ATLAN_TAG")) {
+            } else if (filterBy.toUpperCase(Locale.ROOT).equals("ATLAN_TAG")) {
                 FILTER_TYPE = FilterType.BY_ATLAN_TAG;
             } else {
                 FILTER_TYPE = FilterType.BY_PREFIX;
@@ -198,9 +198,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 PREFIX = prefix;
             }
             String includeFieldLevel = event.getOrDefault("INCLUDE_FIELD_LEVEL", "false");
-            INCLUDE_FIELD_LEVEL = includeFieldLevel.toUpperCase().equals("TRUE");
+            INCLUDE_FIELD_LEVEL = includeFieldLevel.toUpperCase(Locale.ROOT).equals("TRUE");
             String directAtlanTagsOnly = event.getOrDefault("DIRECT_ATLAN_TAGS_ONLY", "false");
-            DIRECT_ATLAN_TAG_ONLY = directAtlanTagsOnly.toUpperCase().equals("TRUE");
+            DIRECT_ATLAN_TAG_ONLY = directAtlanTagsOnly.toUpperCase(Locale.ROOT).equals("TRUE");
         }
     }
 
@@ -225,10 +225,10 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             // Can only cache custom metadata-related heading information after we have access to
             // an environment
             getOrderedCustomMetadata();
-            LinkedHashMap<String, String> ASSET_ENRICHMENT = createAssetEnrichmentHeader();
-            LinkedHashMap<String, String> GLOSSARY_ENRICHMENT = createGlossaryEnrichmentHeader();
-            LinkedHashMap<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
-            LinkedHashMap<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
+            Map<String, String> ASSET_ENRICHMENT = createAssetEnrichmentHeader();
+            Map<String, String> GLOSSARY_ENRICHMENT = createGlossaryEnrichmentHeader();
+            Map<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
+            Map<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
 
             ExcelWriter xlsx = new ExcelWriter();
 
@@ -974,8 +974,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         }
     }
 
-    static LinkedHashMap<String, String> createAssetEnrichmentHeader() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createAssetEnrichmentHeader() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("Connector", "Type of the data source");
         map.put("Qualified name", "Unique name of the asset");
         map.put("Type", "Type of asset");
@@ -1012,8 +1012,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return map;
     }
 
-    static LinkedHashMap<String, String> createGlossaryEnrichmentHeader() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createGlossaryEnrichmentHeader() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("Glossary Name", "Name of the glossary");
         map.put("Description", "Explanation of the glossary's contained terminology");
         map.put("User Description", "Explanation of the glossary's meaning, as provided by a user in the UI");
@@ -1039,8 +1039,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return map;
     }
 
-    static LinkedHashMap<String, String> createCategoryEnrichmentHeader() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createCategoryEnrichmentHeader() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("Glossary Name", "Name of the glossary in which the category exists");
         map.put("Category Path", "Path of the category, separated by '@'");
         map.put("Description", "Explanation of the category's meaning");
@@ -1067,8 +1067,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         return map;
     }
 
-    static LinkedHashMap<String, String> createTermEnrichmentHeader() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createTermEnrichmentHeader() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("Glossary Name", "Name of the glossary in which the term exists");
         map.put("Term Name*", "Name of the term, which cannot include '@'");
         map.put("Description", "Explanation of the term's meaning");

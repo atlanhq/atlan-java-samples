@@ -5,10 +5,7 @@ package com.atlan.samples.readers;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -155,7 +152,7 @@ public class ExcelReader {
                 if (name.contains(caseSensitiveDelimiter)) {
                     columns.add(name);
                 } else if (name.length() > 0) {
-                    columns.add(name.toUpperCase());
+                    columns.add(name.toUpperCase(Locale.ROOT));
                 }
             }
         }
