@@ -48,6 +48,10 @@ afterEvaluate { project ->
         from javadoc.destinationDir
     }
 
+    task openApiLoaderJar(type: Jar, dependsOn: openApiJar) {
+        from openApiJar
+    }
+
     signing {
         required { isReleaseBuild() && gradle.taskGraph.hasTask("publish") }
         useGpgCmd()
@@ -71,6 +75,7 @@ afterEvaluate { project ->
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
+                artifact openApiLoaderJar
                 pom {
                     name = POM_NAME
                     description = POM_DESCRIPTION
