@@ -74,6 +74,14 @@ repositories {
     }
 }
 
+configurations {
+    logable {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    logable.extendsFrom(runtimeClasspath)
+}
+
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.20.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
@@ -88,6 +96,7 @@ dependencies {
     implementation 'io.swagger.parser.v3:swagger-parser:2.1.16'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-core', version: '1.4.8'
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
+    logable group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
     testImplementation group: 'org.testng', name: 'testng', version: '7.8.0'
     testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.8'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
@@ -161,9 +170,9 @@ task openApiJar(type: Jar) {
     manifest {
         attributes("Main-Class": "com.atlan.samples.loaders.OpenAPISpecLoader")
     }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.logable.collect { it.isDirectory() ? it : zipTree(it) }
     }
     with jar
 }

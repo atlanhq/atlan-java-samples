@@ -19,7 +19,7 @@ jobs:
       - name: Check formatting
         run: ./gradlew spotlessCheck
       - name: Build artifacts
-        run: ./gradlew assemble shadowJar buildZip
+        run: ./gradlew assemble shadowJar buildZip openApiJar
         env:
           GH_USERNAME: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
