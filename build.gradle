@@ -39,10 +39,6 @@ tasks.withType(JavaCompile) {
         // to fix by adding the missing summaries.
         disable("MissingSummary")
 
-        // This check is disabled because multiple nested classes may have the same name in a given
-        // file. (In particular the EqualsAndHashCode from Lombok will create this in many places.)
-        disable("SameNameButDifferent")
-
         // This check is disabled because of how we have object-based inheritance setup, and the
         // inability of Lombok to generate Overrides on its generated builder-related methods.
         disable("MissingOverride")
