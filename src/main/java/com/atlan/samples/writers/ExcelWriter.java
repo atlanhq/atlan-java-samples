@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -172,7 +171,7 @@ public class ExcelWriter {
      * @param worksheet in which to create the header row
      * @param headers ordered map of header names and descriptions
      */
-    public void addHeader(Sheet worksheet, LinkedHashMap<String, String> headers) {
+    public void addHeader(Sheet worksheet, Map<String, String> headers) {
         Row header = worksheet.createRow(0);
         int colIdx = 0;
         for (Map.Entry<String, String> entry : headers.entrySet()) {

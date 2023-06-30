@@ -25,7 +25,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Slf4j
 public class UserReporter extends AbstractReporter implements RequestHandler<Map<String, String>, String> {
 
-    private static final LinkedHashMap<String, String> USER_REPORT_HEADERS = createUserDetailsReportHeaders();
+    private static final Map<String, String> USER_REPORT_HEADERS = createUserDetailsReportHeaders();
 
     private static final Set<String> autoSizeSheets = new HashSet<>();
 
@@ -94,8 +94,8 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
         return getFilename();
     }
 
-    static LinkedHashMap<String, String> createUserDetailsReportHeaders() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createUserDetailsReportHeaders() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("GUID", "Unique identifier for the user.");
         map.put("Username", "Unique username for the user.");
         map.put("First Name", "First name of the user.");

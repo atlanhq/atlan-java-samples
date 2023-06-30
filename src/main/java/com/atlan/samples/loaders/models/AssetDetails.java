@@ -119,7 +119,7 @@ public abstract class AssetDetails {
         if (candidate == null || candidate.length() == 0) {
             return false;
         } else {
-            String upper = candidate.toUpperCase();
+            String upper = candidate.toUpperCase(Locale.ROOT);
             return upper.equals("X") || upper.equals("Y") || upper.equals("YES") || upper.equals("TRUE");
         }
     }

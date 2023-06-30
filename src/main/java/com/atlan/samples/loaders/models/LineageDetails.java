@@ -106,7 +106,7 @@ public class LineageDetails extends AssetDetails {
         if (getMissingFields(row, List.of(COL_S_CONNECTOR, COL_S_CONNECTION)).isEmpty()) {
             return ConnectionDetails.getHeader(
                     row.get(COL_S_CONNECTION),
-                    AtlanConnectorType.fromValue(row.get(COL_S_CONNECTOR).toLowerCase()));
+                    AtlanConnectorType.fromValue(row.get(COL_S_CONNECTOR).toLowerCase(Locale.ROOT)));
         }
         return null;
     }
@@ -121,7 +121,7 @@ public class LineageDetails extends AssetDetails {
         if (getMissingFields(row, List.of(COL_T_CONNECTOR, COL_T_CONNECTION)).isEmpty()) {
             return ConnectionDetails.getHeader(
                     row.get(COL_T_CONNECTION),
-                    AtlanConnectorType.fromValue(row.get(COL_T_CONNECTOR).toLowerCase()));
+                    AtlanConnectorType.fromValue(row.get(COL_T_CONNECTOR).toLowerCase(Locale.ROOT)));
         }
         return null;
     }

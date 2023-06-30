@@ -25,7 +25,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Slf4j
 public class SlackDiscussionReporter extends AbstractReporter implements RequestHandler<Map<String, String>, String> {
 
-    private static final LinkedHashMap<String, String> SLACK_DISCUSSIONS = createSlackDiscussionHeader();
+    private static final Map<String, String> SLACK_DISCUSSIONS = createSlackDiscussionHeader();
 
     private static final Set<String> autoSizeSheets = new HashSet<>();
 
@@ -152,8 +152,8 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
         }
     }
 
-    static LinkedHashMap<String, String> createSlackDiscussionHeader() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> createSlackDiscussionHeader() {
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("Qualified name", "Unique name of the asset");
         map.put("Type", "Type of asset");
         map.put("Name", "Name of the asset");

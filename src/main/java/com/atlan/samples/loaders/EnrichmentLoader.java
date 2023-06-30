@@ -13,10 +13,7 @@ import com.atlan.samples.loaders.models.GlossaryEnrichmentDetails;
 import com.atlan.samples.loaders.models.TermEnrichmentDetails;
 import com.atlan.samples.readers.ExcelReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -47,9 +44,10 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
         super.parseParametersFromEvent(event);
         if (event != null) {
             String replaceClassifications = event.getOrDefault("REPLACE_CLASSIFICATIONS", "false");
-            REPLACE_CLASSIFICATIONS = replaceClassifications.toUpperCase().equals("TRUE");
+            REPLACE_CLASSIFICATIONS =
+                    replaceClassifications.toUpperCase(Locale.ROOT).equals("TRUE");
             String replaceCM = event.getOrDefault("REPLACE_CUSTOM_METADATA", "false");
-            REPLACE_CUSTOM_METADATA = replaceCM.toUpperCase().equals("TRUE");
+            REPLACE_CUSTOM_METADATA = replaceCM.toUpperCase(Locale.ROOT).equals("TRUE");
         }
     }
 
