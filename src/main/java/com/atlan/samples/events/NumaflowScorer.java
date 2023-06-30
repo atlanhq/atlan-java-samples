@@ -2,7 +2,6 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
-import com.atlan.events.AbstractNumaflowHandler;
 import io.numaproj.numaflow.function.FunctionServer;
 import lombok.extern.slf4j.Slf4j;
 
