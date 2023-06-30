@@ -285,11 +285,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .must(beOfType(Glossary.TYPE_NAME))
                 .build()
                 ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
+        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
                         .size(getBatchSize())
-                        .query(query)
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
@@ -316,11 +313,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .must(beOfType(GlossaryTerm.TYPE_NAME))
                 .build()
                 ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
+        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
                         .size(getBatchSize())
-                        .query(query)
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
@@ -362,11 +356,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
         }
         Query query = builder.build()._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
+        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
                         .size(getBatchSize())
-                        .query(query)
                         .sortOption(Sort.by(KeywordFields.GUID, SortOrder.Asc))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
@@ -467,11 +458,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .must(beOfType(GlossaryCategory.TYPE_NAME))
                 .build()
                 ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
+        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
                         .size(getBatchSize())
-                        .query(query)
                         .sortOption(Sort.by(KeywordFields.NAME))
                         .build())
                 .attributes(ENRICHMENT_ATTRIBUTES)

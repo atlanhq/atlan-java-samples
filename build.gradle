@@ -81,7 +81,7 @@ repositories {
 dependencies {
     errorprone group: "com.google.errorprone", name: "error_prone_core", version: "2.14.0"
     errorproneJavac group: "com.google.errorprone", name: "javac", version:"9+181-r4173-1"
-    implementation group: "com.atlan", name: "atlan-java", "version": "0.8.0-SNAPSHOT"
+    implementation group: "com.atlan", name: "atlan-java", "version": "0.8.0"
     implementation "io.numaproj.numaflow:numaflow-java:0.4.6"
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.32"
     implementation 'org.apache.poi:poi:5.2.3'
@@ -171,50 +171,6 @@ task openApiJar(type: Jar) {
     }
     with jar
 }
-
-/*shadowJar {
-    archiveClassifier = 'openapi-loader'
-    dependencies {
-        include(dependency('com.atlan:atlan-java:.*'))
-        include(dependency('io.swagger.core.v3:swagger-models:.*'))
-        include(dependency('io.swagger.core.v3:swagger-annotations:.*'))
-        include(dependency('io.swagger.core.v3:swagger-core:.*'))
-        include(dependency('io.swagger.parser.v3:swagger-parser-core:.*'))
-        include(dependency('io.swagger.parser.v3:swagger-parser-safe-url-resolver:.*'))
-        include(dependency('io.swagger.parser.v3:swagger-parser:.*'))
-        include(dependency('io.swagger.parser.v3:swagger-parser-v2-converter:.*'))
-        include(dependency('io.swagger.parser.v3:swagger-parser-v3:.*'))
-        include(dependency('io.swagger:swagger-core:.*'))
-        include(dependency('io.swagger:swagger-compat-spec-parser:.*'))
-        include(dependency('io.swagger:swagger-annotations:.*'))
-        include(dependency('io.swagger:swagger-models:.*'))
-        include(dependency('io.swagger:swagger-parser:.*'))
-        include(dependency('org.apache.commons:commons-lang3:.*'))
-        include(dependency('commons-io:commons-io:.*'))
-        include(dependency('com.fasterxml.jackson.core:jackson-core:.*'))
-        include(dependency('com.fasterxml.jackson.core:jackson-annotations:.*'))
-        include(dependency('com.fasterxml.jackson.core:jackson-databind:.*'))
-        include(dependency('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:.*'))
-        include(dependency('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:.*'))
-        include(dependency('org.yaml:snakeyaml:.*'))
-        include(dependency('software.amazon.awssdk:s3:.*'))
-        include(dependency('software.amazon.awssdk:regions:.*'))
-        include(dependency('software.amazon.awssdk:utils:.*'))
-        include(dependency('com.amazonaws:aws-lambda-java-core:.*'))
-        include(dependency('co.elastic.clients:elasticsearch-java:.*'))
-        include(dependency('org.elasticsearch.client:elasticsearch-rest-client:.*'))
-        include(dependency('jakarta.json:jakarta.json-api:.*'))
-        include(dependency('jakarta.xml.bind:jakarta.xml.bind-api:.*'))
-        include(dependency('jakarta.activation:jakarta.activation-api:.*'))
-        include(dependency('jakarta.validation:jakarta.validation-api:.*'))
-        include(dependency('org.slf4j:slf4j-api:.*'))
-        include(dependency('ch.qos.logback:logback-classic:.*'))
-        include(dependency('ch.qos.logback:logback-core:.*'))
-    }
-    manifest {
-        inheritFrom(project.tasks.openApiJar.manifest)
-    }
-}*/
 
 gitPublish {
     repoUri = 'https://github.com/atlanhq/atlan-java-samples.git'
