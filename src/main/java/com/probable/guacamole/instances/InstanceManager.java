@@ -14,7 +14,6 @@ import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.AtlanDeleteType;
 import com.atlan.model.enums.CertificateStatus;
-import com.atlan.model.search.IndexSearchDSL;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.util.AssetBatch;
@@ -154,9 +153,7 @@ public class InstanceManager extends AtlanRunner {
                 .build()
                 ._toQuery();
 
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder().query(query).build())
-                .build();
+        IndexSearchRequest request = IndexSearchRequest.builder(query).build();
 
         try {
             IndexSearchResponse response = request.search();
@@ -174,9 +171,7 @@ public class InstanceManager extends AtlanRunner {
                 .build()
                 ._toQuery();
 
-        request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder().query(query).build())
-                .build();
+        request = IndexSearchRequest.builder(query).build();
 
         try {
             IndexSearchResponse response = request.search();
@@ -194,9 +189,7 @@ public class InstanceManager extends AtlanRunner {
                 .build()
                 ._toQuery();
 
-        request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder().query(query).build())
-                .build();
+        request = IndexSearchRequest.builder(query).build();
 
         try {
             IndexSearchResponse response = request.search();
@@ -214,9 +207,7 @@ public class InstanceManager extends AtlanRunner {
                 .build()
                 ._toQuery();
 
-        request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder().query(query).build())
-                .build();
+        request = IndexSearchRequest.builder(query).build();
 
         try {
             IndexSearchResponse response = request.search();

@@ -100,11 +100,8 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                 .must(beOfType(Link.TYPE_NAME))
                 .build()
                 ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder()
-                .dsl(IndexSearchDSL.builder()
-                        .from(0)
+        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
                         .size(getBatchSize())
-                        .query(query)
                         .sortOption(Sort.by(KeywordFields.GUID, SortOrder.Asc))
                         .build())
                 .attribute("asset")

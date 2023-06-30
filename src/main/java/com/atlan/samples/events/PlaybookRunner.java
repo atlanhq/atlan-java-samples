@@ -99,9 +99,7 @@ public class PlaybookRunner implements AtlanEventHandler {
                 Query query = filter.getDsl().getQuery();
                 // Add the asset in the event to the search criteria of the rule,
                 // to confirm there is a match (that we should apply the associated actions)
-                IndexSearchRequest match = IndexSearchRequest.builder()
-                        .dsl(IndexSearchDSL.builder()
-                                .query(CompoundQuery.builder()
+                IndexSearchRequest match = IndexSearchRequest.builder(IndexSearchDSL.builder(CompoundQuery.builder()
                                         .must(query)
                                         .must(have(KeywordFields.GUID).eq(original.getGuid()))
                                         .build()
