@@ -49,7 +49,7 @@ afterEvaluate { project ->
     }
 
     task openApiLoaderJar(type: Jar, dependsOn: openApiJar) {
-        classifier = "openapi"
+        classifier = "openapi-loader"
         from openApiJar
     }
 
