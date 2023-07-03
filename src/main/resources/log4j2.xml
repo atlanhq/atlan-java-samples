@@ -14,6 +14,6 @@
         </Root>
         <Logger name="software.amazon.awssdk" level="WARN" />
         <Logger name="software.amazon.awssdk.request" level="DEBUG" />
-        <Logger name="com.atlan" level="DEBUG" />
+        <Logger name="com.atlan" level="INFO" />
     </Loggers>
 </Configuration>

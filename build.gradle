@@ -98,7 +98,8 @@ jar {
                 "Implementation-Version": VERSION_NAME,
                 "Implementation-Vendor": VENDOR_NAME,
                 "Bundle-SymbolicName": POM_ARTIFACT_ID,
-                "Export-Package": "com.atlan.*")
+                "Export-Package": "com.atlan.*",
+                "Multi-Release": "true")
 
         archiveVersion = VERSION_NAME
     }
