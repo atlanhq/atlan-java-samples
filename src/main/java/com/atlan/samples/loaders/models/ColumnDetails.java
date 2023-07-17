@@ -93,7 +93,7 @@ public class ColumnDetails extends AssetDetails {
             String rawType = row.get(COL_COLUMN_TYPE);
             String rawTypeOnly = DataTypeMapper.getTypeOnly(rawType);
             String mappedType = DataTypeMapper.getMappedType(rawTypeOnly);
-            if (rawType.length() > 0) {
+            if (rawType != null && rawType.length() > 0) {
                 builder = builder.rawType(rawType);
             }
             if (mappedType != null && mappedType.length() > 0) {

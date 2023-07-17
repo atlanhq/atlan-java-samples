@@ -99,10 +99,10 @@ public abstract class AssetDetails {
         String certificate = row.get(COL_CERTIFICATE);
         String announcement = row.get(COL_ANNOUNCEMENT);
 
-        if (certificate.length() > 0) {
+        if (certificate != null && certificate.length() > 0) {
             builder.certificate(CertificateStatus.fromValue(certificate));
         }
-        if (announcement.length() > 0) {
+        if (announcement != null && announcement.length() > 0) {
             builder.announcementType(AtlanAnnouncementType.fromValue(announcement));
         }
         return builder;

@@ -29,6 +29,8 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
 
     private static final Set<String> autoSizeSheets = new HashSet<>();
 
+    private static final Comparator<String> stringComparator = Comparator.nullsFirst(String::compareTo);
+
     public static void main(String[] args) {
         UserReporter ur = new UserReporter();
         Map<String, String> event = new HashMap<>(System.getenv());
@@ -55,7 +57,8 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
             log.info("Retrieving user details for tenant: {}", Atlan.getBaseUrlSafe());
             List<AtlanUser> users;
             users = AtlanUser.retrieveAll();
-            users.sort(Comparator.comparing(AtlanUser::getFirstName).thenComparing(AtlanUser::getLastName));
+            users.sort(Comparator.comparing(AtlanUser::getFirstName, stringComparator)
+                    .thenComparing(AtlanUser::getLastName, stringComparator));
 
             log.info("Creating Excel file (in-memory)...");
             if (context != null && context.getClientContext() != null) {
