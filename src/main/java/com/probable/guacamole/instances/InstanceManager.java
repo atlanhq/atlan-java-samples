@@ -5,8 +5,7 @@ package com.probable.guacamole.instances;
 import static com.atlan.util.QueryFactory.*;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.atlan.api.EntityBulkEndpoint;
-import com.atlan.cache.RoleCache;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Connection;
@@ -53,11 +52,11 @@ public class InstanceManager extends AtlanRunner {
                 Connection toCreate = Connection.creator(
                                 SERVICE_TYPE,
                                 AtlanConnectorType.MONGODB,
-                                List.of(RoleCache.getIdForName("$admin")),
+                                List.of(Atlan.getDefaultClient().getRoleCache().getIdForName("$admin")),
                                 null,
                                 null)
                         .build();
-                AssetMutationResponse response = toCreate.upsert().block();
+                AssetMutationResponse response = toCreate.save().block();
                 connection = (Connection) response.getCreatedAssets().get(0);
             } catch (AtlanException e) {
                 log.error("Unable to create a new connection.", e);
@@ -78,14 +77,14 @@ public class InstanceManager extends AtlanRunner {
                 .guacamoleSize(123L)
                 .build();
         try {
-            AssetMutationResponse response = table.upsert();
+            AssetMutationResponse response = table.save();
             log.info("Created table entity: {}", response);
             table = (GuacamoleTable) response.getCreatedAssets().get(0);
         } catch (AtlanException e) {
             log.error("Failed to create new guacamole table.", e);
         }
         try {
-            AssetBatch batch = new AssetBatch(GuacamoleColumn.TYPE_NAME, 20);
+            AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), GuacamoleColumn.TYPE_NAME, 20);
             GuacamoleColumn child1 = GuacamoleColumn.builder()
                     .connectionQualifiedName(connection.getQualifiedName())
                     .connectorType(AtlanConnectorType.MONGODB)
@@ -139,7 +138,7 @@ public class InstanceManager extends AtlanRunner {
                 .certificateStatus(CertificateStatus.DRAFT)
                 .build();
         try {
-            AssetMutationResponse response = toUpdate.upsert();
+            AssetMutationResponse response = toUpdate.save();
             log.info("Updated parent: {}", response);
         } catch (AtlanException e) {
             log.error("Unable to update entity.", e);
@@ -227,7 +226,9 @@ public class InstanceManager extends AtlanRunner {
             GuacamoleTable parent = GuacamoleTable.retrieveByQualifiedName(parentQN);
             GuacamoleColumn one = GuacamoleColumn.retrieveByQualifiedName(child1QN);
             GuacamoleColumn two = GuacamoleColumn.retrieveByQualifiedName(child2QN);
-            EntityBulkEndpoint.delete(List.of(parent.getGuid(), one.getGuid(), two.getGuid()), AtlanDeleteType.PURGE);
+            Atlan.getDefaultClient()
+                    .assets()
+                    .delete(List.of(parent.getGuid(), one.getGuid(), two.getGuid()), AtlanDeleteType.PURGE);
             log.info("Entities purged.");
         } catch (AtlanException e) {
             log.error("Unable to purge entities.", e);

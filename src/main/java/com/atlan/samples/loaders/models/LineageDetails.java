@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.ICatalog;
 import com.atlan.model.assets.LineageProcess;
@@ -214,7 +215,7 @@ public class LineageDetails extends AssetDetails {
      * @param batchSize maximum number of processes to create per batch
      */
     public static void upsert(Map<String, Set<LineageDetails>> processes, int batchSize) {
-        AssetBatch batch = new AssetBatch(LineageProcess.TYPE_NAME, batchSize);
+        AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), LineageProcess.TYPE_NAME, batchSize);
         Map<String, List<String>> toTag = new HashMap<>();
 
         try {

@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
@@ -125,7 +126,7 @@ public class BucketDetails extends AssetDetails {
      * @param updateOnly if true, only attempt to update existing assets, otherwise allow assets to be created as well
      */
     public static void upsert(Map<String, BucketDetails> buckets, int batchSize, boolean updateOnly) {
-        AssetBatch batch = new AssetBatch("bucket", batchSize);
+        AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), "bucket", batchSize);
         Map<String, List<String>> toClassifyS3 = new HashMap<>();
         Map<String, List<String>> toClassifyGCS = new HashMap<>();
         Map<String, List<String>> toClassifyADLS = new HashMap<>();

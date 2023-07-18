@@ -82,7 +82,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
             }
 
         } catch (AtlanException e) {
-            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrlSafe(), e);
+            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrl(), e);
             System.exit(1);
         } catch (IOException e) {
             log.error("Failed to write Excel file to: {}", getFilename(), e);
@@ -111,7 +111,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                 .relationAttribute("typeName")
                 .relationAttribute("name")
                 .build();
-        log.info("Retrieving first {} link details from: {}", getBatchSize(), Atlan.getBaseUrlSafe());
+        log.info("Retrieving first {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
         IndexSearchResponse response = request.search();
         List<Asset> results = response.getAssets();
         while (results != null) {
@@ -131,7 +131,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                     }
                 }
             }
-            log.info(" retrieving next {} link details from: {}", getBatchSize(), Atlan.getBaseUrlSafe());
+            log.info(" retrieving next {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
             response = response.getNextPage();
             results = response.getAssets();
         }

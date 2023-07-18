@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
@@ -122,7 +123,7 @@ public class ContainerDetails extends AssetDetails {
      */
     public static Set<String> upsert(Map<String, ContainerDetails> containers, int batchSize, boolean updateOnly) {
         Set<String> parents = new HashSet<>();
-        AssetBatch batchContainers = new AssetBatch("container", batchSize);
+        AssetBatch batchContainers = new AssetBatch(Atlan.getDefaultClient(), "container", batchSize);
         Map<String, List<String>> toClassifyTables = new HashMap<>();
         Map<String, List<String>> toClassifyViews = new HashMap<>();
         Map<String, List<String>> toClassifyMVs = new HashMap<>();

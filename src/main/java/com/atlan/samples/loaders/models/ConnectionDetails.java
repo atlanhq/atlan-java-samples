@@ -2,7 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
-import com.atlan.cache.RoleCache;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
@@ -156,7 +156,7 @@ public class ConnectionDetails extends AssetDetails {
         // 1. Search for existing connection with the name, so we can avoid creating if it
         //    already exists (since connection qualifiedNames have a time-based component, they
         //    are not automatically idempotent across create and update)
-        AssetBatch batch = new AssetBatch(Connection.TYPE_NAME, batchSize);
+        AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), Connection.TYPE_NAME, batchSize);
         log.info("... looking for existing ({}) connections...", connections.size());
         try {
             for (ConnectionDetails details : connections.values()) {
@@ -187,7 +187,9 @@ public class ConnectionDetails extends AssetDetails {
                                 if (!ownerGroups.isEmpty()) {
                                     for (String groupName : ownerGroups) {
                                         if (groupName.startsWith("$")) {
-                                            ownerRoles.add(RoleCache.getIdForName(groupName));
+                                            ownerRoles.add(Atlan.getDefaultClient()
+                                                    .getRoleCache()
+                                                    .getIdForName(groupName));
                                         } else {
                                             leftOverGroups.add(groupName);
                                         }
@@ -196,7 +198,9 @@ public class ConnectionDetails extends AssetDetails {
                                 if (leftOverGroups.isEmpty() && ownerRoles.isEmpty() && ownerUsers.isEmpty()) {
                                     // If no owners have been specified at all (no connection admins),
                                     // then fallback to setting All Admins as the connection owner
-                                    ownerRoles.add(RoleCache.getIdForName("$admin"));
+                                    ownerRoles.add(Atlan.getDefaultClient()
+                                            .getRoleCache()
+                                            .getIdForName("$admin"));
                                 }
                                 Connection toCreate = Connection.creator(
                                                 header.getName(),

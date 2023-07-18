@@ -83,7 +83,7 @@ public abstract class AbstractReporter {
     }
 
     protected static String getAssetLink(String guid) {
-        return Atlan.getBaseUrlSafe() + "/assets/" + guid + "/overview";
+        return Atlan.getBaseUrl() + "/assets/" + guid + "/overview";
     }
 
     protected static String getDescription(Asset asset) {
