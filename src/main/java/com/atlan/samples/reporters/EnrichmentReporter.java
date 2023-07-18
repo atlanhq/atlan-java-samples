@@ -10,7 +10,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.Atlan;
-import com.atlan.cache.CustomMetadataCache;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.CustomMetadataAttributes;
@@ -268,7 +267,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             }
 
         } catch (AtlanException e) {
-            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrlSafe(), e);
+            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrl(), e);
             System.exit(1);
         } catch (IOException e) {
             log.error("Failed to write Excel file to: {}", getFilename(), e);
@@ -366,7 +365,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .relationAttribute("description")
                 .relationAttribute("userDescription")
                 .build();
-        log.info("Retrieving first {} asset details from: {}", getBatchSize(), Atlan.getBaseUrlSafe());
+        log.info("Retrieving first {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
         IndexSearchResponse response = request.search();
         List<Asset> results = response.getAssets();
         while (results != null) {
@@ -416,7 +415,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     processed.put(guid, result.getQualifiedName());
                 }
             }
-            log.info(" retrieving next {} asset details from: {}", getBatchSize(), Atlan.getBaseUrlSafe());
+            log.info(" retrieving next {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
             response = response.getNextPage();
             results = response.getAssets();
         }
@@ -949,10 +948,12 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         CM_ATTRIBUTE_HEADERS = new LinkedHashMap<>();
         CM_ATTRIBUTES_FOR_SEARCH = new HashSet<>();
         try {
-            Map<String, List<AttributeDef>> allAttrs = CustomMetadataCache.getAllCustomAttributes();
+            Map<String, List<AttributeDef>> allAttrs =
+                    Atlan.getDefaultClient().getCustomMetadataCache().getAllCustomAttributes();
             List<String> sortedNames = allAttrs.keySet().stream().sorted().collect(Collectors.toList());
             for (String cmName : sortedNames) {
-                CM_ATTRIBUTES_FOR_SEARCH.addAll(CustomMetadataCache.getAttributesForSearchResults(cmName));
+                CM_ATTRIBUTES_FOR_SEARCH.addAll(
+                        Atlan.getDefaultClient().getCustomMetadataCache().getAttributesForSearchResults(cmName));
                 List<AttributeDef> attrs = allAttrs.get(cmName);
                 List<String> attrNames = new ArrayList<>();
                 for (AttributeDef attr : attrs) {

@@ -2,6 +2,8 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
+import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.events.AtlanEvent;
@@ -29,7 +31,7 @@ public class EventLogger implements AtlanEventHandler {
     @Override
     public boolean validatePrerequisites(AtlanEvent event, Logger log) {
         // Do nothing, just log the event
-        log.info("Atlan event payload: {}", event.getPayload().toJson());
+        log.info("Atlan event payload: {}", event.getPayload().toJson(Atlan.getDefaultClient()));
         return true;
     }
 
@@ -56,7 +58,7 @@ public class EventLogger implements AtlanEventHandler {
 
     /** {@inheritDoc} */
     @Override
-    public void upsertChanges(Collection<Asset> changedAssets, Logger log) {
+    public void saveChanges(AtlanClient client, Collection<Asset> changedAssets, Logger log) {
         // Do nothing
     }
 }

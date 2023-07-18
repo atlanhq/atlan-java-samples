@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
@@ -130,8 +131,8 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
                 }
                 try {
                     AssetMutationResponse result = replaceCM
-                            ? glossary.upsertReplacingCM(replaceClassifications)
-                            : glossary.upsertMergingCM(replaceClassifications);
+                            ? glossary.saveReplacingCM(replaceClassifications)
+                            : glossary.saveMergingCM(replaceClassifications);
                     if (result != null) {
                         List<Asset> created = result.getCreatedAssets();
                         for (Asset one : created) {
@@ -171,7 +172,7 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
 
         // Then go through and create any the READMEs linked to these assets...
         try {
-            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            AssetBatch readmeBatch = new AssetBatch(Atlan.getDefaultClient(), Readme.TYPE_NAME, batchSize);
             for (Map.Entry<String, String> entry : readmes.entrySet()) {
                 String glossaryName = entry.getKey();
                 String readmeContent = entry.getValue();

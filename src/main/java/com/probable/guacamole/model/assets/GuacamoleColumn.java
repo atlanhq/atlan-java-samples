@@ -2,29 +2,12 @@
 /* Copyright 2022 Atlan Pte. Ltd. */
 package com.probable.guacamole.model.assets;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ErrorCode;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Attribute;
-import com.atlan.model.assets.IAsset;
-import com.atlan.model.assets.IAtlanQuery;
-import com.atlan.model.assets.ICatalog;
-import com.atlan.model.assets.IColumn;
-import com.atlan.model.assets.IDbtMetric;
-import com.atlan.model.assets.IDbtModel;
-import com.atlan.model.assets.IDbtModelColumn;
-import com.atlan.model.assets.IDbtSource;
-import com.atlan.model.assets.IGlossaryTerm;
-import com.atlan.model.assets.ILineageProcess;
-import com.atlan.model.assets.IMaterializedView;
-import com.atlan.model.assets.IMetric;
-import com.atlan.model.assets.IReferenceable;
-import com.atlan.model.assets.ISQL;
-import com.atlan.model.assets.ITable;
-import com.atlan.model.assets.ITablePartition;
-import com.atlan.model.assets.IView;
+import com.atlan.model.assets.*;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.relations.UniqueAttributes;
@@ -156,6 +139,10 @@ public class GuacamoleColumn extends Asset
     @Attribute
     @Singular
     List<ColumnValueFrequencyMap> columnTopValues;
+
+    @Attribute
+    @Singular
+    SortedSet<IDbtTest> dbtTests;
 
     /** TBC */
     @Attribute
@@ -478,7 +465,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleColumn does not exist
      */
     public static GuacamoleColumn retrieveByQualifiedName(String qualifiedName) throws AtlanException {
-        Asset asset = Asset.retrieveFull(TYPE_NAME, qualifiedName);
+        Asset asset = Asset.retrieveFull(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
         if (asset instanceof GuacamoleColumn) {
             return (GuacamoleColumn) asset;
         } else {
@@ -494,7 +481,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static boolean restore(String qualifiedName) throws AtlanException {
-        return Asset.restore(TYPE_NAME, qualifiedName);
+        return Asset.restore(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
     }
 
     /**
@@ -540,7 +527,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeDescription(updater(qualifiedName, name));
+        return (GuacamoleColumn) Asset.removeDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -552,7 +539,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeUserDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeUserDescription(updater(qualifiedName, name));
+        return (GuacamoleColumn) Asset.removeUserDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -564,7 +551,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeOwners(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeOwners(updater(qualifiedName, name));
+        return (GuacamoleColumn) Asset.removeOwners(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -578,7 +565,8 @@ public class GuacamoleColumn extends Asset
      */
     public static GuacamoleColumn updateCertificate(String qualifiedName, CertificateStatus certificate, String message)
             throws AtlanException {
-        return (GuacamoleColumn) Asset.updateCertificate(builder(), TYPE_NAME, qualifiedName, certificate, message);
+        return (GuacamoleColumn) Asset.updateCertificate(
+                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, certificate, message);
     }
 
     /**
@@ -590,7 +578,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeCertificate(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeCertificate(updater(qualifiedName, name));
+        return (GuacamoleColumn) Asset.removeCertificate(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -605,7 +593,8 @@ public class GuacamoleColumn extends Asset
      */
     public static GuacamoleColumn updateAnnouncement(
             String qualifiedName, AtlanAnnouncementType type, String title, String message) throws AtlanException {
-        return (GuacamoleColumn) Asset.updateAnnouncement(builder(), TYPE_NAME, qualifiedName, type, title, message);
+        return (GuacamoleColumn) Asset.updateAnnouncement(
+                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, type, title, message);
     }
 
     /**
@@ -617,7 +606,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeAnnouncement(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeAnnouncement(updater(qualifiedName, name));
+        return (GuacamoleColumn) Asset.removeAnnouncement(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -631,7 +620,7 @@ public class GuacamoleColumn extends Asset
      */
     public static GuacamoleColumn replaceTerms(String qualifiedName, String name, List<IGlossaryTerm> terms)
             throws AtlanException {
-        return (GuacamoleColumn) Asset.replaceTerms(updater(qualifiedName, name), terms);
+        return (GuacamoleColumn) Asset.replaceTerms(Atlan.getDefaultClient(), updater(qualifiedName, name), terms);
     }
 
     /**
@@ -645,7 +634,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn appendTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleColumn) Asset.appendTerms(TYPE_NAME, qualifiedName, terms);
+        return (GuacamoleColumn) Asset.appendTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -659,7 +648,7 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems
      */
     public static GuacamoleColumn removeTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleColumn) Asset.removeTerms(TYPE_NAME, qualifiedName, terms);
+        return (GuacamoleColumn) Asset.removeTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -674,7 +663,8 @@ public class GuacamoleColumn extends Asset
      */
     public static GuacamoleColumn appendAtlanTags(String qualifiedName, List<String> atlanTagNames)
             throws AtlanException {
-        return (GuacamoleColumn) Asset.appendAtlanTags(TYPE_NAME, qualifiedName, atlanTagNames);
+        return (GuacamoleColumn)
+                Asset.appendAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -698,6 +688,7 @@ public class GuacamoleColumn extends Asset
             boolean restrictLineagePropagation)
             throws AtlanException {
         return (GuacamoleColumn) Asset.appendAtlanTags(
+                Atlan.getDefaultClient(),
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -716,7 +707,7 @@ public class GuacamoleColumn extends Asset
      */
     @Deprecated
     public static void addAtlanTags(String qualifiedName, List<String> atlanTagNames) throws AtlanException {
-        Asset.addAtlanTags(TYPE_NAME, qualifiedName, atlanTagNames);
+        Asset.addAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -739,6 +730,7 @@ public class GuacamoleColumn extends Asset
             boolean restrictLineagePropagation)
             throws AtlanException {
         Asset.addAtlanTags(
+                Atlan.getDefaultClient(),
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -755,6 +747,6 @@ public class GuacamoleColumn extends Asset
      * @throws AtlanException on any API problems, or if the Atlan tag does not exist on the GuacamoleColumn
      */
     public static void removeAtlanTag(String qualifiedName, String atlanTagName) throws AtlanException {
-        Asset.removeAtlanTag(TYPE_NAME, qualifiedName, atlanTagName);
+        Asset.removeAtlanTag(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagName);
     }
 }

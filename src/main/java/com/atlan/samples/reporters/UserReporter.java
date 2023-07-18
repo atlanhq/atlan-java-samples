@@ -54,7 +54,7 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
         try {
             parseParametersFromEvent(event);
 
-            log.info("Retrieving user details for tenant: {}", Atlan.getBaseUrlSafe());
+            log.info("Retrieving user details for tenant: {}", Atlan.getBaseUrl());
             List<AtlanUser> users;
             users = AtlanUser.retrieveAll();
             users.sort(Comparator.comparing(AtlanUser::getFirstName, stringComparator)
@@ -87,7 +87,7 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
                 xlsx.create(getFilename(), autoSizeSheets);
             }
         } catch (AtlanException e) {
-            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrlSafe(), e);
+            log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrl(), e);
             System.exit(1);
         } catch (IOException e) {
             log.error("Failed to write Excel file to: {}", getFilename(), e);

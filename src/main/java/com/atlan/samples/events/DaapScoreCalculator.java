@@ -2,7 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
-import com.atlan.cache.CustomMetadataCache;
+import com.atlan.Atlan;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ConflictException;
@@ -67,7 +67,7 @@ public class DaapScoreCalculator implements AtlanEventHandler {
     @Override
     public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
         Set<String> searchAttrs = new HashSet<>(SCORED_ATTRS);
-        searchAttrs.addAll(CustomMetadataCache.getAttributesForSearchResults(CM_DAAP));
+        searchAttrs.addAll(Atlan.getDefaultClient().getCustomMetadataCache().getAttributesForSearchResults(CM_DAAP));
         Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, searchAttrs, true, true);
         if (asset == null) {
             throw new NotFoundException(
@@ -163,7 +163,7 @@ public class DaapScoreCalculator implements AtlanEventHandler {
      */
     static String createCMIfNotExists(Logger log) {
         try {
-            return CustomMetadataCache.getIdForName(CM_DAAP);
+            return Atlan.getDefaultClient().getCustomMetadataCache().getIdForName(CM_DAAP);
         } catch (NotFoundException e) {
             try {
                 CustomMetadataDef customMetadataDef = CustomMetadataDef.creator(CM_DAAP)
@@ -188,16 +188,16 @@ public class DaapScoreCalculator implements AtlanEventHandler {
                         .badgeCondition(BadgeCondition.of(BadgeComparisonOperator.LTE, "25", BadgeConditionColor.RED))
                         .build();
                 try {
-                    badge.upsert();
+                    badge.save();
                     log.info("Created DaaP completeness score badge.");
                 } catch (AtlanException eBadge) {
                     log.error("Unable to create badge over the DaaP score.", eBadge);
                 }
-                return CustomMetadataCache.getIdForName(CM_DAAP);
+                return Atlan.getDefaultClient().getCustomMetadataCache().getIdForName(CM_DAAP);
             } catch (ConflictException conflict) {
                 // Handle cross-thread race condition that the typedef has since been created
                 try {
-                    return CustomMetadataCache.getIdForName(CM_DAAP);
+                    return Atlan.getDefaultClient().getCustomMetadataCache().getIdForName(CM_DAAP);
                 } catch (AtlanException eConflict) {
                     log.error(
                             "Unable to look up DaaP custom metadata, even though it should already exist.", eConflict);

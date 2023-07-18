@@ -65,7 +65,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
             Asset current = handler.getCurrentState(event.getPayload().getAsset(), log);
             Collection<Asset> updated = handler.calculateChanges(current, log);
             if (!updated.isEmpty()) {
-                handler.upsertChanges(updated, log);
+                handler.saveChanges(Atlan.getDefaultClient(), updated, log);
                 return succeeded(keys, data);
             } else {
                 return drop();
@@ -98,7 +98,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
      * @throws IOException if an Atlan event cannot be parsed from the message
      */
     protected static AtlanEvent getAtlanEvent(Datum data) throws IOException {
-        return AtlanEventHandler.getAtlanEvent(data.getValue());
+        return AtlanEventHandler.getAtlanEvent(Atlan.getDefaultClient(), data.getValue());
     }
 
     /**

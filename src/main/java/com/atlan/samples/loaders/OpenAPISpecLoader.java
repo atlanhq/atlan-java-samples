@@ -4,7 +4,7 @@ package com.atlan.samples.loaders;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.atlan.cache.RoleCache;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
@@ -89,9 +89,13 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
             try {
                 log.info("... none found, creating a new API connection...");
                 Connection connectionToCreate = Connection.creator(
-                                _apiName, AtlanConnectorType.API, List.of(RoleCache.getIdForName("$admin")), null, null)
+                                _apiName,
+                                AtlanConnectorType.API,
+                                List.of(Atlan.getDefaultClient().getRoleCache().getIdForName("$admin")),
+                                null,
+                                null)
                         .build();
-                AssetMutationResponse response = connectionToCreate.upsert();
+                AssetMutationResponse response = connectionToCreate.save();
                 if (response != null && response.getCreatedAssets().size() == 1) {
                     connectionQualifiedName = response.getCreatedAssets().get(0).getQualifiedName();
                     log.info("... created connection: {}", connectionQualifiedName);
@@ -135,7 +139,7 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
                     .apiExternalDoc("description", parser.getExternalDocsDescription())
                     .build();
             log.info("Upserting APISpec: {}", specToCreate.getQualifiedName());
-            AssetMutationResponse response = specToCreate.upsert();
+            AssetMutationResponse response = specToCreate.save();
             if (response != null) {
                 if (response.getCreatedAssets().size() == 1) {
                     specQualifiedName = response.getCreatedAssets().get(0).getQualifiedName();
@@ -153,7 +157,7 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
             System.exit(1);
         }
 
-        AssetBatch batch = new AssetBatch(APIPath.TYPE_NAME, getBatchSize());
+        AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), APIPath.TYPE_NAME, getBatchSize());
         Paths apiPaths = parser.getPaths();
         if (apiPaths != null && !apiPaths.isEmpty()) {
             log.info("Creating an APIPath for each path defined within the spec: {}", apiPaths.size());

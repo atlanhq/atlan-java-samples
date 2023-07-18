@@ -4,6 +4,7 @@ package com.atlan.samples.loaders;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.enums.AtlanConnectorType;
@@ -172,7 +173,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
 
         // 6. Finally, update each of the objects that tracks counts with their counts
         log.info("Updating assets with counts...");
-        AssetBatch databasesToUpdate = new AssetBatch(Database.TYPE_NAME, getBatchSize());
+        AssetBatch databasesToUpdate = new AssetBatch(Atlan.getDefaultClient(), Database.TYPE_NAME, getBatchSize());
         for (String databaseQualifiedName : databaseCountsToUpdate) {
             try {
                 Database complete = Database.retrieveByQualifiedName(databaseQualifiedName);
@@ -190,7 +191,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
             log.error("Unable to update schema counts for all databases.", e);
         }
 
-        AssetBatch schemasToUpdate = new AssetBatch(Schema.TYPE_NAME, getBatchSize());
+        AssetBatch schemasToUpdate = new AssetBatch(Atlan.getDefaultClient(), Schema.TYPE_NAME, getBatchSize());
         for (String schemaQualifiedName : schemaCountsToUpdate) {
             try {
                 Schema complete = Schema.retrieveByQualifiedName(schemaQualifiedName);
@@ -211,7 +212,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
             log.error("Unable to update table and view counts for all schemas.", e);
         }
 
-        AssetBatch containersToUpdate = new AssetBatch("container", getBatchSize());
+        AssetBatch containersToUpdate = new AssetBatch(Atlan.getDefaultClient(), "container", getBatchSize());
         for (ContainerDetails container : containerCountsToUpdate) {
             String containerType = container.getType();
             String containerQN = container.getName();
@@ -322,7 +323,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
 
         // 6. Finally, update each of the objects that tracks counts with their counts
         log.info("Updating assets with counts...");
-        AssetBatch bucketsToUpdate = new AssetBatch("bucket", getBatchSize());
+        AssetBatch bucketsToUpdate = new AssetBatch(Atlan.getDefaultClient(), "bucket", getBatchSize());
         for (String bucketQualifiedName : bucketCountsToUpdate) {
             try {
                 AtlanConnectorType type = Connection.getConnectorTypeFromQualifiedName(bucketQualifiedName);

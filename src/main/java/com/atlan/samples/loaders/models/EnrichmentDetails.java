@@ -2,7 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
-import com.atlan.cache.CustomMetadataCache;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.typedefs.AttributeDef;
@@ -49,7 +49,8 @@ public abstract class EnrichmentDetails extends AssetDetails {
             Map<String, String> row, String delimiter) {
         Map<String, CustomMetadataAttributes> cmMap = new HashMap<>();
         try {
-            Map<String, List<AttributeDef>> customAttrDefs = CustomMetadataCache.getAllCustomAttributes();
+            Map<String, List<AttributeDef>> customAttrDefs =
+                    Atlan.getDefaultClient().getCustomMetadataCache().getAllCustomAttributes();
             for (String colName : row.keySet()) {
                 if (colName != null && colName.contains(CM_DELIMITER)) {
                     String[] tokens = colName.split(Pattern.quote(CM_DELIMITER));

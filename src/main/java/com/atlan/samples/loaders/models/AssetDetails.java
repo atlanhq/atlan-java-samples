@@ -2,7 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
-import com.atlan.api.EntityUniqueAttributesEndpoint;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.core.AtlanTag;
@@ -215,7 +215,7 @@ public abstract class AssetDetails {
                 List<String> atlanTags = details.getValue();
                 try {
                     log.info("...... tagging: {}", qn);
-                    EntityUniqueAttributesEndpoint.addAtlanTags(typeName, qn, atlanTags);
+                    Atlan.getDefaultClient().assets().addAtlanTags(typeName, qn, atlanTags);
                 } catch (AtlanException e) {
                     log.error("Unable to tag {} {} with: {}", typeName, qn, atlanTags, e);
                 }

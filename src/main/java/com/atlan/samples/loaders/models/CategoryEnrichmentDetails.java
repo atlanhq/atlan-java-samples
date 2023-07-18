@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
@@ -222,8 +223,8 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                     try {
                         // TODO: matching on name alone has very minor risk of a collision as it is not strictly unique
                         AssetMutationResponse response = replaceCM
-                                ? category.upsertReplacingCM(replaceClassifications)
-                                : category.upsertMergingCM(replaceClassifications);
+                                ? category.saveReplacingCM(replaceClassifications)
+                                : category.saveMergingCM(replaceClassifications);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
@@ -274,7 +275,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
 
         // Then go through and create any the READMEs linked to these assets...
         try {
-            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            AssetBatch readmeBatch = new AssetBatch(Atlan.getDefaultClient(), Readme.TYPE_NAME, batchSize);
             for (Map.Entry<String, String> entry : readmes.entrySet()) {
                 String categoryIdentity = entry.getKey();
                 String readmeContent = entry.getValue();

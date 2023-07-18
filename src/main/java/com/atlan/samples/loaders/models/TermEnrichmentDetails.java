@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
@@ -243,8 +244,8 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     // before we can take next actions
                     try {
                         AssetMutationResponse response = replaceCM
-                                ? term.upsertReplacingCM(replaceAtlanTags)
-                                : term.upsertMergingCM(replaceAtlanTags);
+                                ? term.saveReplacingCM(replaceAtlanTags)
+                                : term.saveMergingCM(replaceAtlanTags);
                         if (response != null) {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
@@ -319,7 +320,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
 
         // Then go through and create any the READMEs linked to these assets...
         try {
-            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            AssetBatch readmeBatch = new AssetBatch(Atlan.getDefaultClient(), Readme.TYPE_NAME, batchSize);
             for (Map.Entry<String, String> entry : readmes.entrySet()) {
                 String termIdentity = entry.getKey();
                 String readmeContent = entry.getValue();
@@ -339,7 +340,8 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
 
         // And finally go through and create any term-to-term relationships
         try {
-            AssetBatch termToTermBatch = new AssetBatch("term-to-term relationship", batchSize);
+            AssetBatch termToTermBatch =
+                    new AssetBatch(Atlan.getDefaultClient(), "term-to-term relationship", batchSize);
             for (Map.Entry<String, TermEnrichmentDetails> entry : termToTerm.entrySet()) {
                 String identity = entry.getKey();
                 TermEnrichmentDetails t2tDetails = entry.getValue();

@@ -2,7 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.probable.guacamole.typedefs;
 
-import com.atlan.api.TypeDefsEndpoint;
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.probable.guacamole.AtlanRunner;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class TypeDefDestroyer extends AtlanRunner {
 
     private void purgeTypeDef(String name) {
         try {
-            TypeDefsEndpoint.purgeTypeDef(name);
+            Atlan.getDefaultClient().typeDefs().purge(name);
             log.info("Purged typedef: {}", name);
         } catch (AtlanException e) {
             log.error("Failed to purge typedef: {}", name, e);

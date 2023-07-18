@@ -2,25 +2,12 @@
 /* Copyright 2022 Atlan Pte. Ltd. */
 package com.probable.guacamole.model.assets;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ErrorCode;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Attribute;
-import com.atlan.model.assets.IAsset;
-import com.atlan.model.assets.IAtlanQuery;
-import com.atlan.model.assets.ICatalog;
-import com.atlan.model.assets.IColumn;
-import com.atlan.model.assets.IDbtModel;
-import com.atlan.model.assets.IDbtSource;
-import com.atlan.model.assets.IGlossaryTerm;
-import com.atlan.model.assets.ILineageProcess;
-import com.atlan.model.assets.IReferenceable;
-import com.atlan.model.assets.ISQL;
-import com.atlan.model.assets.ISchema;
-import com.atlan.model.assets.ITable;
-import com.atlan.model.assets.ITablePartition;
+import com.atlan.model.assets.*;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.relations.UniqueAttributes;
@@ -70,6 +57,10 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     /** TBC */
     @Attribute
     String databaseName;
+
+    @Attribute
+    @Singular
+    SortedSet<IDbtTest> dbtTests;
 
     /** TBC */
     @Attribute
@@ -294,7 +285,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist
      */
     public static GuacamoleTable retrieveByQualifiedName(String qualifiedName) throws AtlanException {
-        Asset asset = Asset.retrieveFull(TYPE_NAME, qualifiedName);
+        Asset asset = Asset.retrieveFull(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
         if (asset instanceof GuacamoleTable) {
             return (GuacamoleTable) asset;
         } else {
@@ -310,7 +301,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static boolean restore(String qualifiedName) throws AtlanException {
-        return Asset.restore(TYPE_NAME, qualifiedName);
+        return Asset.restore(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
     }
 
     /**
@@ -356,7 +347,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeDescription(updater(qualifiedName, name));
+        return (GuacamoleTable) Asset.removeDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -368,7 +359,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeUserDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeUserDescription(updater(qualifiedName, name));
+        return (GuacamoleTable) Asset.removeUserDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -380,7 +371,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeOwners(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeOwners(updater(qualifiedName, name));
+        return (GuacamoleTable) Asset.removeOwners(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -394,7 +385,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable updateCertificate(String qualifiedName, CertificateStatus certificate, String message)
             throws AtlanException {
-        return (GuacamoleTable) Asset.updateCertificate(builder(), TYPE_NAME, qualifiedName, certificate, message);
+        return (GuacamoleTable) Asset.updateCertificate(
+                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, certificate, message);
     }
 
     /**
@@ -406,7 +398,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeCertificate(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeCertificate(updater(qualifiedName, name));
+        return (GuacamoleTable) Asset.removeCertificate(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -421,7 +413,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable updateAnnouncement(
             String qualifiedName, AtlanAnnouncementType type, String title, String message) throws AtlanException {
-        return (GuacamoleTable) Asset.updateAnnouncement(builder(), TYPE_NAME, qualifiedName, type, title, message);
+        return (GuacamoleTable) Asset.updateAnnouncement(
+                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, type, title, message);
     }
 
     /**
@@ -433,7 +426,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeAnnouncement(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeAnnouncement(updater(qualifiedName, name));
+        return (GuacamoleTable) Asset.removeAnnouncement(Atlan.getDefaultClient(), updater(qualifiedName, name));
     }
 
     /**
@@ -447,7 +440,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable replaceTerms(String qualifiedName, String name, List<IGlossaryTerm> terms)
             throws AtlanException {
-        return (GuacamoleTable) Asset.replaceTerms(updater(qualifiedName, name), terms);
+        return (GuacamoleTable) Asset.replaceTerms(Atlan.getDefaultClient(), updater(qualifiedName, name), terms);
     }
 
     /**
@@ -461,7 +454,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable appendTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleTable) Asset.appendTerms(TYPE_NAME, qualifiedName, terms);
+        return (GuacamoleTable) Asset.appendTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -475,7 +468,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleTable) Asset.removeTerms(TYPE_NAME, qualifiedName, terms);
+        return (GuacamoleTable) Asset.removeTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -490,7 +483,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable appendAtlanTags(String qualifiedName, List<String> atlanTagNames)
             throws AtlanException {
-        return (GuacamoleTable) Asset.appendAtlanTags(TYPE_NAME, qualifiedName, atlanTagNames);
+        return (GuacamoleTable)
+                Asset.appendAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -514,6 +508,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
             boolean restrictLineagePropagation)
             throws AtlanException {
         return (GuacamoleTable) Asset.appendAtlanTags(
+                Atlan.getDefaultClient(),
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -532,7 +527,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     @Deprecated
     public static void addAtlanTags(String qualifiedName, List<String> atlanTagNames) throws AtlanException {
-        Asset.addAtlanTags(TYPE_NAME, qualifiedName, atlanTagNames);
+        Asset.addAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -555,6 +550,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
             boolean restrictLineagePropagation)
             throws AtlanException {
         Asset.addAtlanTags(
+                Atlan.getDefaultClient(),
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -571,6 +567,6 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems, or if the Atlan tag does not exist on the GuacamoleTable
      */
     public static void removeAtlanTag(String qualifiedName, String atlanTagName) throws AtlanException {
-        Asset.removeAtlanTag(TYPE_NAME, qualifiedName, atlanTagName);
+        Asset.removeAtlanTag(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagName);
     }
 }

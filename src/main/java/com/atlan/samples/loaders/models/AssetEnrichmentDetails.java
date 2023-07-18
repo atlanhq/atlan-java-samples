@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.loaders.models;
 
+import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
@@ -112,8 +113,12 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
             boolean updateOnly) {
         Map<String, Map<String, List<String>>> toTagMap = new HashMap<>();
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
-        AssetBatch batch =
-                new AssetBatch("asset", batchSize, replaceAtlanTags, AssetBatch.CustomMetadataHandling.OVERWRITE);
+        AssetBatch batch = new AssetBatch(
+                Atlan.getDefaultClient(),
+                "asset",
+                batchSize,
+                replaceAtlanTags,
+                AssetBatch.CustomMetadataHandling.OVERWRITE);
         Map<String, String> readmes = new HashMap<>();
         Map<String, Asset> assetIdentityToResult = new HashMap<>();
 
@@ -213,7 +218,7 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
 
         // Then go through and create any of the READMEs linked to these assets...
         try {
-            AssetBatch readmeBatch = new AssetBatch(Readme.TYPE_NAME, batchSize);
+            AssetBatch readmeBatch = new AssetBatch(Atlan.getDefaultClient(), Readme.TYPE_NAME, batchSize);
             for (Map.Entry<String, String> entry : readmes.entrySet()) {
                 String assetIdentity = entry.getKey();
                 String readmeContent = entry.getValue();

@@ -6,7 +6,7 @@ import static com.atlan.util.QueryFactory.CompoundQuery;
 import static com.atlan.util.QueryFactory.have;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.atlan.api.PlaybooksEndpoint;
+import com.atlan.Atlan;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
@@ -19,7 +19,6 @@ import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.model.workflow.*;
 import com.atlan.net.HttpClient;
-import com.atlan.serde.Serde;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.*;
@@ -158,7 +157,7 @@ public class PlaybookRunner implements AtlanEventHandler {
      */
     private Map<String, List<PlaybookRule>> fetchPlaybooks() throws AtlanException {
         Map<String, List<PlaybookRule>> map = new LinkedHashMap<>();
-        WorkflowSearchResponse response = PlaybooksEndpoint.list(50);
+        WorkflowSearchResponse response = Atlan.getDefaultClient().playbooks().list(50);
         if (response != null && response.getHits() != null) {
             List<WorkflowSearchResult> hits = response.getHits().getHits();
             for (WorkflowSearchResult hit : hits) {
@@ -179,7 +178,7 @@ public class PlaybookRunner implements AtlanEventHandler {
                     if (parameter.getName().equals("rules")) {
                         String value = (String) parameter.getValue();
                         try {
-                            rules = Serde.mapper.readValue(value, new TypeReference<>() {});
+                            rules = Atlan.getDefaultClient().readValue(value, new TypeReference<>() {});
                         } catch (IOException e) {
                             log.error("Unable to parse rules for playbook \"{}\" - skipping...", playbookName);
                         }
