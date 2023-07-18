@@ -220,8 +220,9 @@ implements com.atlan.events.AtlanEventHandler</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upsertChanges(java.util.Collection,org.slf4j.Logger)">upsertChanges</a></span>&#8203;(java.util.Collection&lt;com.atlan.model.assets.Asset&gt;&nbsp;changedAssets,
-             org.slf4j.Logger&nbsp;log)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveChanges(com.atlan.AtlanClient,java.util.Collection,org.slf4j.Logger)">saveChanges</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+           java.util.Collection&lt;com.atlan.model.assets.Asset&gt;&nbsp;changedAssets,
+           org.slf4j.Logger&nbsp;log)</code></th>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
@@ -337,17 +338,18 @@ implements com.atlan.events.AtlanEventHandler</pre>
 </dl>
 </li>
 </ul>
-<a id="upsertChanges(java.util.Collection,org.slf4j.Logger)">
+<a id="saveChanges(com.atlan.AtlanClient,java.util.Collection,org.slf4j.Logger)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>upsertChanges</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;upsertChanges&#8203;(java.util.Collection&lt;com.atlan.model.assets.Asset&gt;&nbsp;changedAssets,
-                          org.slf4j.Logger&nbsp;log)</pre>
+<h4>saveChanges</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;saveChanges&#8203;(com.atlan.AtlanClient&nbsp;client,
+                        java.util.Collection&lt;com.atlan.model.assets.Asset&gt;&nbsp;changedAssets,
+                        org.slf4j.Logger&nbsp;log)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>upsertChanges</code>&nbsp;in interface&nbsp;<code>com.atlan.events.AtlanEventHandler</code></dd>
+<dd><code>saveChanges</code>&nbsp;in interface&nbsp;<code>com.atlan.events.AtlanEventHandler</code></dd>
 </dl>
 </li>
 </ul>
