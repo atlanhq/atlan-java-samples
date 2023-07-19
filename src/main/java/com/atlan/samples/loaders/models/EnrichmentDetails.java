@@ -58,13 +58,12 @@ public abstract class EnrichmentDetails extends AssetDetails {
                     String cmAttrName = tokens[1];
                     List<AttributeDef> attrDefs = customAttrDefs.get(cmName);
                     AttributeDef attrDef = null;
-                    if (attrDefs == null) {
-                        continue;
-                    }
-                    for (AttributeDef candidate : attrDefs) {
-                        if (candidate.getDisplayName().equals(cmAttrName)) {
-                            attrDef = candidate;
-                            break;
+                    if (attrDefs != null) {
+                        for (AttributeDef candidate : attrDefs) {
+                            if (candidate.getDisplayName().equals(cmAttrName)) {
+                                attrDef = candidate;
+                                break;
+                            }
                         }
                     }
                     if (attrDef != null) {
