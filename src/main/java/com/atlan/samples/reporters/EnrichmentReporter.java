@@ -354,50 +354,50 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
         log.info("Retrieving first {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
         IndexSearchResponse response = request.search();
         for (Asset result : response) {
-                String guid = result.getGuid();
-                if (!processed.containsKey(guid)) {
-                    List<Asset> childAssets = getChildAssets(result);
-                    long descriptionCounts = 0;
-                    for (Asset child : childAssets) {
-                        String childDesc = getDescription(child);
-                        descriptionCounts += childDesc.length() > 0 ? 1 : 0;
-                    }
-                    List<DataCell> row = new ArrayList<>();
-                    row.add(DataCell.of(result.getConnectorType()));
-                    row.add(DataCell.of(result.getQualifiedName()));
-                    row.add(DataCell.of(result.getTypeName()));
-                    row.add(DataCell.of(result.getName()));
-                    row.add(DataCell.of(result.getDescription()));
-                    row.add(DataCell.of(result.getUserDescription()));
-                    row.add(DataCell.of(getUserOwners(result, getDelimiter())));
-                    row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
-                    row.add(DataCell.of(result.getCertificateStatus()));
-                    row.add(DataCell.of(result.getCertificateStatusMessage()));
-                    row.add(DataCell.of(result.getCertificateUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
-                    row.add(DataCell.of(result.getAnnouncementType()));
-                    row.add(DataCell.of(result.getAnnouncementTitle()));
-                    row.add(DataCell.of(result.getAnnouncementMessage()));
-                    row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
-                    row.add(DataCell.of(result.getCreatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
-                    row.add(DataCell.of(result.getUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
-                    row.add(DataCell.of(getREADME(result)));
-                    row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
-                    row.add(DataCell.of(getCount(result.getLinks())));
-                    row.add(DataCell.of(
-                            DIRECT_ATLAN_TAG_ONLY
-                                    ? getDirectAtlanTags(result, getDelimiter())
-                                    : getAtlanTags(result, getDelimiter())));
-                    row.add(DataCell.of(childAssets.size()));
-                    row.add(DataCell.of(descriptionCounts));
-                    row.add(DataCell.of(getAssetLink(guid)));
-                    addCustomMetadata(row, result);
-                    xlsx.appendRow(sheet, row);
-                    processed.put(guid, result.getQualifiedName());
+            String guid = result.getGuid();
+            if (!processed.containsKey(guid)) {
+                List<Asset> childAssets = getChildAssets(result);
+                long descriptionCounts = 0;
+                for (Asset child : childAssets) {
+                    String childDesc = getDescription(child);
+                    descriptionCounts += childDesc.length() > 0 ? 1 : 0;
                 }
+                List<DataCell> row = new ArrayList<>();
+                row.add(DataCell.of(result.getConnectorType()));
+                row.add(DataCell.of(result.getQualifiedName()));
+                row.add(DataCell.of(result.getTypeName()));
+                row.add(DataCell.of(result.getName()));
+                row.add(DataCell.of(result.getDescription()));
+                row.add(DataCell.of(result.getUserDescription()));
+                row.add(DataCell.of(getUserOwners(result, getDelimiter())));
+                row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
+                row.add(DataCell.of(result.getCertificateStatus()));
+                row.add(DataCell.of(result.getCertificateStatusMessage()));
+                row.add(DataCell.of(result.getCertificateUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
+                row.add(DataCell.of(result.getAnnouncementType()));
+                row.add(DataCell.of(result.getAnnouncementTitle()));
+                row.add(DataCell.of(result.getAnnouncementMessage()));
+                row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
+                row.add(DataCell.of(result.getCreatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
+                row.add(DataCell.of(result.getUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
+                row.add(DataCell.of(getREADME(result)));
+                row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
+                row.add(DataCell.of(getCount(result.getLinks())));
+                row.add(DataCell.of(
+                        DIRECT_ATLAN_TAG_ONLY
+                                ? getDirectAtlanTags(result, getDelimiter())
+                                : getAtlanTags(result, getDelimiter())));
+                row.add(DataCell.of(childAssets.size()));
+                row.add(DataCell.of(descriptionCounts));
+                row.add(DataCell.of(getAssetLink(guid)));
+                addCustomMetadata(row, result);
+                xlsx.appendRow(sheet, row);
+                processed.put(guid, result.getQualifiedName());
+            }
         }
     }
 
