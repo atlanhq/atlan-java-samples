@@ -293,16 +293,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .relationAttributes(RELATION_ATTRIBUTES)
                 .build();
         IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof Glossary) {
-                    glossaryGuidToDetails.put(result.getGuid(), (Glossary) result);
-                }
-            }
-            response = response.getNextPage();
-            results = response.getAssets();
-        }
+        response.stream()
+                .filter(a -> a instanceof Glossary)
+                .forEach(g -> glossaryGuidToDetails.put(g.getGuid(), (Glossary) g));
     }
 
     void cacheTerms() throws AtlanException {
@@ -330,16 +323,9 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .relationAttributes(RELATION_ATTRIBUTES)
                 .build();
         IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof GlossaryTerm) {
-                    termGuidToDetails.put(result.getGuid(), (GlossaryTerm) result);
-                }
-            }
-            response = response.getNextPage();
-            results = response.getAssets();
-        }
+        response.stream()
+                .filter(a -> a instanceof GlossaryTerm)
+                .forEach(t -> termGuidToDetails.put(t.getGuid(), (GlossaryTerm) t));
     }
 
     void getAssets(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
@@ -367,9 +353,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .build();
         log.info("Retrieving first {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
         IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        while (results != null) {
-            for (Asset result : results) {
+        for (Asset result : response) {
                 String guid = result.getGuid();
                 if (!processed.containsKey(guid)) {
                     List<Asset> childAssets = getChildAssets(result);
@@ -414,10 +398,6 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     xlsx.appendRow(sheet, row);
                     processed.put(guid, result.getQualifiedName());
                 }
-            }
-            log.info(" retrieving next {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
-            response = response.getNextPage();
-            results = response.getAssets();
         }
     }
 
@@ -468,17 +448,10 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .relationAttributes(RELATION_ATTRIBUTES)
                 .build();
         IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
         Map<String, GlossaryCategory> categoryGuidToDetails = new HashMap<>();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof GlossaryCategory) {
-                    categoryGuidToDetails.put(result.getGuid(), (GlossaryCategory) result);
-                }
-            }
-            response = response.getNextPage();
-            results = response.getAssets();
-        }
+        response.stream()
+                .filter(a -> a instanceof GlossaryCategory)
+                .forEach(c -> categoryGuidToDetails.put(c.getGuid(), (GlossaryCategory) c));
         for (GlossaryCategory category : categoryGuidToDetails.values()) {
             String categoryPath = getCategoryPath(category, categoryGuidToDetails);
             categoryGuidToPath.put(category.getGuid(), categoryPath);

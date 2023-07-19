@@ -113,11 +113,10 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                 .build();
         log.info("Retrieving first {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
         IndexSearchResponse response = request.search();
-        List<Asset> results = response.getAssets();
-        while (results != null) {
-            for (Asset result : results) {
-                if (result instanceof Link) {
-                    Link link = (Link) result;
+        response.stream()
+                .filter(a -> a instanceof Link)
+                .forEach(l -> {
+                    Link link = (Link) l;
                     if (link.getAsset() != null) {
                         String assetGuid = link.getAsset().getGuid();
                         String url = link.getLink();
@@ -129,12 +128,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                             guidToLinkedAsset.put(assetGuid, link.getAsset());
                         }
                     }
-                }
-            }
-            log.info(" retrieving next {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
-            response = response.getNextPage();
-            results = response.getAssets();
-        }
+                });
         for (Map.Entry<String, Long> entry : assetToSlackDiscussions.entrySet()) {
             String assetGuid = entry.getKey();
             Long linkCount = entry.getValue();
