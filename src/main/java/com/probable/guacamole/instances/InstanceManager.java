@@ -16,7 +16,7 @@ import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.util.AssetBatch;
-import com.probable.guacamole.AtlanRunner;
+import com.probable.guacamole.ExtendedModelGenerator;
 import com.probable.guacamole.model.assets.GuacamoleColumn;
 import com.probable.guacamole.model.assets.GuacamoleTable;
 import com.probable.guacamole.model.enums.GuacamoleTemperature;
@@ -26,7 +26,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InstanceManager extends AtlanRunner {
+public class InstanceManager extends ExtendedModelGenerator {
 
     private static Connection connection = null;
 
@@ -43,7 +43,7 @@ public class InstanceManager extends AtlanRunner {
     void createConnection() {
         try {
             List<Connection> results = Connection.findByName(SERVICE_TYPE, AtlanConnectorType.MONGODB, null);
-            if (results.size() > 0) {
+            if (!results.isEmpty()) {
                 connection = results.get(0);
                 log.info("Connection already exists, reusing it: {}", connection.getQualifiedName());
             }
@@ -117,14 +117,14 @@ public class InstanceManager extends AtlanRunner {
         final String child1QN = parentQN + "/column1";
         final String child2QN = parentQN + "/column2";
         try {
-            GuacamoleTable table = GuacamoleTable.retrieveByQualifiedName(parentQN);
+            GuacamoleTable table = GuacamoleTable.get(parentQN);
             assert table.getQualifiedName().equals(parentQN);
             assert table.getGuacamoleColumns().size() == 2;
             String tableGuid = table.getGuid();
-            GuacamoleColumn one = GuacamoleColumn.retrieveByQualifiedName(child1QN);
+            GuacamoleColumn one = GuacamoleColumn.get(child1QN);
             assert one.getQualifiedName().equals(child1QN);
             assert one.getGuacamoleTable().getGuid().equals(tableGuid);
-            GuacamoleColumn two = GuacamoleColumn.retrieveByQualifiedName(child2QN);
+            GuacamoleColumn two = GuacamoleColumn.get(child2QN);
             assert two.getQualifiedName().equals(child2QN);
             assert two.getGuacamoleTable().getGuid().equals(tableGuid);
         } catch (AtlanException e) {
@@ -223,11 +223,11 @@ public class InstanceManager extends AtlanRunner {
         final String child1QN = parentQN + "/column1";
         final String child2QN = parentQN + "/column2";
         try {
-            GuacamoleTable parent = GuacamoleTable.retrieveByQualifiedName(parentQN);
-            GuacamoleColumn one = GuacamoleColumn.retrieveByQualifiedName(child1QN);
-            GuacamoleColumn two = GuacamoleColumn.retrieveByQualifiedName(child2QN);
+            GuacamoleTable parent = GuacamoleTable.get(parentQN);
+            GuacamoleColumn one = GuacamoleColumn.get(child1QN);
+            GuacamoleColumn two = GuacamoleColumn.get(child2QN);
             Atlan.getDefaultClient()
-                    .assets()
+                    .assets
                     .delete(List.of(parent.getGuid(), one.getGuid(), two.getGuid()), AtlanDeleteType.PURGE);
             log.info("Entities purged.");
         } catch (AtlanException e) {

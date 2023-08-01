@@ -4,7 +4,7 @@ package com.probable.guacamole;
 
 import com.atlan.Atlan;
 
-public abstract class AtlanRunner {
+public abstract class ExtendedModelGenerator {
     static {
         Atlan.setBaseUrl(System.getenv("ATLAN_BASE_URL"));
         Atlan.setApiToken(System.getenv("ATLAN_API_KEY"));
