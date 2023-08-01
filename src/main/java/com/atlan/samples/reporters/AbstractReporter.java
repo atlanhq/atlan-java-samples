@@ -88,7 +88,7 @@ public abstract class AbstractReporter {
 
     protected static String getDescription(Asset asset) {
         String description = asset.getUserDescription();
-        if (description == null || description.length() == 0) {
+        if (description == null || description.isEmpty()) {
             description = asset.getDescription();
         }
         return description == null ? "" : description;
@@ -114,7 +114,7 @@ public abstract class AbstractReporter {
         IReadme readme = asset.getReadme();
         if (readme != null) {
             String content = readme.getDescription();
-            if (content != null && content.length() > 0) {
+            if (content != null && !content.isEmpty()) {
                 return content;
             }
         }

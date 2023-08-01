@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("deprecation")
 public class GuacamoleColumnTest {
 
-    private static final GuacamoleColumn full = GuacamoleColumn.builder()
+    private static final GuacamoleColumn full = GuacamoleColumn._internal()
             .guid("guid")
             .displayText("displayText")
             .status(AtlanStatus.ACTIVE)

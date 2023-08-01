@@ -8,12 +8,12 @@ import com.atlan.model.enums.AtlanAttributeType;
 import com.atlan.model.enums.AtlanCustomAttributeCardinality;
 import com.atlan.model.enums.RelationshipCategory;
 import com.atlan.model.typedefs.*;
-import com.probable.guacamole.AtlanRunner;
+import com.probable.guacamole.ExtendedModelGenerator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TypeDefCreator extends AtlanRunner {
+public class TypeDefCreator extends ExtendedModelGenerator {
 
     static final String STRUCT_DEF_NAME = TYPE_PREFIX + "Struct";
     static final String ENUM_DEF_NAME = TYPE_PREFIX + "Temperature";
@@ -41,7 +41,7 @@ public class TypeDefCreator extends AtlanRunner {
                 .description("Complex embedded attributes for " + TYPE_PREFIX + " objects.")
                 .build();
         try {
-            TypeDefResponse response = Atlan.getDefaultClient().typeDefs().createInternal(sd);
+            TypeDefResponse response = Atlan.getDefaultClient().typeDefs._create(sd);
             log.info("Created structDef: {}", response);
         } catch (AtlanException e) {
             log.error("Failed to create StructDef.", e);
@@ -80,7 +80,7 @@ public class TypeDefCreator extends AtlanRunner {
                 .superTypes(List.of("Table"))
                 .build();
         try {
-            TypeDefResponse response = Atlan.getDefaultClient().typeDefs().createInternal(ed);
+            TypeDefResponse response = Atlan.getDefaultClient().typeDefs._create(ed);
             log.info("Created entityDef: {}", response);
         } catch (AtlanException e) {
             log.error("Failed to create EntityDef.", e);
@@ -98,7 +98,7 @@ public class TypeDefCreator extends AtlanRunner {
                 .superTypes(List.of("Column"))
                 .build();
         try {
-            TypeDefResponse response = Atlan.getDefaultClient().typeDefs().createInternal(ed);
+            TypeDefResponse response = Atlan.getDefaultClient().typeDefs._create(ed);
             log.info("Created entityDef: {}", response);
         } catch (AtlanException e) {
             log.error("Failed to create EntityDef.", e);
@@ -123,7 +123,7 @@ public class TypeDefCreator extends AtlanRunner {
                 .description("Parent-child relationship between specialized table and its columns.")
                 .build();
         try {
-            TypeDefResponse response = Atlan.getDefaultClient().typeDefs().createInternal(rd);
+            TypeDefResponse response = Atlan.getDefaultClient().typeDefs._create(rd);
             log.info("Created relationshipDef: {}", response);
         } catch (AtlanException e) {
             log.error("Failed to create RelationshipDef.", e);
@@ -132,14 +132,14 @@ public class TypeDefCreator extends AtlanRunner {
 
     void updateEntityDef() {
         try {
-            EntityDef parent = (EntityDef) Atlan.getDefaultClient().typeDefs().get(ENTITY_DEF_PARENT_NAME);
+            EntityDef parent = (EntityDef) Atlan.getDefaultClient().typeDefs.get(ENTITY_DEF_PARENT_NAME);
             parent = parent.toBuilder()
                     .attributeDef(AttributeDef.creator(SERVICE_TYPE + "Archived", AtlanAttributeType.BOOLEAN)
                             .description("Whether this table is currently archived (true) or not (false).")
                             .build())
                     .typeVersion("1.1")
                     .build();
-            TypeDefResponse response = Atlan.getDefaultClient().typeDefs().updateInternal(parent);
+            TypeDefResponse response = Atlan.getDefaultClient().typeDefs._update(parent);
             log.info("Updated entityDef: {}", response);
         } catch (AtlanException e) {
             log.error("Failed to update entityDef.", e);

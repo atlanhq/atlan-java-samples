@@ -9,6 +9,8 @@ import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Connection;
+import com.atlan.model.assets.Database;
+import com.atlan.model.assets.Schema;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.AtlanDeleteType;
@@ -16,7 +18,7 @@ import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.util.AssetBatch;
-import com.probable.guacamole.AtlanRunner;
+import com.probable.guacamole.ExtendedModelGenerator;
 import com.probable.guacamole.model.assets.GuacamoleColumn;
 import com.probable.guacamole.model.assets.GuacamoleTable;
 import com.probable.guacamole.model.enums.GuacamoleTemperature;
@@ -26,14 +28,15 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InstanceManager extends AtlanRunner {
+public class InstanceManager extends ExtendedModelGenerator {
 
     private static Connection connection = null;
 
     public static void main(String[] args) {
         InstanceManager im = new InstanceManager();
         im.createConnection();
-        im.createEntities();
+        im.createOOTBEntities();
+        im.createCustomEntities();
         im.readEntities();
         im.updateEntities();
         im.searchEntities();
@@ -42,8 +45,8 @@ public class InstanceManager extends AtlanRunner {
 
     void createConnection() {
         try {
-            List<Connection> results = Connection.findByName(SERVICE_TYPE, AtlanConnectorType.MONGODB, null);
-            if (results.size() > 0) {
+            List<Connection> results = Connection.findByName(SERVICE_TYPE, AtlanConnectorType.MONGODB);
+            if (!results.isEmpty()) {
                 connection = results.get(0);
                 log.info("Connection already exists, reusing it: {}", connection.getQualifiedName());
             }
@@ -66,12 +69,26 @@ public class InstanceManager extends AtlanRunner {
         }
     }
 
-    void createEntities() {
-        GuacamoleTable table = GuacamoleTable.builder()
-                .connectionQualifiedName(connection.getQualifiedName())
-                .connectorType(AtlanConnectorType.MONGODB)
-                .name("table")
-                .qualifiedName(connection.getQualifiedName() + "/table")
+    void createOOTBEntities() {
+        Database db = Database.creator("db", connection.getQualifiedName()).build();
+        try {
+            AssetMutationResponse response = db.save();
+            log.info("Created database entity: {}", response);
+        } catch (AtlanException e) {
+            log.error("Failed to create new database.", e);
+        }
+        Schema schema =
+                Schema.creator("schema", connection.getQualifiedName() + "/db").build();
+        try {
+            AssetMutationResponse response = schema.save();
+            log.info("Created schema entity: {}", response);
+        } catch (AtlanException e) {
+            log.error("Failed to create new schema.", e);
+        }
+    }
+
+    void createCustomEntities() {
+        GuacamoleTable table = GuacamoleTable.creator("table", connection.getQualifiedName() + "/db/schema")
                 .guacamoleTemperature(GuacamoleTemperature.HOT)
                 .guacamoleArchived(false)
                 .guacamoleSize(123L)
@@ -85,22 +102,12 @@ public class InstanceManager extends AtlanRunner {
         }
         try {
             AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), GuacamoleColumn.TYPE_NAME, 20);
-            GuacamoleColumn child1 = GuacamoleColumn.builder()
-                    .connectionQualifiedName(connection.getQualifiedName())
-                    .connectorType(AtlanConnectorType.MONGODB)
-                    .name("column1")
-                    .qualifiedName(table.getQualifiedName() + "/column1")
-                    .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
+            GuacamoleColumn child1 = GuacamoleColumn.creator("column1", table.getQualifiedName(), 1)
                     .guacamoleConceptualized(123456789L)
                     .guacamoleWidth(100L)
                     .build();
             batch.add(child1);
-            GuacamoleColumn child2 = GuacamoleColumn.builder()
-                    .connectionQualifiedName(connection.getQualifiedName())
-                    .connectorType(AtlanConnectorType.MONGODB)
-                    .name("column2")
-                    .qualifiedName(table.getQualifiedName() + "/column2")
-                    .guacamoleTable(GuacamoleTable.refByGuid(table.getGuid()))
+            GuacamoleColumn child2 = GuacamoleColumn.creator("column2", table.getQualifiedName(), 2)
                     .guacamoleConceptualized(1234567890L)
                     .guacamoleWidth(200L)
                     .build();
@@ -113,18 +120,18 @@ public class InstanceManager extends AtlanRunner {
     }
 
     void readEntities() {
-        final String parentQN = connection.getQualifiedName() + "/table";
+        final String parentQN = connection.getQualifiedName() + "/db/schema/table";
         final String child1QN = parentQN + "/column1";
         final String child2QN = parentQN + "/column2";
         try {
-            GuacamoleTable table = GuacamoleTable.retrieveByQualifiedName(parentQN);
+            GuacamoleTable table = GuacamoleTable.get(parentQN);
             assert table.getQualifiedName().equals(parentQN);
             assert table.getGuacamoleColumns().size() == 2;
             String tableGuid = table.getGuid();
-            GuacamoleColumn one = GuacamoleColumn.retrieveByQualifiedName(child1QN);
+            GuacamoleColumn one = GuacamoleColumn.get(child1QN);
             assert one.getQualifiedName().equals(child1QN);
             assert one.getGuacamoleTable().getGuid().equals(tableGuid);
-            GuacamoleColumn two = GuacamoleColumn.retrieveByQualifiedName(child2QN);
+            GuacamoleColumn two = GuacamoleColumn.get(child2QN);
             assert two.getQualifiedName().equals(child2QN);
             assert two.getGuacamoleTable().getGuid().equals(tableGuid);
         } catch (AtlanException e) {
@@ -133,7 +140,7 @@ public class InstanceManager extends AtlanRunner {
     }
 
     void updateEntities() {
-        GuacamoleTable toUpdate = GuacamoleTable.updater(connection.getQualifiedName() + "/table", "table")
+        GuacamoleTable toUpdate = GuacamoleTable.updater(connection.getQualifiedName() + "/db/schema/table", "table")
                 .description("Now with a description!")
                 .certificateStatus(CertificateStatus.DRAFT)
                 .build();
@@ -219,15 +226,15 @@ public class InstanceManager extends AtlanRunner {
     }
 
     void purgeEntities() {
-        final String parentQN = connection.getQualifiedName() + "/table";
+        final String parentQN = connection.getQualifiedName() + "/db/schema/table";
         final String child1QN = parentQN + "/column1";
         final String child2QN = parentQN + "/column2";
         try {
-            GuacamoleTable parent = GuacamoleTable.retrieveByQualifiedName(parentQN);
-            GuacamoleColumn one = GuacamoleColumn.retrieveByQualifiedName(child1QN);
-            GuacamoleColumn two = GuacamoleColumn.retrieveByQualifiedName(child2QN);
+            GuacamoleTable parent = GuacamoleTable.get(parentQN);
+            GuacamoleColumn one = GuacamoleColumn.get(child1QN);
+            GuacamoleColumn two = GuacamoleColumn.get(child2QN);
             Atlan.getDefaultClient()
-                    .assets()
+                    .assets
                     .delete(List.of(parent.getGuid(), one.getGuid(), two.getGuid()), AtlanDeleteType.PURGE);
             log.info("Entities purged.");
         } catch (AtlanException e) {

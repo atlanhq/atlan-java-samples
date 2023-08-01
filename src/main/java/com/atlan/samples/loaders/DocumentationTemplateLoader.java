@@ -176,7 +176,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
         AssetBatch databasesToUpdate = new AssetBatch(Atlan.getDefaultClient(), Database.TYPE_NAME, getBatchSize());
         for (String databaseQualifiedName : databaseCountsToUpdate) {
             try {
-                Database complete = Database.retrieveByQualifiedName(databaseQualifiedName);
+                Database complete = Database.get(databaseQualifiedName);
                 int schemaCount = complete.getSchemas().size();
                 Database toUpdate =
                         complete.trimToRequired().schemaCount(schemaCount).build();
@@ -194,7 +194,7 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
         AssetBatch schemasToUpdate = new AssetBatch(Atlan.getDefaultClient(), Schema.TYPE_NAME, getBatchSize());
         for (String schemaQualifiedName : schemaCountsToUpdate) {
             try {
-                Schema complete = Schema.retrieveByQualifiedName(schemaQualifiedName);
+                Schema complete = Schema.get(schemaQualifiedName);
                 int tableCount = complete.getTables().size();
                 int viewCount = complete.getViews().size();
                 Schema toUpdate = complete.trimToRequired()
@@ -220,17 +220,17 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 Asset toUpdate = null;
                 switch (containerType) {
                     case Table.TYPE_NAME:
-                        Table table = Table.retrieveByQualifiedName(containerQN);
+                        Table table = Table.get(containerQN);
                         long tc = table.getColumns().size();
                         toUpdate = table.trimToRequired().columnCount(tc).build();
                         break;
                     case View.TYPE_NAME:
-                        View view = View.retrieveByQualifiedName(containerQN);
+                        View view = View.get(containerQN);
                         long vc = view.getColumns().size();
                         toUpdate = view.trimToRequired().columnCount(vc).build();
                         break;
                     case MaterializedView.TYPE_NAME:
-                        MaterializedView mv = MaterializedView.retrieveByQualifiedName(containerQN);
+                        MaterializedView mv = MaterializedView.get(containerQN);
                         long mvc = mv.getColumns().size();
                         toUpdate = mv.trimToRequired().columnCount(mvc).build();
                         break;
@@ -329,13 +329,13 @@ public class DocumentationTemplateLoader extends AbstractLoader implements Reque
                 AtlanConnectorType type = Connection.getConnectorTypeFromQualifiedName(bucketQualifiedName);
                 switch (type) {
                     case S3:
-                        S3Bucket s3f = S3Bucket.retrieveByQualifiedName(bucketQualifiedName);
+                        S3Bucket s3f = S3Bucket.get(bucketQualifiedName);
                         long s3c = s3f.getObjects().size();
                         S3Bucket s3u = s3f.trimToRequired().s3ObjectCount(s3c).build();
                         bucketsToUpdate.add(s3u);
                         break;
                     case GCS:
-                        GCSBucket gcsf = GCSBucket.retrieveByQualifiedName(bucketQualifiedName);
+                        GCSBucket gcsf = GCSBucket.get(bucketQualifiedName);
                         long gcsc = gcsf.getGcsObjects().size();
                         GCSBucket gcsu =
                                 gcsf.trimToRequired().gcsObjectCount(gcsc).build();

@@ -10,7 +10,6 @@ import com.atlan.model.assets.GlossaryCategory;
 import com.atlan.model.assets.Readme;
 import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.core.CustomMetadataAttributes;
-import com.atlan.samples.loaders.*;
 import com.atlan.samples.loaders.caches.CategoryCache;
 import com.atlan.samples.loaders.caches.GlossaryCache;
 import com.atlan.util.AssetBatch;
@@ -259,7 +258,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                         }
                     }
                     String readmeContents = details.getReadme();
-                    if (readmeContents != null && readmeContents.length() > 0) {
+                    if (readmeContents != null && !readmeContents.isEmpty()) {
                         readmes.put(details.getIdentity(), readmeContents);
                     }
                 }

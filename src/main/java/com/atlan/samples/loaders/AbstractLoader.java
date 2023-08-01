@@ -74,7 +74,7 @@ public abstract class AbstractLoader {
                 String qn = details.getKey();
                 List<String> atlanTags = new ArrayList<>(details.getValue());
                 try {
-                    Asset column = Asset.retrieveMinimal(typeName, qn);
+                    Asset column = Asset.get(Atlan.getDefaultClient(), typeName, qn, false);
                     Set<AtlanTag> existing = column.getAtlanTags();
                     List<String> toRemove = new ArrayList<>();
                     for (AtlanTag one : existing) {
@@ -98,7 +98,7 @@ public abstract class AbstractLoader {
                 List<String> atlanTags = details.getValue();
                 try {
                     log.info("...... tagging: {}", qn);
-                    Atlan.getDefaultClient().assets().addAtlanTags(typeName, qn, atlanTags);
+                    Atlan.getDefaultClient().assets.addAtlanTags(typeName, qn, atlanTags);
                 } catch (AtlanException e) {
                     log.error("Unable to tag {} {} with: {}", typeName, qn, atlanTags, e);
                 }

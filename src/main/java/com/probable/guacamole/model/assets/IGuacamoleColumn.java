@@ -8,6 +8,7 @@ import com.atlan.model.assets.IDbtMetric;
 import com.atlan.model.assets.IDbtModel;
 import com.atlan.model.assets.IDbtModelColumn;
 import com.atlan.model.assets.IDbtSource;
+import com.atlan.model.assets.IDbtTest;
 import com.atlan.model.assets.IFile;
 import com.atlan.model.assets.IGlossaryTerm;
 import com.atlan.model.assets.ILineageProcess;
@@ -29,6 +30,7 @@ import com.atlan.model.relations.UniqueAttributes;
 import com.atlan.model.structs.ColumnValueFrequencyMap;
 import com.atlan.model.structs.Histogram;
 import com.atlan.model.structs.PopularityInsights;
+import com.atlan.model.structs.StarredDetails;
 import com.atlan.serde.AssetDeserializer;
 import com.atlan.serde.AssetSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -185,6 +187,9 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     SortedSet<String> getAssetDbtTags();
+
+    /** TBC */
+    String getAssetDbtTestStatus();
 
     /** TBC */
     String getAssetDbtUniqueId();
@@ -359,6 +364,9 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     SortedSet<IDbtSource> getDbtSources();
+
+    /** TBC */
+    SortedSet<IDbtTest> getDbtTests();
 
     /** TBC */
     String getDefaultValue();
@@ -620,6 +628,9 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     SortedSet<String> getStarredBy();
+
+    /** TBC */
+    List<StarredDetails> getStarredDetails();
 
     /** TBC */
     String getSubDataType();

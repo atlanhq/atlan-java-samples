@@ -139,7 +139,7 @@ public class ContainerDetails extends AssetDetails {
                         if (updateOnly) {
                             String qualifiedName = Table.generateQualifiedName(containerName, schemaQualifiedName);
                             try {
-                                Asset.retrieveMinimal(Table.TYPE_NAME, qualifiedName);
+                                Table.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 Table toUpdate = Table.updater(qualifiedName, containerName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())
@@ -180,7 +180,7 @@ public class ContainerDetails extends AssetDetails {
                         if (updateOnly) {
                             String qualifiedName = View.generateQualifiedName(containerName, schemaQualifiedName);
                             try {
-                                Asset.retrieveMinimal(View.TYPE_NAME, qualifiedName);
+                                View.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 View toUpdate = View.updater(qualifiedName, containerName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())
@@ -222,7 +222,7 @@ public class ContainerDetails extends AssetDetails {
                             String qualifiedName =
                                     MaterializedView.generateQualifiedName(containerName, schemaQualifiedName);
                             try {
-                                Asset.retrieveMinimal(MaterializedView.TYPE_NAME, qualifiedName);
+                                MaterializedView.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 MaterializedView toUpdate = MaterializedView.updater(qualifiedName, containerName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())

@@ -4,11 +4,11 @@ package com.probable.guacamole.typedefs;
 
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
-import com.probable.guacamole.AtlanRunner;
+import com.probable.guacamole.ExtendedModelGenerator;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TypeDefDestroyer extends AtlanRunner {
+public class TypeDefDestroyer extends ExtendedModelGenerator {
 
     public static void main(String[] args) {
         TypeDefDestroyer tdd = new TypeDefDestroyer();
@@ -25,7 +25,7 @@ public class TypeDefDestroyer extends AtlanRunner {
 
     private void purgeTypeDef(String name) {
         try {
-            Atlan.getDefaultClient().typeDefs().purge(name);
+            Atlan.getDefaultClient().typeDefs.purge(name);
             log.info("Purged typedef: {}", name);
         } catch (AtlanException e) {
             log.error("Failed to purge typedef: {}", name, e);

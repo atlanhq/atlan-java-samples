@@ -5,7 +5,6 @@ package com.atlan.samples.loaders.models;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Column;
 import com.atlan.util.AssetBatch;
 import java.util.*;
@@ -94,10 +93,10 @@ public class ColumnDetails extends AssetDetails {
             String rawType = row.get(COL_COLUMN_TYPE);
             String rawTypeOnly = DataTypeMapper.getTypeOnly(rawType);
             String mappedType = DataTypeMapper.getMappedType(rawTypeOnly);
-            if (rawType != null && rawType.length() > 0) {
+            if (rawType != null && !rawType.isEmpty()) {
                 builder = builder.rawType(rawType);
             }
-            if (mappedType != null && mappedType.length() > 0) {
+            if (mappedType != null && !mappedType.isEmpty()) {
                 builder = builder.mappedType(mappedType);
             }
             return builder.stub(false).build();
@@ -127,7 +126,7 @@ public class ColumnDetails extends AssetDetails {
                 if (updateOnly) {
                     String qualifiedName = Column.generateQualifiedName(columnName, parentQualifiedName);
                     try {
-                        Asset.retrieveMinimal(Column.TYPE_NAME, qualifiedName);
+                        Column.get(Atlan.getDefaultClient(), qualifiedName, false);
                         Column toUpdate = Column.updater(qualifiedName, columnName)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())

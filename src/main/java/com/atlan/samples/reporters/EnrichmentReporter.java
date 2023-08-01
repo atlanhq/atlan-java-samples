@@ -33,7 +33,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     private static Map<String, List<String>> CM_ATTRIBUTE_ORDER;
     private static Map<String, String> CM_ATTRIBUTE_HEADERS;
     private static Set<String> CM_ATTRIBUTES_FOR_SEARCH;
-    private static Set<String> autoSizeSheets = new HashSet<>();
+    private static final Set<String> autoSizeSheets = new HashSet<>();
 
     private enum FilterType {
         BY_GROUP,
@@ -189,11 +189,11 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 FILTER_TYPE = FilterType.BY_PREFIX;
             }
             String atlanTag = event.getOrDefault("ATLAN_TAG", null);
-            if (atlanTag != null && atlanTag.length() > 0) {
+            if (atlanTag != null && !atlanTag.isEmpty()) {
                 ATLAN_TAG_LIST = List.of(atlanTag);
             }
             String prefix = event.getOrDefault("PREFIX", null);
-            if (prefix != null && prefix.length() > 0) {
+            if (prefix != null && !prefix.isEmpty()) {
                 PREFIX = prefix;
             }
             String includeFieldLevel = event.getOrDefault("INCLUDE_FIELD_LEVEL", "false");
@@ -360,7 +360,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 long descriptionCounts = 0;
                 for (Asset child : childAssets) {
                     String childDesc = getDescription(child);
-                    descriptionCounts += childDesc.length() > 0 ? 1 : 0;
+                    descriptionCounts += !childDesc.isEmpty() ? 1 : 0;
                 }
                 List<DataCell> row = new ArrayList<>();
                 row.add(DataCell.of(result.getConnectorType()));

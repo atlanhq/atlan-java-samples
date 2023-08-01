@@ -65,18 +65,18 @@ public class BucketDetails extends AssetDetails {
         switch (type) {
             case S3:
                 String bucketARN = row.get(COL_BUCKET_ARN);
-                if (bucketARN != null && bucketARN.length() > 0 && bucketName != null && bucketName.length() > 0) {
+                if (bucketARN != null && !bucketARN.isEmpty() && bucketName != null && !bucketName.isEmpty()) {
                     return IS3.generateQualifiedName(connectionQualifiedName, bucketARN);
                 }
                 break;
             case GCS:
-                if (bucketName != null && bucketName.length() > 0) {
+                if (bucketName != null && !bucketName.isEmpty()) {
                     return connectionQualifiedName + "/" + bucketName;
                 }
                 break;
             case ADLS:
                 String accountQN = AccountDetails.getQualifiedName(connectionCache, row);
-                if (accountQN != null && accountQN.length() > 0 && bucketName != null && bucketName.length() > 0) {
+                if (accountQN != null && !accountQN.isEmpty() && bucketName != null && !bucketName.isEmpty()) {
                     return accountQN + "/" + bucketName;
                 }
                 break;
@@ -140,11 +140,11 @@ public class BucketDetails extends AssetDetails {
                 AtlanConnectorType bucketType = Connection.getConnectorTypeFromQualifiedName(connectionQualifiedName);
                 switch (bucketType) {
                     case S3:
-                        if (bucketARN != null && bucketARN.length() > 0) {
+                        if (bucketARN != null && !bucketARN.isEmpty()) {
                             if (updateOnly) {
                                 String qualifiedName = IS3.generateQualifiedName(connectionQualifiedName, bucketARN);
                                 try {
-                                    Asset.retrieveMinimal(S3Bucket.TYPE_NAME, qualifiedName);
+                                    S3Bucket.get(Atlan.getDefaultClient(), qualifiedName, false);
                                     S3Bucket toUpdate = S3Bucket.updater(qualifiedName, bucketName)
                                             .description(details.getDescription())
                                             .certificateStatus(details.getCertificate())
@@ -188,7 +188,7 @@ public class BucketDetails extends AssetDetails {
                         if (updateOnly) {
                             String qualifiedName = GCSBucket.generateQualifiedName(bucketName, connectionQualifiedName);
                             try {
-                                Asset.retrieveMinimal(S3Bucket.TYPE_NAME, qualifiedName);
+                                GCSBucket.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 GCSBucket toUpdate = GCSBucket.updater(qualifiedName, bucketName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())
@@ -226,12 +226,12 @@ public class BucketDetails extends AssetDetails {
                         }
                         break;
                     case ADLS:
-                        if (accountName != null && accountName.length() > 0) {
+                        if (accountName != null && !accountName.isEmpty()) {
                             String accountQN = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
                             if (updateOnly) {
                                 String qualifiedName = ADLSContainer.generateQualifiedName(bucketName, accountQN);
                                 try {
-                                    Asset.retrieveMinimal(ADLSContainer.TYPE_NAME, qualifiedName);
+                                    ADLSContainer.get(Atlan.getDefaultClient(), qualifiedName, false);
                                     ADLSContainer toUpdate = ADLSContainer.updater(qualifiedName, bucketName)
                                             .description(details.getDescription())
                                             .certificateStatus(details.getCertificate())
