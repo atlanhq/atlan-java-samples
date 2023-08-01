@@ -8,6 +8,7 @@ import com.atlan.generators.ModelGenerator;
 import com.atlan.generators.TestGenerator;
 import com.probable.guacamole.ExtendedModelGenerator;
 import com.probable.guacamole.typedefs.TypeDefCreator;
+import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 
 // TODO: Won't work without multiple runs due to generated POJOs being something we introspect
@@ -15,7 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class POJOGenerator extends ExtendedModelGenerator {
     public static void main(String[] args) throws Exception {
-        GeneratorConfig cfg = GeneratorConfig.creator(POJOGenerator.class, PACKAGE_ROOT)
+        GeneratorConfig cfg = GeneratorConfig.creator(
+                        POJOGenerator.class, new File("resources/templates"), PACKAGE_ROOT)
                 .serviceType(TypeDefCreator.SERVICE_TYPE)
                 .build();
         new ModelGenerator(cfg).generate();

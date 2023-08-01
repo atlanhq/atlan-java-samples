@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("deprecation")
 public class GuacamoleTableTest {
 
-    private static final GuacamoleTable full = GuacamoleTable.builder()
+    private static final GuacamoleTable full = GuacamoleTable._internal()
             .guid("guid")
             .displayText("displayText")
             .status(AtlanStatus.ACTIVE)

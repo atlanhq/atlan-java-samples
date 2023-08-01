@@ -3,14 +3,37 @@
 package com.probable.guacamole.model.assets;
 
 import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ErrorCode;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.*;
+import com.atlan.model.assets.Asset;
+import com.atlan.model.assets.Attribute;
+import com.atlan.model.assets.Connection;
+import com.atlan.model.assets.IAsset;
+import com.atlan.model.assets.IAtlanQuery;
+import com.atlan.model.assets.ICatalog;
+import com.atlan.model.assets.IColumn;
+import com.atlan.model.assets.IDbtModel;
+import com.atlan.model.assets.IDbtSource;
+import com.atlan.model.assets.IDbtTest;
+import com.atlan.model.assets.IGlossaryTerm;
+import com.atlan.model.assets.ILineageProcess;
+import com.atlan.model.assets.IReferenceable;
+import com.atlan.model.assets.ISQL;
+import com.atlan.model.assets.ISchema;
+import com.atlan.model.assets.ITable;
+import com.atlan.model.assets.ITablePartition;
+import com.atlan.model.assets.Schema;
+import com.atlan.model.core.AssetFilter;
 import com.atlan.model.enums.AtlanAnnouncementType;
+import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.relations.UniqueAttributes;
+import com.atlan.util.QueryFactory;
+import com.atlan.util.StringUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.probable.guacamole.model.enums.GuacamoleTemperature;
 import java.util.ArrayList;
@@ -27,8 +50,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Generated(value = "com.probable.guacamole.generators.POJOGenerator")
 @Getter
-@SuperBuilder(toBuilder = true)
+@SuperBuilder(toBuilder = true, builderMethodName = "_internal")
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Slf4j
 @SuppressWarnings("cast")
 public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, ISQL, ICatalog, IAsset, IReferenceable {
@@ -58,10 +82,6 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     @Attribute
     String databaseName;
 
-    @Attribute
-    @Singular
-    SortedSet<IDbtTest> dbtTests;
-
     /** TBC */
     @Attribute
     String databaseQualifiedName;
@@ -75,6 +95,11 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     @Attribute
     @Singular
     SortedSet<IDbtSource> dbtSources;
+
+    /** TBC */
+    @Attribute
+    @Singular
+    SortedSet<IDbtTest> dbtTests;
 
     /** TBC */
     @Attribute
@@ -237,13 +262,70 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     String viewQualifiedName;
 
     /**
+     * Start an asset filter that will return all GuacamoleTable assets.
+     * Additional conditions can be chained onto the returned filter before any
+     * asset retrieval is attempted, ensuring all conditions are pushed-down for
+     * optimal retrieval. Only active (non-archived) GuacamoleTable assets will be included.
+     *
+     * @return an asset filter that includes all GuacamoleTable assets
+     */
+    public static AssetFilter.AssetFilterBuilder all() {
+        return all(Atlan.getDefaultClient());
+    }
+
+    /**
+     * Start an asset filter that will return all GuacamoleTable assets.
+     * Additional conditions can be chained onto the returned filter before any
+     * asset retrieval is attempted, ensuring all conditions are pushed-down for
+     * optimal retrieval. Only active (non-archived) GuacamoleTable assets will be included.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the assets
+     * @return an asset filter that includes all GuacamoleTable assets
+     */
+    public static AssetFilter.AssetFilterBuilder all(AtlanClient client) {
+        return all(client, false);
+    }
+
+    /**
+     * Start an asset filter that will return all GuacamoleTable assets.
+     * Additional conditions can be chained onto the returned filter before any
+     * asset retrieval is attempted, ensuring all conditions are pushed-down for
+     * optimal retrieval.
+     *
+     * @param includeArchived when true, archived (soft-deleted) GuacamoleTables will be included
+     * @return an asset filter that includes all GuacamoleTable assets
+     */
+    public static AssetFilter.AssetFilterBuilder all(boolean includeArchived) {
+        return all(Atlan.getDefaultClient(), includeArchived);
+    }
+
+    /**
+     * Start an asset filter that will return all GuacamoleTable assets.
+     * Additional conditions can be chained onto the returned filter before any
+     * asset retrieval is attempted, ensuring all conditions are pushed-down for
+     * optimal retrieval.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the assets
+     * @param includeArchived when true, archived (soft-deleted) GuacamoleTables will be included
+     * @return an asset filter that includes all GuacamoleTable assets
+     */
+    public static AssetFilter.AssetFilterBuilder all(AtlanClient client, boolean includeArchived) {
+        AssetFilter.AssetFilterBuilder builder =
+                AssetFilter.builder().client(client).filter(QueryFactory.type(TYPE_NAME));
+        if (!includeArchived) {
+            builder.filter(QueryFactory.active());
+        }
+        return builder;
+    }
+
+    /**
      * Reference to a GuacamoleTable by GUID.
      *
      * @param guid the GUID of the GuacamoleTable to reference
      * @return reference to a GuacamoleTable that can be used for defining a relationship to a GuacamoleTable
      */
     public static GuacamoleTable refByGuid(String guid) {
-        return GuacamoleTable.builder().guid(guid).build();
+        return GuacamoleTable._internal().guid(guid).build();
     }
 
     /**
@@ -253,10 +335,68 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @return reference to a GuacamoleTable that can be used for defining a relationship to a GuacamoleTable
      */
     public static GuacamoleTable refByQualifiedName(String qualifiedName) {
-        return GuacamoleTable.builder()
+        return GuacamoleTable._internal()
                 .uniqueAttributes(
                         UniqueAttributes.builder().qualifiedName(qualifiedName).build())
                 .build();
+    }
+
+    /**
+     * Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.
+     *
+     * @param id of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName
+     * @return the requested full GuacamoleTable, complete with all of its relationships
+     * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable
+     */
+    @JsonIgnore
+    public static GuacamoleTable get(String id) throws AtlanException {
+        return get(Atlan.getDefaultClient(), id);
+    }
+
+    /**
+     * Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the asset
+     * @param id of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName
+     * @return the requested full GuacamoleTable, complete with all of its relationships
+     * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable
+     */
+    @JsonIgnore
+    public static GuacamoleTable get(AtlanClient client, String id) throws AtlanException {
+        return get(client, id, true);
+    }
+
+    /**
+     * Retrieves a GuacamoleTable by one of its identifiers, optionally complete with all of its relationships.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the asset
+     * @param id of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName
+     * @param includeRelationships if true, all of the asset's relationships will also be retrieved; if false, no relationships will be retrieved
+     * @return the requested full GuacamoleTable, optionally complete with all of its relationships
+     * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable
+     */
+    @JsonIgnore
+    public static GuacamoleTable get(AtlanClient client, String id, boolean includeRelationships)
+            throws AtlanException {
+        if (id == null) {
+            throw new NotFoundException(ErrorCode.ASSET_NOT_FOUND_BY_GUID, "(null)");
+        } else if (StringUtils.isUUID(id)) {
+            Asset asset = Asset.get(client, id, includeRelationships);
+            if (asset == null) {
+                throw new NotFoundException(ErrorCode.ASSET_NOT_FOUND_BY_GUID, id);
+            } else if (asset instanceof GuacamoleTable) {
+                return (GuacamoleTable) asset;
+            } else {
+                throw new NotFoundException(ErrorCode.ASSET_NOT_TYPE_REQUESTED, id, TYPE_NAME);
+            }
+        } else {
+            Asset asset = Asset.get(client, TYPE_NAME, id, includeRelationships);
+            if (asset instanceof GuacamoleTable) {
+                return (GuacamoleTable) asset;
+            } else {
+                throw new NotFoundException(ErrorCode.ASSET_NOT_FOUND_BY_QN, id, TYPE_NAME);
+            }
+        }
     }
 
     /**
@@ -265,16 +405,25 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @param guid of the GuacamoleTable to retrieve
      * @return the requested full GuacamoleTable, complete with all of its relationships
      * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable
+     * @deprecated see {@link #get(String)} instead
      */
+    @Deprecated
     public static GuacamoleTable retrieveByGuid(String guid) throws AtlanException {
-        Asset asset = Asset.retrieveFull(guid);
-        if (asset == null) {
-            throw new NotFoundException(ErrorCode.ASSET_NOT_FOUND_BY_GUID, guid);
-        } else if (asset instanceof GuacamoleTable) {
-            return (GuacamoleTable) asset;
-        } else {
-            throw new NotFoundException(ErrorCode.ASSET_NOT_TYPE_REQUESTED, guid, "GuacamoleTable");
-        }
+        return get(Atlan.getDefaultClient(), guid);
+    }
+
+    /**
+     * Retrieves a GuacamoleTable by its GUID, complete with all of its relationships.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the asset
+     * @param guid of the GuacamoleTable to retrieve
+     * @return the requested full GuacamoleTable, complete with all of its relationships
+     * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable
+     * @deprecated see {@link #get(AtlanClient, String)} instead
+     */
+    @Deprecated
+    public static GuacamoleTable retrieveByGuid(AtlanClient client, String guid) throws AtlanException {
+        return get(client, guid);
     }
 
     /**
@@ -283,14 +432,26 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @param qualifiedName of the GuacamoleTable to retrieve
      * @return the requested full GuacamoleTable, complete with all of its relationships
      * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist
+     * @deprecated see {@link #get(String)} instead
      */
+    @Deprecated
     public static GuacamoleTable retrieveByQualifiedName(String qualifiedName) throws AtlanException {
-        Asset asset = Asset.retrieveFull(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
-        if (asset instanceof GuacamoleTable) {
-            return (GuacamoleTable) asset;
-        } else {
-            throw new NotFoundException(ErrorCode.ASSET_NOT_FOUND_BY_QN, qualifiedName, "GuacamoleTable");
-        }
+        return get(Atlan.getDefaultClient(), qualifiedName);
+    }
+
+    /**
+     * Retrieves a GuacamoleTable by its qualifiedName, complete with all of its relationships.
+     *
+     * @param client connectivity to the Atlan tenant from which to retrieve the asset
+     * @param qualifiedName of the GuacamoleTable to retrieve
+     * @return the requested full GuacamoleTable, complete with all of its relationships
+     * @throws AtlanException on any error during the API invocation, such as the {@link NotFoundException} if the GuacamoleTable does not exist
+     * @deprecated see {@link #get(AtlanClient, String)} instead
+     */
+    @Deprecated
+    public static GuacamoleTable retrieveByQualifiedName(AtlanClient client, String qualifiedName)
+            throws AtlanException {
+        return get(client, qualifiedName);
     }
 
     /**
@@ -301,7 +462,45 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static boolean restore(String qualifiedName) throws AtlanException {
-        return Asset.restore(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName);
+        return restore(Atlan.getDefaultClient(), qualifiedName);
+    }
+
+    /**
+     * Restore the archived (soft-deleted) GuacamoleTable to active.
+     *
+     * @param client connectivity to the Atlan tenant on which to restore the asset
+     * @param qualifiedName for the GuacamoleTable
+     * @return true if the GuacamoleTable is now active, and false otherwise
+     * @throws AtlanException on any API problems
+     */
+    public static boolean restore(AtlanClient client, String qualifiedName) throws AtlanException {
+        return Asset.restore(client, TYPE_NAME, qualifiedName);
+    }
+
+    /**
+     * Builds the minimal object necessary to create a Guacamole table.
+     *
+     * @param name of the Guacamole table
+     * @param schemaQualifiedName unique name of the schema in which this Guacamole table exists
+     * @return the minimal request necessary to create the Guacamole table, as a builder
+     */
+    public static GuacamoleTableBuilder<?, ?> creator(String name, String schemaQualifiedName) {
+        String[] tokens = schemaQualifiedName.split("/");
+        AtlanConnectorType connectorType = Connection.getConnectorTypeFromQualifiedName(tokens);
+        String schemaName = StringUtils.getNameFromQualifiedName(schemaQualifiedName);
+        String databaseQualifiedName = StringUtils.getParentQualifiedNameFromQualifiedName(schemaQualifiedName);
+        String databaseName = StringUtils.getNameFromQualifiedName(databaseQualifiedName);
+        String connectionQualifiedName = StringUtils.getParentQualifiedNameFromQualifiedName(databaseQualifiedName);
+        return GuacamoleTable._internal()
+                .name(name)
+                .qualifiedName(generateQualifiedName(name, schemaQualifiedName))
+                .connectorType(connectorType)
+                .schemaName(schemaName)
+                .schemaQualifiedName(schemaQualifiedName)
+                .schema(Schema.refByQualifiedName(schemaQualifiedName))
+                .databaseName(databaseName)
+                .databaseQualifiedName(databaseQualifiedName)
+                .connectionQualifiedName(connectionQualifiedName);
     }
 
     /**
@@ -312,7 +511,18 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @return the minimal request necessary to update the GuacamoleTable, as a builder
      */
     public static GuacamoleTableBuilder<?, ?> updater(String qualifiedName, String name) {
-        return GuacamoleTable.builder().qualifiedName(qualifiedName).name(name);
+        return GuacamoleTable._internal().qualifiedName(qualifiedName).name(name);
+    }
+
+    /**
+     * Generate a unique Guacamole table name.
+     *
+     * @param name of the Guacamole table
+     * @param schemaQualifiedName unique name of the schema in which this Guacamole table exists
+     * @return a unique name for the Guacamole table
+     */
+    public static String generateQualifiedName(String name, String schemaQualifiedName) {
+        return schemaQualifiedName + "/" + name;
     }
 
     /**
@@ -333,7 +543,7 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
         }
         if (!missing.isEmpty()) {
             throw new InvalidRequestException(
-                    ErrorCode.MISSING_REQUIRED_UPDATE_PARAM, "GuacamoleTable", String.join(",", missing));
+                    ErrorCode.MISSING_REQUIRED_UPDATE_PARAM, TYPE_NAME, String.join(",", missing));
         }
         return updater(this.getQualifiedName(), this.getName());
     }
@@ -347,7 +557,21 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
+        return removeDescription(Atlan.getDefaultClient(), qualifiedName, name);
+    }
+
+    /**
+     * Remove the system description from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to remove the asset's description
+     * @param qualifiedName of the GuacamoleTable
+     * @param name of the GuacamoleTable
+     * @return the updated GuacamoleTable, or null if the removal failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeDescription(AtlanClient client, String qualifiedName, String name)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeDescription(client, updater(qualifiedName, name));
     }
 
     /**
@@ -359,7 +583,21 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeUserDescription(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeUserDescription(Atlan.getDefaultClient(), updater(qualifiedName, name));
+        return removeUserDescription(Atlan.getDefaultClient(), qualifiedName, name);
+    }
+
+    /**
+     * Remove the user's description from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to remove the asset's description
+     * @param qualifiedName of the GuacamoleTable
+     * @param name of the GuacamoleTable
+     * @return the updated GuacamoleTable, or null if the removal failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeUserDescription(AtlanClient client, String qualifiedName, String name)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeUserDescription(client, updater(qualifiedName, name));
     }
 
     /**
@@ -371,7 +609,21 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeOwners(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeOwners(Atlan.getDefaultClient(), updater(qualifiedName, name));
+        return removeOwners(Atlan.getDefaultClient(), qualifiedName, name);
+    }
+
+    /**
+     * Remove the owners from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant from which to remove the GuacamoleTable's owners
+     * @param qualifiedName of the GuacamoleTable
+     * @param name of the GuacamoleTable
+     * @return the updated GuacamoleTable, or null if the removal failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeOwners(AtlanClient client, String qualifiedName, String name)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeOwners(client, updater(qualifiedName, name));
     }
 
     /**
@@ -385,8 +637,24 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable updateCertificate(String qualifiedName, CertificateStatus certificate, String message)
             throws AtlanException {
-        return (GuacamoleTable) Asset.updateCertificate(
-                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, certificate, message);
+        return updateCertificate(Atlan.getDefaultClient(), qualifiedName, certificate, message);
+    }
+
+    /**
+     * Update the certificate on a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to update the GuacamoleTable's certificate
+     * @param qualifiedName of the GuacamoleTable
+     * @param certificate to use
+     * @param message (optional) message, or null if no message
+     * @return the updated GuacamoleTable, or null if the update failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable updateCertificate(
+            AtlanClient client, String qualifiedName, CertificateStatus certificate, String message)
+            throws AtlanException {
+        return (GuacamoleTable)
+                Asset.updateCertificate(client, _internal(), TYPE_NAME, qualifiedName, certificate, message);
     }
 
     /**
@@ -398,7 +666,21 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeCertificate(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeCertificate(Atlan.getDefaultClient(), updater(qualifiedName, name));
+        return removeCertificate(Atlan.getDefaultClient(), qualifiedName, name);
+    }
+
+    /**
+     * Remove the certificate from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant from which to remove the GuacamoleTable's certificate
+     * @param qualifiedName of the GuacamoleTable
+     * @param name of the GuacamoleTable
+     * @return the updated GuacamoleTable, or null if the removal failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeCertificate(AtlanClient client, String qualifiedName, String name)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeCertificate(client, updater(qualifiedName, name));
     }
 
     /**
@@ -413,8 +695,25 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable updateAnnouncement(
             String qualifiedName, AtlanAnnouncementType type, String title, String message) throws AtlanException {
-        return (GuacamoleTable) Asset.updateAnnouncement(
-                Atlan.getDefaultClient(), builder(), TYPE_NAME, qualifiedName, type, title, message);
+        return updateAnnouncement(Atlan.getDefaultClient(), qualifiedName, type, title, message);
+    }
+
+    /**
+     * Update the announcement on a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to update the GuacamoleTable's announcement
+     * @param qualifiedName of the GuacamoleTable
+     * @param type type of announcement to set
+     * @param title (optional) title of the announcement to set (or null for no title)
+     * @param message (optional) message of the announcement to set (or null for no message)
+     * @return the result of the update, or null if the update failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable updateAnnouncement(
+            AtlanClient client, String qualifiedName, AtlanAnnouncementType type, String title, String message)
+            throws AtlanException {
+        return (GuacamoleTable)
+                Asset.updateAnnouncement(client, _internal(), TYPE_NAME, qualifiedName, type, title, message);
     }
 
     /**
@@ -426,7 +725,21 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeAnnouncement(String qualifiedName, String name) throws AtlanException {
-        return (GuacamoleTable) Asset.removeAnnouncement(Atlan.getDefaultClient(), updater(qualifiedName, name));
+        return removeAnnouncement(Atlan.getDefaultClient(), qualifiedName, name);
+    }
+
+    /**
+     * Remove the announcement from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan client from which to remove the GuacamoleTable's announcement
+     * @param qualifiedName of the GuacamoleTable
+     * @param name of the GuacamoleTable
+     * @return the updated GuacamoleTable, or null if the removal failed
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeAnnouncement(AtlanClient client, String qualifiedName, String name)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeAnnouncement(client, updater(qualifiedName, name));
     }
 
     /**
@@ -440,7 +753,22 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable replaceTerms(String qualifiedName, String name, List<IGlossaryTerm> terms)
             throws AtlanException {
-        return (GuacamoleTable) Asset.replaceTerms(Atlan.getDefaultClient(), updater(qualifiedName, name), terms);
+        return replaceTerms(Atlan.getDefaultClient(), qualifiedName, name, terms);
+    }
+
+    /**
+     * Replace the terms linked to the GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to replace the GuacamoleTable's assigned terms
+     * @param qualifiedName for the GuacamoleTable
+     * @param name human-readable name of the GuacamoleTable
+     * @param terms the list of terms to replace on the GuacamoleTable, or null to remove all terms from the GuacamoleTable
+     * @return the GuacamoleTable that was updated (note that it will NOT contain details of the replaced terms)
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable replaceTerms(
+            AtlanClient client, String qualifiedName, String name, List<IGlossaryTerm> terms) throws AtlanException {
+        return (GuacamoleTable) Asset.replaceTerms(client, updater(qualifiedName, name), terms);
     }
 
     /**
@@ -454,7 +782,23 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable appendTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleTable) Asset.appendTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
+        return appendTerms(Atlan.getDefaultClient(), qualifiedName, terms);
+    }
+
+    /**
+     * Link additional terms to the GuacamoleTable, without replacing existing terms linked to the GuacamoleTable.
+     * Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing terms,
+     * and a second to append the new terms.
+     *
+     * @param client connectivity to the Atlan tenant on which to append terms to the GuacamoleTable
+     * @param qualifiedName for the GuacamoleTable
+     * @param terms the list of terms to append to the GuacamoleTable
+     * @return the GuacamoleTable that was updated  (note that it will NOT contain details of the appended terms)
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable appendTerms(AtlanClient client, String qualifiedName, List<IGlossaryTerm> terms)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.appendTerms(client, TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -468,7 +812,23 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems
      */
     public static GuacamoleTable removeTerms(String qualifiedName, List<IGlossaryTerm> terms) throws AtlanException {
-        return (GuacamoleTable) Asset.removeTerms(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, terms);
+        return removeTerms(Atlan.getDefaultClient(), qualifiedName, terms);
+    }
+
+    /**
+     * Remove terms from a GuacamoleTable, without replacing all existing terms linked to the GuacamoleTable.
+     * Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing terms,
+     * and a second to remove the provided terms.
+     *
+     * @param client connectivity to the Atlan tenant from which to remove terms from the GuacamoleTable
+     * @param qualifiedName for the GuacamoleTable
+     * @param terms the list of terms to remove from the GuacamoleTable, which must be referenced by GUID
+     * @return the GuacamoleTable that was updated (note that it will NOT contain details of the resulting terms)
+     * @throws AtlanException on any API problems
+     */
+    public static GuacamoleTable removeTerms(AtlanClient client, String qualifiedName, List<IGlossaryTerm> terms)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.removeTerms(client, TYPE_NAME, qualifiedName, terms);
     }
 
     /**
@@ -483,8 +843,23 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     public static GuacamoleTable appendAtlanTags(String qualifiedName, List<String> atlanTagNames)
             throws AtlanException {
-        return (GuacamoleTable)
-                Asset.appendAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
+        return appendAtlanTags(Atlan.getDefaultClient(), qualifiedName, atlanTagNames);
+    }
+
+    /**
+     * Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.
+     * Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing Atlan tags,
+     * and a second to append the new Atlan tags.
+     *
+     * @param client connectivity to the Atlan tenant on which to append Atlan tags to the GuacamoleTable
+     * @param qualifiedName of the GuacamoleTable
+     * @param atlanTagNames human-readable names of the Atlan tags to add
+     * @throws AtlanException on any API problems
+     * @return the updated GuacamoleTable
+     */
+    public static GuacamoleTable appendAtlanTags(AtlanClient client, String qualifiedName, List<String> atlanTagNames)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.appendAtlanTags(client, TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -507,8 +882,39 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
             boolean removePropagationsOnDelete,
             boolean restrictLineagePropagation)
             throws AtlanException {
-        return (GuacamoleTable) Asset.appendAtlanTags(
+        return appendAtlanTags(
                 Atlan.getDefaultClient(),
+                qualifiedName,
+                atlanTagNames,
+                propagate,
+                removePropagationsOnDelete,
+                restrictLineagePropagation);
+    }
+
+    /**
+     * Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.
+     * Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing Atlan tags,
+     * and a second to append the new Atlan tags.
+     *
+     * @param client connectivity to the Atlan tenant on which to append Atlan tags to the GuacamoleTable
+     * @param qualifiedName of the GuacamoleTable
+     * @param atlanTagNames human-readable names of the Atlan tags to add
+     * @param propagate whether to propagate the Atlan tag (true) or not (false)
+     * @param removePropagationsOnDelete whether to remove the propagated Atlan tags when the Atlan tag is removed from this asset (true) or not (false)
+     * @param restrictLineagePropagation whether to avoid propagating through lineage (true) or do propagate through lineage (false)
+     * @throws AtlanException on any API problems
+     * @return the updated GuacamoleTable
+     */
+    public static GuacamoleTable appendAtlanTags(
+            AtlanClient client,
+            String qualifiedName,
+            List<String> atlanTagNames,
+            boolean propagate,
+            boolean removePropagationsOnDelete,
+            boolean restrictLineagePropagation)
+            throws AtlanException {
+        return (GuacamoleTable) Asset.appendAtlanTags(
+                client,
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -527,7 +933,22 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      */
     @Deprecated
     public static void addAtlanTags(String qualifiedName, List<String> atlanTagNames) throws AtlanException {
-        Asset.addAtlanTags(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagNames);
+        addAtlanTags(Atlan.getDefaultClient(), qualifiedName, atlanTagNames);
+    }
+
+    /**
+     * Add Atlan tags to a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to add Atlan tags to the GuacamoleTable
+     * @param qualifiedName of the GuacamoleTable
+     * @param atlanTagNames human-readable names of the Atlan tags to add
+     * @throws AtlanException on any API problems, or if any of the Atlan tags already exist on the GuacamoleTable
+     * @deprecated see {@link #appendAtlanTags(String, List)} instead
+     */
+    @Deprecated
+    public static void addAtlanTags(AtlanClient client, String qualifiedName, List<String> atlanTagNames)
+            throws AtlanException {
+        Asset.addAtlanTags(client, TYPE_NAME, qualifiedName, atlanTagNames);
     }
 
     /**
@@ -549,8 +970,38 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
             boolean removePropagationsOnDelete,
             boolean restrictLineagePropagation)
             throws AtlanException {
-        Asset.addAtlanTags(
+        addAtlanTags(
                 Atlan.getDefaultClient(),
+                qualifiedName,
+                atlanTagNames,
+                propagate,
+                removePropagationsOnDelete,
+                restrictLineagePropagation);
+    }
+
+    /**
+     * Add Atlan tags to a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant on which to add Atlan tags to the GuacamoleTable
+     * @param qualifiedName of the GuacamoleTable
+     * @param atlanTagNames human-readable names of the Atlan tags to add
+     * @param propagate whether to propagate the Atlan tag (true) or not (false)
+     * @param removePropagationsOnDelete whether to remove the propagated Atlan tags when the Atlan tag is removed from this asset (true) or not (false)
+     * @param restrictLineagePropagation whether to avoid propagating through lineage (true) or do propagate through lineage (false)
+     * @throws AtlanException on any API problems, or if any of the Atlan tags already exist on the GuacamoleTable
+     * @deprecated see {@link #appendAtlanTags(String, List, boolean, boolean, boolean)} instead
+     */
+    @Deprecated
+    public static void addAtlanTags(
+            AtlanClient client,
+            String qualifiedName,
+            List<String> atlanTagNames,
+            boolean propagate,
+            boolean removePropagationsOnDelete,
+            boolean restrictLineagePropagation)
+            throws AtlanException {
+        Asset.addAtlanTags(
+                client,
                 TYPE_NAME,
                 qualifiedName,
                 atlanTagNames,
@@ -567,6 +1018,19 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @throws AtlanException on any API problems, or if the Atlan tag does not exist on the GuacamoleTable
      */
     public static void removeAtlanTag(String qualifiedName, String atlanTagName) throws AtlanException {
-        Asset.removeAtlanTag(Atlan.getDefaultClient(), TYPE_NAME, qualifiedName, atlanTagName);
+        removeAtlanTag(Atlan.getDefaultClient(), qualifiedName, atlanTagName);
+    }
+
+    /**
+     * Remove an Atlan tag from a GuacamoleTable.
+     *
+     * @param client connectivity to the Atlan tenant from which to remove an Atlan tag from a GuacamoleTable
+     * @param qualifiedName of the GuacamoleTable
+     * @param atlanTagName human-readable name of the Atlan tag to remove
+     * @throws AtlanException on any API problems, or if the Atlan tag does not exist on the GuacamoleTable
+     */
+    public static void removeAtlanTag(AtlanClient client, String qualifiedName, String atlanTagName)
+            throws AtlanException {
+        Asset.removeAtlanTag(client, TYPE_NAME, qualifiedName, atlanTagName);
     }
 }
