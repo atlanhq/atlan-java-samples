@@ -205,7 +205,8 @@ implements com.atlan.events.AtlanEventHandler</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>com.atlan.model.assets.Asset</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCurrentState(com.atlan.model.assets.Asset,org.slf4j.Logger)">getCurrentState</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;fromEvent,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCurrentState(com.atlan.AtlanClient,com.atlan.model.assets.Asset,org.slf4j.Logger)">getCurrentState</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+               com.atlan.model.assets.Asset&nbsp;fromEvent,
                org.slf4j.Logger&nbsp;log)</code></th>
 </tr>
 <tr id="i2" class="altColor">
@@ -272,13 +273,14 @@ implements com.atlan.events.AtlanEventHandler</pre>
 <pre class="methodSignature">public static&nbsp;<a href="VerificationEnforcer.html" title="class in com.atlan.samples.events">VerificationEnforcer</a>&nbsp;getInstance()</pre>
 </li>
 </ul>
-<a id="getCurrentState(com.atlan.model.assets.Asset,org.slf4j.Logger)">
+<a id="getCurrentState(com.atlan.AtlanClient,com.atlan.model.assets.Asset,org.slf4j.Logger)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getCurrentState</h4>
-<pre class="methodSignature">public&nbsp;com.atlan.model.assets.Asset&nbsp;getCurrentState&#8203;(com.atlan.model.assets.Asset&nbsp;fromEvent,
+<pre class="methodSignature">public&nbsp;com.atlan.model.assets.Asset&nbsp;getCurrentState&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                    com.atlan.model.assets.Asset&nbsp;fromEvent,
                                                     org.slf4j.Logger&nbsp;log)
                                              throws com.atlan.exception.AtlanException</pre>
 <dl>

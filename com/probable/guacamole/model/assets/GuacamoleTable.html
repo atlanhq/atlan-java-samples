@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":41,"i1":41,"i2":9,"i3":9,"i4":9,"i5":9,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":9,"i56":9,"i57":9,"i58":9,"i59":9,"i60":9,"i61":9,"i62":9,"i63":9,"i64":9,"i65":9,"i66":9,"i67":9,"i68":10,"i69":10,"i70":9,"i71":9,"i72":9};
+var data = {"i0":9,"i1":41,"i2":41,"i3":41,"i4":41,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":10,"i16":9,"i17":10,"i18":9,"i19":9,"i20":9,"i21":9,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":10,"i56":10,"i57":10,"i58":10,"i59":10,"i60":10,"i61":10,"i62":10,"i63":10,"i64":10,"i65":10,"i66":10,"i67":10,"i68":10,"i69":9,"i70":9,"i71":9,"i72":9,"i73":9,"i74":9,"i75":9,"i76":9,"i77":9,"i78":9,"i79":9,"i80":9,"i81":9,"i82":9,"i83":9,"i84":9,"i85":9,"i86":9,"i87":9,"i88":9,"i89":41,"i90":41,"i91":41,"i92":41,"i93":10,"i94":10,"i95":10,"i96":9,"i97":9,"i98":9,"i99":9,"i100":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -147,7 +147,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><code>com.atlan.model.assets.IAsset</code>, <code>com.atlan.model.assets.ICatalog</code>, <code>com.atlan.model.assets.IReferenceable</code>, <code>com.atlan.model.assets.ISQL</code>, <code>com.atlan.model.assets.ITable</code>, <code>com.atlan.model.search.AuditDetail</code>, <code><a href="IGuacamoleTable.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleTable</a></code>, <code>java.lang.Comparable&lt;com.atlan.model.relations.Reference&gt;</code></dd>
+<dd><code>com.atlan.model.assets.IAsset</code>, <code>com.atlan.model.assets.ICatalog</code>, <code>com.atlan.model.assets.IReferenceable</code>, <code>com.atlan.model.assets.ISQL</code>, <code>com.atlan.model.assets.ITable</code>, <code>com.atlan.model.search.AuditDetail</code>, <code><a href="IGuacamoleTable.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleTable</a></code>, <code>java.io.Serializable</code>, <code>java.lang.Comparable&lt;com.atlan.model.relations.Reference&gt;</code></dd>
 </dl>
 <hr>
 <pre>@Generated("com.probable.guacamole.generators.POJOGenerator")
@@ -155,6 +155,10 @@ public class <span class="typeNameLabel">GuacamoleTable</span>
 extends com.atlan.model.assets.Asset
 implements <a href="IGuacamoleTable.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleTable</a>, com.atlan.model.assets.ITable, com.atlan.model.assets.ISQL, com.atlan.model.assets.ICatalog, com.atlan.model.assets.IAsset, com.atlan.model.assets.IReferenceable</pre>
 <div class="block">Specialized form of a table specific to Guacamole.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../../serialized-form.html#com.probable.guacamole.model.assets.GuacamoleTable">Serialized Form</a></dd>
+</dl>
 </li>
 </ul>
 </div>
@@ -266,6 +270,36 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#_internal()">_internal</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List)">addAtlanTags</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+            java.lang.String&nbsp;qualifiedName,
+            java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)</code></th>
+<td class="colLast">
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#appendAtlanTags(java.lang.String,java.util.List)"><code>appendAtlanTags(String, List)</code></a> instead</div>
+</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List,boolean,boolean,boolean)">addAtlanTags</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+            java.lang.String&nbsp;qualifiedName,
+            java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
+            boolean&nbsp;propagate,
+            boolean&nbsp;removePropagationsOnDelete,
+            boolean&nbsp;restrictLineagePropagation)</code></th>
+<td class="colLast">
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#appendAtlanTags(java.lang.String,java.util.List,boolean,boolean,boolean)"><code>appendAtlanTags(String, List, boolean, boolean, boolean)</code></a> instead</div>
+</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAtlanTags(java.lang.String,java.util.List)">addAtlanTags</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
             java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)</code></th>
@@ -275,7 +309,7 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addAtlanTags(java.lang.String,java.util.List,boolean,boolean,boolean)">addAtlanTags</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
             java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
@@ -288,7 +322,57 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>static com.atlan.model.core.AssetFilter.AssetFilterBuilder</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#all()">all</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>static com.atlan.model.core.AssetFilter.AssetFilterBuilder</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#all(boolean)">all</a></span>&#8203;(boolean&nbsp;includeArchived)</code></th>
+<td class="colLast">
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>static com.atlan.model.core.AssetFilter.AssetFilterBuilder</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#all(com.atlan.AtlanClient)">all</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client)</code></th>
+<td class="colLast">
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>static com.atlan.model.core.AssetFilter.AssetFilterBuilder</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#all(com.atlan.AtlanClient,boolean)">all</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+   boolean&nbsp;includeArchived)</code></th>
+<td class="colLast">
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.</div>
+</td>
+</tr>
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List)">appendAtlanTags</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+               java.lang.String&nbsp;qualifiedName,
+               java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)</code></th>
+<td class="colLast">
+<div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List,boolean,boolean,boolean)">appendAtlanTags</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+               java.lang.String&nbsp;qualifiedName,
+               java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
+               boolean&nbsp;propagate,
+               boolean&nbsp;removePropagationsOnDelete,
+               boolean&nbsp;restrictLineagePropagation)</code></th>
+<td class="colLast">
+<div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendAtlanTags(java.lang.String,java.util.List)">appendAtlanTags</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)</code></th>
@@ -296,7 +380,7 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendAtlanTags(java.lang.String,java.util.List,boolean,boolean,boolean)">appendAtlanTags</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
@@ -307,7 +391,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendTerms(com.atlan.AtlanClient,java.lang.String,java.util.List)">appendTerms</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+           java.lang.String&nbsp;qualifiedName,
+           java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)</code></th>
+<td class="colLast">
+<div class="block">Link additional terms to the GuacamoleTable, without replacing existing terms linked to the GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#appendTerms(java.lang.String,java.util.List)">appendTerms</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
            java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)</code></th>
@@ -315,361 +408,407 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Link additional terms to the GuacamoleTable, without replacing existing terms linked to the GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code>static <a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#builder()">builder</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i6" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#canEqual(java.lang.Object)">canEqual</a></span>&#8203;(java.lang.Object&nbsp;other)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i16" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#creator(java.lang.String,java.lang.String)">creator</a></span>&#8203;(java.lang.String&nbsp;name,
+       java.lang.String&nbsp;schemaQualifiedName)</code></th>
+<td class="colLast">
+<div class="block">Builds the minimal object necessary to create a Guacamole table.</div>
+</td>
+</tr>
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#equals(java.lang.Object)">equals</a></span>&#8203;(java.lang.Object&nbsp;o)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#generateQualifiedName(java.lang.String,java.lang.String)">generateQualifiedName</a></span>&#8203;(java.lang.String&nbsp;name,
+                     java.lang.String&nbsp;schemaQualifiedName)</code></th>
+<td class="colLast">
+<div class="block">Generate a unique Guacamole table name.</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#get(com.atlan.AtlanClient,java.lang.String)">get</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+   java.lang.String&nbsp;id)</code></th>
+<td class="colLast">
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.</div>
+</td>
+</tr>
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#get(com.atlan.AtlanClient,java.lang.String,boolean)">get</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+   java.lang.String&nbsp;id,
+   boolean&nbsp;includeRelationships)</code></th>
+<td class="colLast">
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, optionally complete with all of its relationships.</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#get(java.lang.String)">get</a></span>&#8203;(java.lang.String&nbsp;id)</code></th>
+<td class="colLast">
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAlias()">getAlias</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getColumnCount()">getColumnCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IColumn&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getColumns()">getColumns</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDatabaseName()">getDatabaseName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDatabaseQualifiedName()">getDatabaseQualifiedName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IDbtModel&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDbtModels()">getDbtModels</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IDbtSource&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDbtSources()">getDbtSources</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IDbtTest&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDbtTests()">getDbtTests</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colLast">
+<div class="block">TBC</div>
+</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.ITable&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDimensions()">getDimensions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getExternalLocation()">getExternalLocation</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getExternalLocationFormat()">getExternalLocationFormat</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getExternalLocationRegion()">getExternalLocationRegion</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.ITable&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFacts()">getFacts</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i35" class="rowColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGuacamoleArchived()">getGuacamoleArchived</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Whether this table is currently archived (true) or not (false).</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i36" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;<a href="IGuacamoleColumn.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleColumn</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGuacamoleColumns()">getGuacamoleColumns</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Specialized columns contained within this specialized table.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i37" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGuacamoleSize()">getGuacamoleSize</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Consolidated quantification metric spanning number of columns, rows, and sparsity of population.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i38" class="altColor">
 <td class="colFirst"><code><a href="../enums/GuacamoleTemperature.html" title="enum in com.probable.guacamole.model.enums">GuacamoleTemperature</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGuacamoleTemperature()">getGuacamoleTemperature</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Rough measure of the IOPS allocated to the table's processing.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i39" class="rowColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.ILineageProcess&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getInputToProcesses()">getInputToProcesses</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i40" class="altColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIsPartitioned()">getIsPartitioned</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i41" class="rowColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIsProfiled()">getIsProfiled</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i42" class="altColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIsQueryPreview()">getIsQueryPreview</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i43" class="rowColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIsTemporary()">getIsTemporary</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i44" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLastProfiledAt()">getLastProfiledAt</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i45" class="rowColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.ILineageProcess&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOutputFromProcesses()">getOutputFromProcesses</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i46" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPartitionCount()">getPartitionCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i47" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPartitionList()">getPartitionList</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i48" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.ITablePartition&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPartitions()">getPartitions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i49" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPartitionStrategy()">getPartitionStrategy</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i36" class="altColor">
+<tr id="i50" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IAtlanQuery&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueries()">getQueries</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i37" class="rowColor">
+<tr id="i51" class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueryCount()">getQueryCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i38" class="altColor">
+<tr id="i52" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueryCountUpdatedAt()">getQueryCountUpdatedAt</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i39" class="rowColor">
+<tr id="i53" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueryPreviewConfig()">getQueryPreviewConfig</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i40" class="altColor">
+<tr id="i54" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueryUserCount()">getQueryUserCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i41" class="rowColor">
+<tr id="i55" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.lang.Long&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getQueryUserMap()">getQueryUserMap</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i42" class="altColor">
+<tr id="i56" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRowCount()">getRowCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i43" class="rowColor">
+<tr id="i57" class="rowColor">
 <td class="colFirst"><code>com.atlan.model.assets.ISchema</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSchema()">getSchema</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i44" class="altColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSchemaName()">getSchemaName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i45" class="rowColor">
+<tr id="i59" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSchemaQualifiedName()">getSchemaQualifiedName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i46" class="altColor">
+<tr id="i60" class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSizeBytes()">getSizeBytes</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i47" class="rowColor">
+<tr id="i61" class="rowColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IDbtModel&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlDbtModels()">getSqlDbtModels</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i48" class="altColor">
+<tr id="i62" class="altColor">
 <td class="colFirst"><code>java.util.SortedSet&lt;com.atlan.model.assets.IDbtSource&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlDBTSources()">getSqlDBTSources</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i49" class="rowColor">
+<tr id="i63" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTableName()">getTableName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i50" class="altColor">
+<tr id="i64" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTableQualifiedName()">getTableQualifiedName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i51" class="rowColor">
+<tr id="i65" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTypeName()">getTypeName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Fixed typeName for GuacamoleTables.</div>
 </td>
 </tr>
-<tr id="i52" class="altColor">
+<tr id="i66" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getViewName()">getViewName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i53" class="rowColor">
+<tr id="i67" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getViewQualifiedName()">getViewQualifiedName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">TBC</div>
 </td>
 </tr>
-<tr id="i54" class="altColor">
+<tr id="i68" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i55" class="rowColor">
+<tr id="i69" class="rowColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#refByGuid(java.lang.String)">refByGuid</a></span>&#8203;(java.lang.String&nbsp;guid)</code></th>
 <td class="colLast">
 <div class="block">Reference to a GuacamoleTable by GUID.</div>
 </td>
 </tr>
-<tr id="i56" class="altColor">
+<tr id="i70" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#refByQualifiedName(java.lang.String)">refByQualifiedName</a></span>&#8203;(java.lang.String&nbsp;qualifiedName)</code></th>
 <td class="colLast">
 <div class="block">Reference to a GuacamoleTable by qualifiedName.</div>
 </td>
 </tr>
-<tr id="i57" class="rowColor">
+<tr id="i71" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAnnouncement(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeAnnouncement</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                  java.lang.String&nbsp;qualifiedName,
+                  java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Remove the announcement from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i72" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAnnouncement(java.lang.String,java.lang.String)">removeAnnouncement</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                   java.lang.String&nbsp;name)</code></th>
@@ -677,7 +816,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the announcement from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i58" class="altColor">
+<tr id="i73" class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAtlanTag(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeAtlanTag</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+              java.lang.String&nbsp;qualifiedName,
+              java.lang.String&nbsp;atlanTagName)</code></th>
+<td class="colLast">
+<div class="block">Remove an Atlan tag from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i74" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeAtlanTag(java.lang.String,java.lang.String)">removeAtlanTag</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
               java.lang.String&nbsp;atlanTagName)</code></th>
@@ -685,7 +833,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove an Atlan tag from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i59" class="rowColor">
+<tr id="i75" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeCertificate(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeCertificate</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                 java.lang.String&nbsp;qualifiedName,
+                 java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Remove the certificate from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i76" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeCertificate(java.lang.String,java.lang.String)">removeCertificate</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                  java.lang.String&nbsp;name)</code></th>
@@ -693,7 +850,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the certificate from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i60" class="altColor">
+<tr id="i77" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeDescription(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeDescription</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                 java.lang.String&nbsp;qualifiedName,
+                 java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Remove the system description from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i78" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeDescription(java.lang.String,java.lang.String)">removeDescription</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                  java.lang.String&nbsp;name)</code></th>
@@ -701,7 +867,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the system description from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i61" class="rowColor">
+<tr id="i79" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeOwners(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeOwners</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+            java.lang.String&nbsp;qualifiedName,
+            java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Remove the owners from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i80" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeOwners(java.lang.String,java.lang.String)">removeOwners</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
             java.lang.String&nbsp;name)</code></th>
@@ -709,7 +884,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the owners from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i62" class="altColor">
+<tr id="i81" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeTerms(com.atlan.AtlanClient,java.lang.String,java.util.List)">removeTerms</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+           java.lang.String&nbsp;qualifiedName,
+           java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)</code></th>
+<td class="colLast">
+<div class="block">Remove terms from a GuacamoleTable, without replacing all existing terms linked to the GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i82" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeTerms(java.lang.String,java.util.List)">removeTerms</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
            java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)</code></th>
@@ -717,7 +901,16 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove terms from a GuacamoleTable, without replacing all existing terms linked to the GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i63" class="rowColor">
+<tr id="i83" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeUserDescription(com.atlan.AtlanClient,java.lang.String,java.lang.String)">removeUserDescription</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                     java.lang.String&nbsp;qualifiedName,
+                     java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Remove the user's description from a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i84" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#removeUserDescription(java.lang.String,java.lang.String)">removeUserDescription</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                      java.lang.String&nbsp;name)</code></th>
@@ -725,7 +918,17 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the user's description from a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i64" class="altColor">
+<tr id="i85" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#replaceTerms(com.atlan.AtlanClient,java.lang.String,java.lang.String,java.util.List)">replaceTerms</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+            java.lang.String&nbsp;qualifiedName,
+            java.lang.String&nbsp;name,
+            java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)</code></th>
+<td class="colLast">
+<div class="block">Replace the terms linked to the GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i86" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#replaceTerms(java.lang.String,java.lang.String,java.util.List)">replaceTerms</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
             java.lang.String&nbsp;name,
@@ -734,33 +937,70 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Replace the terms linked to the GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i65" class="rowColor">
+<tr id="i87" class="rowColor">
+<td class="colFirst"><code>static boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#restore(com.atlan.AtlanClient,java.lang.String)">restore</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+       java.lang.String&nbsp;qualifiedName)</code></th>
+<td class="colLast">
+<div class="block">Restore the archived (soft-deleted) GuacamoleTable to active.</div>
+</td>
+</tr>
+<tr id="i88" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#restore(java.lang.String)">restore</a></span>&#8203;(java.lang.String&nbsp;qualifiedName)</code></th>
 <td class="colLast">
 <div class="block">Restore the archived (soft-deleted) GuacamoleTable to active.</div>
 </td>
 </tr>
-<tr id="i66" class="altColor">
+<tr id="i89" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#retrieveByGuid(com.atlan.AtlanClient,java.lang.String)">retrieveByGuid</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+              java.lang.String&nbsp;guid)</code></th>
+<td class="colLast">
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(com.atlan.AtlanClient,java.lang.String)"><code>get(AtlanClient, String)</code></a> instead</div>
+</div>
+</td>
+</tr>
+<tr id="i90" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#retrieveByGuid(java.lang.String)">retrieveByGuid</a></span>&#8203;(java.lang.String&nbsp;guid)</code></th>
 <td class="colLast">
-<div class="block">Retrieves a GuacamoleTable by its GUID, complete with all of its relationships.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(java.lang.String)"><code>get(String)</code></a> instead</div>
+</div>
 </td>
 </tr>
-<tr id="i67" class="rowColor">
+<tr id="i91" class="rowColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#retrieveByQualifiedName(com.atlan.AtlanClient,java.lang.String)">retrieveByQualifiedName</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                       java.lang.String&nbsp;qualifiedName)</code></th>
+<td class="colLast">
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(com.atlan.AtlanClient,java.lang.String)"><code>get(AtlanClient, String)</code></a> instead</div>
+</div>
+</td>
+</tr>
+<tr id="i92" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#retrieveByQualifiedName(java.lang.String)">retrieveByQualifiedName</a></span>&#8203;(java.lang.String&nbsp;qualifiedName)</code></th>
 <td class="colLast">
-<div class="block">Retrieves a GuacamoleTable by its qualifiedName, complete with all of its relationships.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(java.lang.String)"><code>get(String)</code></a> instead</div>
+</div>
 </td>
 </tr>
-<tr id="i68" class="altColor">
+<tr id="i93" class="rowColor">
 <td class="colFirst"><code><a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toBuilder()">toBuilder</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i69" class="rowColor">
+<tr id="i94" class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i95" class="rowColor">
 <td class="colFirst"><code><a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#trimToRequired()">trimToRequired</a></span>()</code></th>
 <td class="colLast">
@@ -768,7 +1008,18 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
  more-complete GuacamoleTable object.</div>
 </td>
 </tr>
-<tr id="i70" class="altColor">
+<tr id="i96" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateAnnouncement(com.atlan.AtlanClient,java.lang.String,com.atlan.model.enums.AtlanAnnouncementType,java.lang.String,java.lang.String)">updateAnnouncement</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                  java.lang.String&nbsp;qualifiedName,
+                  com.atlan.model.enums.AtlanAnnouncementType&nbsp;type,
+                  java.lang.String&nbsp;title,
+                  java.lang.String&nbsp;message)</code></th>
+<td class="colLast">
+<div class="block">Update the announcement on a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i97" class="rowColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateAnnouncement(java.lang.String,com.atlan.model.enums.AtlanAnnouncementType,java.lang.String,java.lang.String)">updateAnnouncement</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                   com.atlan.model.enums.AtlanAnnouncementType&nbsp;type,
@@ -778,7 +1029,17 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Update the announcement on a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i71" class="rowColor">
+<tr id="i98" class="altColor">
+<td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCertificate(com.atlan.AtlanClient,java.lang.String,com.atlan.model.enums.CertificateStatus,java.lang.String)">updateCertificate</a></span>&#8203;(com.atlan.AtlanClient&nbsp;client,
+                 java.lang.String&nbsp;qualifiedName,
+                 com.atlan.model.enums.CertificateStatus&nbsp;certificate,
+                 java.lang.String&nbsp;message)</code></th>
+<td class="colLast">
+<div class="block">Update the certificate on a GuacamoleTable.</div>
+</td>
+</tr>
+<tr id="i99" class="rowColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateCertificate(java.lang.String,com.atlan.model.enums.CertificateStatus,java.lang.String)">updateCertificate</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
                  com.atlan.model.enums.CertificateStatus&nbsp;certificate,
@@ -787,7 +1048,7 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Update the certificate on a GuacamoleTable.</div>
 </td>
 </tr>
-<tr id="i72" class="altColor">
+<tr id="i100" class="altColor">
 <td class="colFirst"><code>static <a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updater(java.lang.String,java.lang.String)">updater</a></span>&#8203;(java.lang.String&nbsp;qualifiedName,
        java.lang.String&nbsp;name)</code></th>
@@ -801,21 +1062,21 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.atlan.model.assets.Asset</h3>
-<code>addAtlanTags, addAtlanTags, appendAtlanTags, appendAtlanTags, appendTerms, delete, delete, getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getAtlanTagNames, getAtlanTags, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getCreatedBy, getCreateTime, getCustomMetadataSets, getDbtQualifiedName, getDeleteHandler, getDescription, getDisplayName, getFiles, getHasLineage, getIsDiscoverable, getIsEditable, getIsIncomplete, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMeaningNames, getMeanings, getMetrics, getName, getNullFields, getOwnerGroups, getOwnerUsers, getPendingTasks, getPopularityScore, getQualifiedName, getReadme, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStatus, getSubType, getTenantId, getUpdatedBy, getUpdateTime, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, purge, purge, removeAnnouncement, removeAtlanTag, removeCertificate, removeCustomMetadata, removeCustomMetadata, removeDescription, removeOwners, removeTerms, removeUserDescription, replaceCustomMetadata, replaceCustomMetadata, replaceTerms, restore, retrieveFull, retrieveFull, retrieveFull, retrieveMinimal, retrieveMinimal, retrieveMinimal, retrieveMinimal, save, save, save, save, saveMergingCM, saveMergingCM, saveReplacingCM, saveReplacingCM, updateAnnouncement, updateAnnouncement, updateCertificate, updateCertificate, updateCustomMetadataAttributes, updateCustomMetadataAttributes, upsert, upsert, upsertMergingCM, upsertReplacingCM</code></li>
+<code>addAtlanTags, addAtlanTags, appendAtlanTags, appendAtlanTags, appendTerms, delete, delete, get, getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getAtlanTagNames, getAtlanTags, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getCreatedBy, getCreateTime, getCustomMetadata, getCustomMetadataSets, getDbtQualifiedName, getDeleteHandler, getDescription, getDisplayName, getFiles, getHasLineage, getIsDiscoverable, getIsEditable, getIsIncomplete, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMeaningNames, getMeanings, getMetrics, getName, getNullFields, getOwnerGroups, getOwnerUsers, getPendingTasks, getPopularityScore, getQualifiedName, getReadme, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStarredDetails, getStatus, getSubType, getTenantId, getUpdatedBy, getUpdateTime, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, purge, purge, removeAnnouncement, removeAtlanTag, removeCertificate, removeCustomMetadata, removeCustomMetadata, removeDescription, removeOwners, removeTerms, removeUserDescription, replaceCustomMetadata, replaceCustomMetadata, replaceTerms, restore, retrieveFull, retrieveFull, retrieveFull, retrieveMinimal, retrieveMinimal, retrieveMinimal, retrieveMinimal, save, save, save, save, saveMergingCM, saveMergingCM, saveReplacingCM, saveReplacingCM, updateAnnouncement, updateAnnouncement, updateCertificate, updateCertificate, updateCustomMetadataAttributes, updateCustomMetadataAttributes, upsert, upsert, upsertMergingCM, upsertReplacingCM</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.model.relations.Reference">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.atlan.model.relations.Reference</h3>
-<code>by, compareTo, getCompleteObject, getDisplayText, getEntityStatus, getGuid, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getUniqueAttributes, isComplete, isValidReference, isValidReferenceByGuid, isValidReferenceByQualifiedName, setCompleteObject, to</code></li>
+<code>builder, by, compareTo, getCompleteObject, getDisplayText, getEntityStatus, getGuid, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getUniqueAttributes, isComplete, isValidReference, isValidReferenceByGuid, isValidReferenceByQualifiedName, setCompleteObject, to</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.model.core.AtlanObject">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;com.atlan.model.core.AtlanObject</h3>
-<code>toJson, toString</code></li>
+<code>toJson</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -829,21 +1090,21 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.atlan.model.assets.IAsset</h3>
-<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
+<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStarredDetails, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.model.assets.ICatalog">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.atlan.model.assets.ICatalog</h3>
-<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
+<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStarredDetails, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.probable.guacamole.model.assets.IGuacamoleTable">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.probable.guacamole.model.assets.<a href="IGuacamoleTable.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleTable</a></h3>
-<code><a href="IGuacamoleTable.html#getAdminGroups()">getAdminGroups</a>, <a href="IGuacamoleTable.html#getAdminRoles()">getAdminRoles</a>, <a href="IGuacamoleTable.html#getAdminUsers()">getAdminUsers</a>, <a href="IGuacamoleTable.html#getAnnouncementMessage()">getAnnouncementMessage</a>, <a href="IGuacamoleTable.html#getAnnouncementTitle()">getAnnouncementTitle</a>, <a href="IGuacamoleTable.html#getAnnouncementType()">getAnnouncementType</a>, <a href="IGuacamoleTable.html#getAnnouncementUpdatedAt()">getAnnouncementUpdatedAt</a>, <a href="IGuacamoleTable.html#getAnnouncementUpdatedBy()">getAnnouncementUpdatedBy</a>, <a href="IGuacamoleTable.html#getAssetDbtAccountName()">getAssetDbtAccountName</a>, <a href="IGuacamoleTable.html#getAssetDbtAlias()">getAssetDbtAlias</a>, <a href="IGuacamoleTable.html#getAssetDbtEnvironmentDbtVersion()">getAssetDbtEnvironmentDbtVersion</a>, <a href="IGuacamoleTable.html#getAssetDbtEnvironmentName()">getAssetDbtEnvironmentName</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRun()">getAssetDbtJobLastRun</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunArtifactS3Path()">getAssetDbtJobLastRunArtifactS3Path</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunArtifactsSaved()">getAssetDbtJobLastRunArtifactsSaved</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunCreatedAt()">getAssetDbtJobLastRunCreatedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunDequedAt()">getAssetDbtJobLastRunDequedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunExecutedByThreadId()">getAssetDbtJobLastRunExecutedByThreadId</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunGitBranch()">getAssetDbtJobLastRunGitBranch</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunGitSha()">getAssetDbtJobLastRunGitSha</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunHasDocsGenerated()">getAssetDbtJobLastRunHasDocsGenerated</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunHasSourcesGenerated()">getAssetDbtJobLastRunHasSourcesGenerated</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunNotificationsSent()">getAssetDbtJobLastRunNotificationsSent</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunOwnerThreadId()">getAssetDbtJobLastRunOwnerThreadId</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunQueuedDuration()">getAssetDbtJobLastRunQueuedDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunQueuedDurationHumanized()">getAssetDbtJobLastRunQueuedDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunRunDuration()">getAssetDbtJobLastRunRunDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunRunDurationHumanized()">getAssetDbtJobLastRunRunDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunStartedAt()">getAssetDbtJobLastRunStartedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunStatusMessage()">getAssetDbtJobLastRunStatusMessage</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunTotalDuration()">getAssetDbtJobLastRunTotalDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunTotalDurationHumanized()">getAssetDbtJobLastRunTotalDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunUpdatedAt()">getAssetDbtJobLastRunUpdatedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunUrl()">getAssetDbtJobLastRunUrl</a>, <a href="IGuacamoleTable.html#getAssetDbtJobName()">getAssetDbtJobName</a>, <a href="IGuacamoleTable.html#getAssetDbtJobNextRun()">getAssetDbtJobNextRun</a>, <a href="IGuacamoleTable.html#getAssetDbtJobNextRunHumanized()">getAssetDbtJobNextRunHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobSchedule()">getAssetDbtJobSchedule</a>, <a href="IGuacamoleTable.html#getAssetDbtJobScheduleCronHumanized()">getAssetDbtJobScheduleCronHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobStatus()">getAssetDbtJobStatus</a>, <a href="IGuacamoleTable.html#getAssetDbtMeta()">getAssetDbtMeta</a>, <a href="IGuacamoleTable.html#getAssetDbtPackageName()">getAssetDbtPackageName</a>, <a href="IGuacamoleTable.html#getAssetDbtProjectName()">getAssetDbtProjectName</a>, <a href="IGuacamoleTable.html#getAssetDbtSemanticLayerProxyUrl()">getAssetDbtSemanticLayerProxyUrl</a>, <a href="IGuacamoleTable.html#getAssetDbtSourceFreshnessCriteria()">getAssetDbtSourceFreshnessCriteria</a>, <a href="IGuacamoleTable.html#getAssetDbtTags()">getAssetDbtTags</a>, <a href="IGuacamoleTable.html#getAssetDbtUniqueId()">getAssetDbtUniqueId</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentNames()">getAssetMcIncidentNames</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentQualifiedNames()">getAssetMcIncidentQualifiedNames</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentSeverities()">getAssetMcIncidentSeverities</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentStates()">getAssetMcIncidentStates</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentSubTypes()">getAssetMcIncidentSubTypes</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentTypes()">getAssetMcIncidentTypes</a>, <a href="IGuacamoleTable.html#getAssetMcLastSyncRunAt()">getAssetMcLastSyncRunAt</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorNames()">getAssetMcMonitorNames</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorQualifiedNames()">getAssetMcMonitorQualifiedNames</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorScheduleTypes()">getAssetMcMonitorScheduleTypes</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorStatuses()">getAssetMcMonitorStatuses</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorTypes()">getAssetMcMonitorTypes</a>, <a href="IGuacamoleTable.html#getAssetTags()">getAssetTags</a>, <a href="IGuacamoleTable.html#getAssignedTerms()">getAssignedTerms</a>, <a href="IGuacamoleTable.html#getCertificateStatus()">getCertificateStatus</a>, <a href="IGuacamoleTable.html#getCertificateStatusMessage()">getCertificateStatusMessage</a>, <a href="IGuacamoleTable.html#getCertificateUpdatedAt()">getCertificateUpdatedAt</a>, <a href="IGuacamoleTable.html#getCertificateUpdatedBy()">getCertificateUpdatedBy</a>, <a href="IGuacamoleTable.html#getConnectionName()">getConnectionName</a>, <a href="IGuacamoleTable.html#getConnectionQualifiedName()">getConnectionQualifiedName</a>, <a href="IGuacamoleTable.html#getConnectorType()">getConnectorType</a>, <a href="IGuacamoleTable.html#getDbtQualifiedName()">getDbtQualifiedName</a>, <a href="IGuacamoleTable.html#getDescription()">getDescription</a>, <a href="IGuacamoleTable.html#getDisplayName()">getDisplayName</a>, <a href="IGuacamoleTable.html#getDisplayText()">getDisplayText</a>, <a href="IGuacamoleTable.html#getEntityStatus()">getEntityStatus</a>, <a href="IGuacamoleTable.html#getFiles()">getFiles</a>, <a href="IGuacamoleTable.html#getGuid()">getGuid</a>, <a href="IGuacamoleTable.html#getHasLineage()">getHasLineage</a>, <a href="IGuacamoleTable.html#getIsDiscoverable()">getIsDiscoverable</a>, <a href="IGuacamoleTable.html#getIsEditable()">getIsEditable</a>, <a href="IGuacamoleTable.html#getLastRowChangedAt()">getLastRowChangedAt</a>, <a href="IGuacamoleTable.html#getLastSyncRun()">getLastSyncRun</a>, <a href="IGuacamoleTable.html#getLastSyncRunAt()">getLastSyncRunAt</a>, <a href="IGuacamoleTable.html#getLastSyncWorkflowName()">getLastSyncWorkflowName</a>, <a href="IGuacamoleTable.html#getLinks()">getLinks</a>, <a href="IGuacamoleTable.html#getMcIncidents()">getMcIncidents</a>, <a href="IGuacamoleTable.html#getMcMonitors()">getMcMonitors</a>, <a href="IGuacamoleTable.html#getMetrics()">getMetrics</a>, <a href="IGuacamoleTable.html#getName()">getName</a>, <a href="IGuacamoleTable.html#getOwnerGroups()">getOwnerGroups</a>, <a href="IGuacamoleTable.html#getOwnerUsers()">getOwnerUsers</a>, <a href="IGuacamoleTable.html#getPopularityScore()">getPopularityScore</a>, <a href="IGuacamoleTable.html#getQualifiedName()">getQualifiedName</a>, <a href="IGuacamoleTable.html#getReadme()">getReadme</a>, <a href="IGuacamoleTable.html#getRelationshipAttributes()">getRelationshipAttributes</a>, <a href="IGuacamoleTable.html#getRelationshipGuid()">getRelationshipGuid</a>, <a href="IGuacamoleTable.html#getRelationshipStatus()">getRelationshipStatus</a>, <a href="IGuacamoleTable.html#getRelationshipType()">getRelationshipType</a>, <a href="IGuacamoleTable.html#getSampleDataUrl()">getSampleDataUrl</a>, <a href="IGuacamoleTable.html#getSourceCostUnit()">getSourceCostUnit</a>, <a href="IGuacamoleTable.html#getSourceCreatedAt()">getSourceCreatedAt</a>, <a href="IGuacamoleTable.html#getSourceCreatedBy()">getSourceCreatedBy</a>, <a href="IGuacamoleTable.html#getSourceEmbedURL()">getSourceEmbedURL</a>, <a href="IGuacamoleTable.html#getSourceLastReadAt()">getSourceLastReadAt</a>, <a href="IGuacamoleTable.html#getSourceOwners()">getSourceOwners</a>, <a href="IGuacamoleTable.html#getSourceQueryComputeCostRecords()">getSourceQueryComputeCostRecords</a>, <a href="IGuacamoleTable.html#getSourceQueryComputeCosts()">getSourceQueryComputeCosts</a>, <a href="IGuacamoleTable.html#getSourceReadCount()">getSourceReadCount</a>, <a href="IGuacamoleTable.html#getSourceReadExpensiveQueryRecords()">getSourceReadExpensiveQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadPopularQueryRecords()">getSourceReadPopularQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadQueryCost()">getSourceReadQueryCost</a>, <a href="IGuacamoleTable.html#getSourceReadRecentUserRecords()">getSourceReadRecentUserRecords</a>, <a href="IGuacamoleTable.html#getSourceReadRecentUsers()">getSourceReadRecentUsers</a>, <a href="IGuacamoleTable.html#getSourceReadSlowQueryRecords()">getSourceReadSlowQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadTopUserRecords()">getSourceReadTopUserRecords</a>, <a href="IGuacamoleTable.html#getSourceReadTopUsers()">getSourceReadTopUsers</a>, <a href="IGuacamoleTable.html#getSourceReadUserCount()">getSourceReadUserCount</a>, <a href="IGuacamoleTable.html#getSourceTotalCost()">getSourceTotalCost</a>, <a href="IGuacamoleTable.html#getSourceUpdatedAt()">getSourceUpdatedAt</a>, <a href="IGuacamoleTable.html#getSourceUpdatedBy()">getSourceUpdatedBy</a>, <a href="IGuacamoleTable.html#getSourceURL()">getSourceURL</a>, <a href="IGuacamoleTable.html#getStarredBy()">getStarredBy</a>, <a href="IGuacamoleTable.html#getSubType()">getSubType</a>, <a href="IGuacamoleTable.html#getTenantId()">getTenantId</a>, <a href="IGuacamoleTable.html#getUniqueAttributes()">getUniqueAttributes</a>, <a href="IGuacamoleTable.html#getUserDescription()">getUserDescription</a>, <a href="IGuacamoleTable.html#getViewerGroups()">getViewerGroups</a>, <a href="IGuacamoleTable.html#getViewerUsers()">getViewerUsers</a>, <a href="IGuacamoleTable.html#getViewScore()">getViewScore</a>, <a href="IGuacamoleTable.html#isComplete()">isComplete</a>, <a href="IGuacamoleTable.html#isValidReferenceByGuid()">isValidReferenceByGuid</a>, <a href="IGuacamoleTable.html#isValidReferenceByQualifiedName()">isValidReferenceByQualifiedName</a></code></li>
+<code><a href="IGuacamoleTable.html#getAdminGroups()">getAdminGroups</a>, <a href="IGuacamoleTable.html#getAdminRoles()">getAdminRoles</a>, <a href="IGuacamoleTable.html#getAdminUsers()">getAdminUsers</a>, <a href="IGuacamoleTable.html#getAnnouncementMessage()">getAnnouncementMessage</a>, <a href="IGuacamoleTable.html#getAnnouncementTitle()">getAnnouncementTitle</a>, <a href="IGuacamoleTable.html#getAnnouncementType()">getAnnouncementType</a>, <a href="IGuacamoleTable.html#getAnnouncementUpdatedAt()">getAnnouncementUpdatedAt</a>, <a href="IGuacamoleTable.html#getAnnouncementUpdatedBy()">getAnnouncementUpdatedBy</a>, <a href="IGuacamoleTable.html#getAssetDbtAccountName()">getAssetDbtAccountName</a>, <a href="IGuacamoleTable.html#getAssetDbtAlias()">getAssetDbtAlias</a>, <a href="IGuacamoleTable.html#getAssetDbtEnvironmentDbtVersion()">getAssetDbtEnvironmentDbtVersion</a>, <a href="IGuacamoleTable.html#getAssetDbtEnvironmentName()">getAssetDbtEnvironmentName</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRun()">getAssetDbtJobLastRun</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunArtifactS3Path()">getAssetDbtJobLastRunArtifactS3Path</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunArtifactsSaved()">getAssetDbtJobLastRunArtifactsSaved</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunCreatedAt()">getAssetDbtJobLastRunCreatedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunDequedAt()">getAssetDbtJobLastRunDequedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunExecutedByThreadId()">getAssetDbtJobLastRunExecutedByThreadId</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunGitBranch()">getAssetDbtJobLastRunGitBranch</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunGitSha()">getAssetDbtJobLastRunGitSha</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunHasDocsGenerated()">getAssetDbtJobLastRunHasDocsGenerated</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunHasSourcesGenerated()">getAssetDbtJobLastRunHasSourcesGenerated</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunNotificationsSent()">getAssetDbtJobLastRunNotificationsSent</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunOwnerThreadId()">getAssetDbtJobLastRunOwnerThreadId</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunQueuedDuration()">getAssetDbtJobLastRunQueuedDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunQueuedDurationHumanized()">getAssetDbtJobLastRunQueuedDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunRunDuration()">getAssetDbtJobLastRunRunDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunRunDurationHumanized()">getAssetDbtJobLastRunRunDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunStartedAt()">getAssetDbtJobLastRunStartedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunStatusMessage()">getAssetDbtJobLastRunStatusMessage</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunTotalDuration()">getAssetDbtJobLastRunTotalDuration</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunTotalDurationHumanized()">getAssetDbtJobLastRunTotalDurationHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunUpdatedAt()">getAssetDbtJobLastRunUpdatedAt</a>, <a href="IGuacamoleTable.html#getAssetDbtJobLastRunUrl()">getAssetDbtJobLastRunUrl</a>, <a href="IGuacamoleTable.html#getAssetDbtJobName()">getAssetDbtJobName</a>, <a href="IGuacamoleTable.html#getAssetDbtJobNextRun()">getAssetDbtJobNextRun</a>, <a href="IGuacamoleTable.html#getAssetDbtJobNextRunHumanized()">getAssetDbtJobNextRunHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobSchedule()">getAssetDbtJobSchedule</a>, <a href="IGuacamoleTable.html#getAssetDbtJobScheduleCronHumanized()">getAssetDbtJobScheduleCronHumanized</a>, <a href="IGuacamoleTable.html#getAssetDbtJobStatus()">getAssetDbtJobStatus</a>, <a href="IGuacamoleTable.html#getAssetDbtMeta()">getAssetDbtMeta</a>, <a href="IGuacamoleTable.html#getAssetDbtPackageName()">getAssetDbtPackageName</a>, <a href="IGuacamoleTable.html#getAssetDbtProjectName()">getAssetDbtProjectName</a>, <a href="IGuacamoleTable.html#getAssetDbtSemanticLayerProxyUrl()">getAssetDbtSemanticLayerProxyUrl</a>, <a href="IGuacamoleTable.html#getAssetDbtSourceFreshnessCriteria()">getAssetDbtSourceFreshnessCriteria</a>, <a href="IGuacamoleTable.html#getAssetDbtTags()">getAssetDbtTags</a>, <a href="IGuacamoleTable.html#getAssetDbtTestStatus()">getAssetDbtTestStatus</a>, <a href="IGuacamoleTable.html#getAssetDbtUniqueId()">getAssetDbtUniqueId</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentNames()">getAssetMcIncidentNames</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentQualifiedNames()">getAssetMcIncidentQualifiedNames</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentSeverities()">getAssetMcIncidentSeverities</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentStates()">getAssetMcIncidentStates</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentSubTypes()">getAssetMcIncidentSubTypes</a>, <a href="IGuacamoleTable.html#getAssetMcIncidentTypes()">getAssetMcIncidentTypes</a>, <a href="IGuacamoleTable.html#getAssetMcLastSyncRunAt()">getAssetMcLastSyncRunAt</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorNames()">getAssetMcMonitorNames</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorQualifiedNames()">getAssetMcMonitorQualifiedNames</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorScheduleTypes()">getAssetMcMonitorScheduleTypes</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorStatuses()">getAssetMcMonitorStatuses</a>, <a href="IGuacamoleTable.html#getAssetMcMonitorTypes()">getAssetMcMonitorTypes</a>, <a href="IGuacamoleTable.html#getAssetTags()">getAssetTags</a>, <a href="IGuacamoleTable.html#getAssignedTerms()">getAssignedTerms</a>, <a href="IGuacamoleTable.html#getCertificateStatus()">getCertificateStatus</a>, <a href="IGuacamoleTable.html#getCertificateStatusMessage()">getCertificateStatusMessage</a>, <a href="IGuacamoleTable.html#getCertificateUpdatedAt()">getCertificateUpdatedAt</a>, <a href="IGuacamoleTable.html#getCertificateUpdatedBy()">getCertificateUpdatedBy</a>, <a href="IGuacamoleTable.html#getConnectionName()">getConnectionName</a>, <a href="IGuacamoleTable.html#getConnectionQualifiedName()">getConnectionQualifiedName</a>, <a href="IGuacamoleTable.html#getConnectorType()">getConnectorType</a>, <a href="IGuacamoleTable.html#getDbtQualifiedName()">getDbtQualifiedName</a>, <a href="IGuacamoleTable.html#getDescription()">getDescription</a>, <a href="IGuacamoleTable.html#getDisplayName()">getDisplayName</a>, <a href="IGuacamoleTable.html#getDisplayText()">getDisplayText</a>, <a href="IGuacamoleTable.html#getEntityStatus()">getEntityStatus</a>, <a href="IGuacamoleTable.html#getFiles()">getFiles</a>, <a href="IGuacamoleTable.html#getGuid()">getGuid</a>, <a href="IGuacamoleTable.html#getHasLineage()">getHasLineage</a>, <a href="IGuacamoleTable.html#getIsDiscoverable()">getIsDiscoverable</a>, <a href="IGuacamoleTable.html#getIsEditable()">getIsEditable</a>, <a href="IGuacamoleTable.html#getLastRowChangedAt()">getLastRowChangedAt</a>, <a href="IGuacamoleTable.html#getLastSyncRun()">getLastSyncRun</a>, <a href="IGuacamoleTable.html#getLastSyncRunAt()">getLastSyncRunAt</a>, <a href="IGuacamoleTable.html#getLastSyncWorkflowName()">getLastSyncWorkflowName</a>, <a href="IGuacamoleTable.html#getLinks()">getLinks</a>, <a href="IGuacamoleTable.html#getMcIncidents()">getMcIncidents</a>, <a href="IGuacamoleTable.html#getMcMonitors()">getMcMonitors</a>, <a href="IGuacamoleTable.html#getMetrics()">getMetrics</a>, <a href="IGuacamoleTable.html#getName()">getName</a>, <a href="IGuacamoleTable.html#getOwnerGroups()">getOwnerGroups</a>, <a href="IGuacamoleTable.html#getOwnerUsers()">getOwnerUsers</a>, <a href="IGuacamoleTable.html#getPopularityScore()">getPopularityScore</a>, <a href="IGuacamoleTable.html#getQualifiedName()">getQualifiedName</a>, <a href="IGuacamoleTable.html#getReadme()">getReadme</a>, <a href="IGuacamoleTable.html#getRelationshipAttributes()">getRelationshipAttributes</a>, <a href="IGuacamoleTable.html#getRelationshipGuid()">getRelationshipGuid</a>, <a href="IGuacamoleTable.html#getRelationshipStatus()">getRelationshipStatus</a>, <a href="IGuacamoleTable.html#getRelationshipType()">getRelationshipType</a>, <a href="IGuacamoleTable.html#getSampleDataUrl()">getSampleDataUrl</a>, <a href="IGuacamoleTable.html#getSourceCostUnit()">getSourceCostUnit</a>, <a href="IGuacamoleTable.html#getSourceCreatedAt()">getSourceCreatedAt</a>, <a href="IGuacamoleTable.html#getSourceCreatedBy()">getSourceCreatedBy</a>, <a href="IGuacamoleTable.html#getSourceEmbedURL()">getSourceEmbedURL</a>, <a href="IGuacamoleTable.html#getSourceLastReadAt()">getSourceLastReadAt</a>, <a href="IGuacamoleTable.html#getSourceOwners()">getSourceOwners</a>, <a href="IGuacamoleTable.html#getSourceQueryComputeCostRecords()">getSourceQueryComputeCostRecords</a>, <a href="IGuacamoleTable.html#getSourceQueryComputeCosts()">getSourceQueryComputeCosts</a>, <a href="IGuacamoleTable.html#getSourceReadCount()">getSourceReadCount</a>, <a href="IGuacamoleTable.html#getSourceReadExpensiveQueryRecords()">getSourceReadExpensiveQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadPopularQueryRecords()">getSourceReadPopularQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadQueryCost()">getSourceReadQueryCost</a>, <a href="IGuacamoleTable.html#getSourceReadRecentUserRecords()">getSourceReadRecentUserRecords</a>, <a href="IGuacamoleTable.html#getSourceReadRecentUsers()">getSourceReadRecentUsers</a>, <a href="IGuacamoleTable.html#getSourceReadSlowQueryRecords()">getSourceReadSlowQueryRecords</a>, <a href="IGuacamoleTable.html#getSourceReadTopUserRecords()">getSourceReadTopUserRecords</a>, <a href="IGuacamoleTable.html#getSourceReadTopUsers()">getSourceReadTopUsers</a>, <a href="IGuacamoleTable.html#getSourceReadUserCount()">getSourceReadUserCount</a>, <a href="IGuacamoleTable.html#getSourceTotalCost()">getSourceTotalCost</a>, <a href="IGuacamoleTable.html#getSourceUpdatedAt()">getSourceUpdatedAt</a>, <a href="IGuacamoleTable.html#getSourceUpdatedBy()">getSourceUpdatedBy</a>, <a href="IGuacamoleTable.html#getSourceURL()">getSourceURL</a>, <a href="IGuacamoleTable.html#getStarredBy()">getStarredBy</a>, <a href="IGuacamoleTable.html#getStarredDetails()">getStarredDetails</a>, <a href="IGuacamoleTable.html#getSubType()">getSubType</a>, <a href="IGuacamoleTable.html#getTenantId()">getTenantId</a>, <a href="IGuacamoleTable.html#getUniqueAttributes()">getUniqueAttributes</a>, <a href="IGuacamoleTable.html#getUserDescription()">getUserDescription</a>, <a href="IGuacamoleTable.html#getViewerGroups()">getViewerGroups</a>, <a href="IGuacamoleTable.html#getViewerUsers()">getViewerUsers</a>, <a href="IGuacamoleTable.html#getViewScore()">getViewScore</a>, <a href="IGuacamoleTable.html#isComplete()">isComplete</a>, <a href="IGuacamoleTable.html#isValidReferenceByGuid()">isValidReferenceByGuid</a>, <a href="IGuacamoleTable.html#isValidReferenceByQualifiedName()">isValidReferenceByQualifiedName</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.model.assets.IReferenceable">
@@ -857,14 +1118,14 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.atlan.model.assets.ISQL</h3>
-<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
+<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStarredDetails, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.com.atlan.model.assets.ITable">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;com.atlan.model.assets.ITable</h3>
-<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
+<code>getAdminGroups, getAdminRoles, getAdminUsers, getAnnouncementMessage, getAnnouncementTitle, getAnnouncementType, getAnnouncementUpdatedAt, getAnnouncementUpdatedBy, getAssetDbtAccountName, getAssetDbtAlias, getAssetDbtEnvironmentDbtVersion, getAssetDbtEnvironmentName, getAssetDbtJobLastRun, getAssetDbtJobLastRunArtifactS3Path, getAssetDbtJobLastRunArtifactsSaved, getAssetDbtJobLastRunCreatedAt, getAssetDbtJobLastRunDequedAt, getAssetDbtJobLastRunExecutedByThreadId, getAssetDbtJobLastRunGitBranch, getAssetDbtJobLastRunGitSha, getAssetDbtJobLastRunHasDocsGenerated, getAssetDbtJobLastRunHasSourcesGenerated, getAssetDbtJobLastRunNotificationsSent, getAssetDbtJobLastRunOwnerThreadId, getAssetDbtJobLastRunQueuedDuration, getAssetDbtJobLastRunQueuedDurationHumanized, getAssetDbtJobLastRunRunDuration, getAssetDbtJobLastRunRunDurationHumanized, getAssetDbtJobLastRunStartedAt, getAssetDbtJobLastRunStatusMessage, getAssetDbtJobLastRunTotalDuration, getAssetDbtJobLastRunTotalDurationHumanized, getAssetDbtJobLastRunUpdatedAt, getAssetDbtJobLastRunUrl, getAssetDbtJobName, getAssetDbtJobNextRun, getAssetDbtJobNextRunHumanized, getAssetDbtJobSchedule, getAssetDbtJobScheduleCronHumanized, getAssetDbtJobStatus, getAssetDbtMeta, getAssetDbtPackageName, getAssetDbtProjectName, getAssetDbtSemanticLayerProxyUrl, getAssetDbtSourceFreshnessCriteria, getAssetDbtTags, getAssetDbtTestStatus, getAssetDbtUniqueId, getAssetMcIncidentNames, getAssetMcIncidentQualifiedNames, getAssetMcIncidentSeverities, getAssetMcIncidentStates, getAssetMcIncidentSubTypes, getAssetMcIncidentTypes, getAssetMcLastSyncRunAt, getAssetMcMonitorNames, getAssetMcMonitorQualifiedNames, getAssetMcMonitorScheduleTypes, getAssetMcMonitorStatuses, getAssetMcMonitorTypes, getAssetTags, getAssignedTerms, getCertificateStatus, getCertificateStatusMessage, getCertificateUpdatedAt, getCertificateUpdatedBy, getConnectionName, getConnectionQualifiedName, getConnectorType, getDbtQualifiedName, getDescription, getDisplayName, getDisplayText, getEntityStatus, getFiles, getGuid, getHasLineage, getIsDiscoverable, getIsEditable, getLastRowChangedAt, getLastSyncRun, getLastSyncRunAt, getLastSyncWorkflowName, getLinks, getMcIncidents, getMcMonitors, getMetrics, getName, getOwnerGroups, getOwnerUsers, getPopularityScore, getQualifiedName, getReadme, getRelationshipAttributes, getRelationshipGuid, getRelationshipStatus, getRelationshipType, getSampleDataUrl, getSourceCostUnit, getSourceCreatedAt, getSourceCreatedBy, getSourceEmbedURL, getSourceLastReadAt, getSourceOwners, getSourceQueryComputeCostRecords, getSourceQueryComputeCosts, getSourceReadCount, getSourceReadExpensiveQueryRecords, getSourceReadPopularQueryRecords, getSourceReadQueryCost, getSourceReadRecentUserRecords, getSourceReadRecentUsers, getSourceReadSlowQueryRecords, getSourceReadTopUserRecords, getSourceReadTopUsers, getSourceReadUserCount, getSourceTotalCost, getSourceUpdatedAt, getSourceUpdatedBy, getSourceURL, getStarredBy, getStarredDetails, getSubType, getTenantId, getUniqueAttributes, getUserDescription, getViewerGroups, getViewerUsers, getViewScore, isComplete, isValidReferenceByGuid, isValidReferenceByQualifiedName</code></li>
 </ul>
 </li>
 </ul>
@@ -924,6 +1185,82 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a id="all()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>all</h4>
+<pre class="methodSignature">public static&nbsp;com.atlan.model.core.AssetFilter.AssetFilterBuilder&nbsp;all()</pre>
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.
+ Additional conditions can be chained onto the returned filter before any
+ asset retrieval is attempted, ensuring all conditions are pushed-down for
+ optimal retrieval. Only active (non-archived) GuacamoleTable assets will be included.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an asset filter that includes all GuacamoleTable assets</dd>
+</dl>
+</li>
+</ul>
+<a id="all(com.atlan.AtlanClient)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>all</h4>
+<pre class="methodSignature">public static&nbsp;com.atlan.model.core.AssetFilter.AssetFilterBuilder&nbsp;all&#8203;(com.atlan.AtlanClient&nbsp;client)</pre>
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.
+ Additional conditions can be chained onto the returned filter before any
+ asset retrieval is attempted, ensuring all conditions are pushed-down for
+ optimal retrieval. Only active (non-archived) GuacamoleTable assets will be included.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the assets</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an asset filter that includes all GuacamoleTable assets</dd>
+</dl>
+</li>
+</ul>
+<a id="all(boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>all</h4>
+<pre class="methodSignature">public static&nbsp;com.atlan.model.core.AssetFilter.AssetFilterBuilder&nbsp;all&#8203;(boolean&nbsp;includeArchived)</pre>
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.
+ Additional conditions can be chained onto the returned filter before any
+ asset retrieval is attempted, ensuring all conditions are pushed-down for
+ optimal retrieval.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>includeArchived</code> - when true, archived (soft-deleted) GuacamoleTables will be included</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an asset filter that includes all GuacamoleTable assets</dd>
+</dl>
+</li>
+</ul>
+<a id="all(com.atlan.AtlanClient,boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>all</h4>
+<pre class="methodSignature">public static&nbsp;com.atlan.model.core.AssetFilter.AssetFilterBuilder&nbsp;all&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                                      boolean&nbsp;includeArchived)</pre>
+<div class="block">Start an asset filter that will return all GuacamoleTable assets.
+ Additional conditions can be chained onto the returned filter before any
+ asset retrieval is attempted, ensuring all conditions are pushed-down for
+ optimal retrieval.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the assets</dd>
+<dd><code>includeArchived</code> - when true, archived (soft-deleted) GuacamoleTables will be included</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an asset filter that includes all GuacamoleTable assets</dd>
+</dl>
+</li>
+</ul>
 <a id="refByGuid(java.lang.String)">
 <!--   -->
 </a>
@@ -956,17 +1293,109 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="get(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;get&#8203;(java.lang.String&nbsp;id)
+                          throws com.atlan.exception.AtlanException</pre>
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>id</code> - of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any error during the API invocation, such as the <code>NotFoundException</code> if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
+<a id="get(com.atlan.AtlanClient,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;get&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                 java.lang.String&nbsp;id)
+                          throws com.atlan.exception.AtlanException</pre>
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, complete with all of its relationships.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the asset</dd>
+<dd><code>id</code> - of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any error during the API invocation, such as the <code>NotFoundException</code> if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
+<a id="get(com.atlan.AtlanClient,java.lang.String,boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;get&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                 java.lang.String&nbsp;id,
+                                 boolean&nbsp;includeRelationships)
+                          throws com.atlan.exception.AtlanException</pre>
+<div class="block">Retrieves a GuacamoleTable by one of its identifiers, optionally complete with all of its relationships.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the asset</dd>
+<dd><code>id</code> - of the GuacamoleTable to retrieve, either its GUID or its full qualifiedName</dd>
+<dd><code>includeRelationships</code> - if true, all of the asset's relationships will also be retrieved; if false, no relationships will be retrieved</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the requested full GuacamoleTable, optionally complete with all of its relationships</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any error during the API invocation, such as the <code>NotFoundException</code> if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
 <a id="retrieveByGuid(java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>retrieveByGuid</h4>
-<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByGuid&#8203;(java.lang.String&nbsp;guid)
+<pre class="methodSignature">@Deprecated
+public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByGuid&#8203;(java.lang.String&nbsp;guid)
                                      throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(java.lang.String)"><code>get(String)</code></a> instead</div>
+</div>
 <div class="block">Retrieves a GuacamoleTable by its GUID, complete with all of its relationships.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>guid</code> - of the GuacamoleTable to retrieve</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any error during the API invocation, such as the <code>NotFoundException</code> if the GuacamoleTable does not exist or the provided GUID is not a GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
+<a id="retrieveByGuid(com.atlan.AtlanClient,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>retrieveByGuid</h4>
+<pre class="methodSignature">@Deprecated
+public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByGuid&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                            java.lang.String&nbsp;guid)
+                                     throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(com.atlan.AtlanClient,java.lang.String)"><code>get(AtlanClient, String)</code></a> instead</div>
+</div>
+<div class="block">Retrieves a GuacamoleTable by its GUID, complete with all of its relationships.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the asset</dd>
 <dd><code>guid</code> - of the GuacamoleTable to retrieve</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
@@ -981,11 +1410,40 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <ul class="blockList">
 <li class="blockList">
 <h4>retrieveByQualifiedName</h4>
-<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByQualifiedName&#8203;(java.lang.String&nbsp;qualifiedName)
+<pre class="methodSignature">@Deprecated
+public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByQualifiedName&#8203;(java.lang.String&nbsp;qualifiedName)
                                               throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(java.lang.String)"><code>get(String)</code></a> instead</div>
+</div>
 <div class="block">Retrieves a GuacamoleTable by its qualifiedName, complete with all of its relationships.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable to retrieve</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any error during the API invocation, such as the <code>NotFoundException</code> if the GuacamoleTable does not exist</dd>
+</dl>
+</li>
+</ul>
+<a id="retrieveByQualifiedName(com.atlan.AtlanClient,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>retrieveByQualifiedName</h4>
+<pre class="methodSignature">@Deprecated
+public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;retrieveByQualifiedName&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                     java.lang.String&nbsp;qualifiedName)
+                                              throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#get(com.atlan.AtlanClient,java.lang.String)"><code>get(AtlanClient, String)</code></a> instead</div>
+</div>
+<div class="block">Retrieves a GuacamoleTable by its qualifiedName, complete with all of its relationships.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to retrieve the asset</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable to retrieve</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the requested full GuacamoleTable, complete with all of its relationships</dd>
@@ -1013,6 +1471,45 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="restore(com.atlan.AtlanClient,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>restore</h4>
+<pre class="methodSignature">public static&nbsp;boolean&nbsp;restore&#8203;(com.atlan.AtlanClient&nbsp;client,
+                              java.lang.String&nbsp;qualifiedName)
+                       throws com.atlan.exception.AtlanException</pre>
+<div class="block">Restore the archived (soft-deleted) GuacamoleTable to active.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to restore the asset</dd>
+<dd><code>qualifiedName</code> - for the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the GuacamoleTable is now active, and false otherwise</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="creator(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>creator</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;&nbsp;creator&#8203;(java.lang.String&nbsp;name,
+                                                                      java.lang.String&nbsp;schemaQualifiedName)</pre>
+<div class="block">Builds the minimal object necessary to create a Guacamole table.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - of the Guacamole table</dd>
+<dd><code>schemaQualifiedName</code> - unique name of the schema in which this Guacamole table exists</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the minimal request necessary to create the Guacamole table, as a builder</dd>
+</dl>
+</li>
+</ul>
 <a id="updater(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1028,6 +1525,24 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <dd><code>name</code> - of the GuacamoleTable</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the minimal request necessary to update the GuacamoleTable, as a builder</dd>
+</dl>
+</li>
+</ul>
+<a id="generateQualifiedName(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>generateQualifiedName</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;generateQualifiedName&#8203;(java.lang.String&nbsp;name,
+                                                     java.lang.String&nbsp;schemaQualifiedName)</pre>
+<div class="block">Generate a unique Guacamole table name.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - of the Guacamole table</dd>
+<dd><code>schemaQualifiedName</code> - unique name of the schema in which this Guacamole table exists</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a unique name for the Guacamole table</dd>
 </dl>
 </li>
 </ul>
@@ -1072,6 +1587,29 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="removeDescription(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeDescription</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeDescription&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                               java.lang.String&nbsp;qualifiedName,
+                                               java.lang.String&nbsp;name)
+                                        throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove the system description from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to remove the asset's description</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>name</code> - of the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the removal failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="removeUserDescription(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1093,6 +1631,29 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="removeUserDescription(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeUserDescription</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeUserDescription&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                   java.lang.String&nbsp;qualifiedName,
+                                                   java.lang.String&nbsp;name)
+                                            throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove the user's description from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to remove the asset's description</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>name</code> - of the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the removal failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="removeOwners(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1105,6 +1666,29 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the owners from a GuacamoleTable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>name</code> - of the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the removal failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="removeOwners(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeOwners</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeOwners&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                          java.lang.String&nbsp;qualifiedName,
+                                          java.lang.String&nbsp;name)
+                                   throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove the owners from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to remove the GuacamoleTable's owners</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
 <dd><code>name</code> - of the GuacamoleTable</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1137,6 +1721,31 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="updateCertificate(com.atlan.AtlanClient,java.lang.String,com.atlan.model.enums.CertificateStatus,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>updateCertificate</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;updateCertificate&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                               java.lang.String&nbsp;qualifiedName,
+                                               com.atlan.model.enums.CertificateStatus&nbsp;certificate,
+                                               java.lang.String&nbsp;message)
+                                        throws com.atlan.exception.AtlanException</pre>
+<div class="block">Update the certificate on a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to update the GuacamoleTable's certificate</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>certificate</code> - to use</dd>
+<dd><code>message</code> - (optional) message, or null if no message</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the update failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="removeCertificate(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1149,6 +1758,29 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the certificate from a GuacamoleTable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>name</code> - of the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the removal failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="removeCertificate(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeCertificate</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeCertificate&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                               java.lang.String&nbsp;qualifiedName,
+                                               java.lang.String&nbsp;name)
+                                        throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove the certificate from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to remove the GuacamoleTable's certificate</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
 <dd><code>name</code> - of the GuacamoleTable</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1183,6 +1815,33 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="updateAnnouncement(com.atlan.AtlanClient,java.lang.String,com.atlan.model.enums.AtlanAnnouncementType,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>updateAnnouncement</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;updateAnnouncement&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                java.lang.String&nbsp;qualifiedName,
+                                                com.atlan.model.enums.AtlanAnnouncementType&nbsp;type,
+                                                java.lang.String&nbsp;title,
+                                                java.lang.String&nbsp;message)
+                                         throws com.atlan.exception.AtlanException</pre>
+<div class="block">Update the announcement on a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to update the GuacamoleTable's announcement</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>type</code> - type of announcement to set</dd>
+<dd><code>title</code> - (optional) title of the announcement to set (or null for no title)</dd>
+<dd><code>message</code> - (optional) message of the announcement to set (or null for no message)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the result of the update, or null if the update failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="removeAnnouncement(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1195,6 +1854,29 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Remove the announcement from a GuacamoleTable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>name</code> - of the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable, or null if the removal failed</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="removeAnnouncement(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeAnnouncement</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeAnnouncement&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                                java.lang.String&nbsp;qualifiedName,
+                                                java.lang.String&nbsp;name)
+                                         throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove the announcement from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan client from which to remove the GuacamoleTable's announcement</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
 <dd><code>name</code> - of the GuacamoleTable</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1217,6 +1899,31 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 <div class="block">Replace the terms linked to the GuacamoleTable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - for the GuacamoleTable</dd>
+<dd><code>name</code> - human-readable name of the GuacamoleTable</dd>
+<dd><code>terms</code> - the list of terms to replace on the GuacamoleTable, or null to remove all terms from the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the GuacamoleTable that was updated (note that it will NOT contain details of the replaced terms)</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="replaceTerms(com.atlan.AtlanClient,java.lang.String,java.lang.String,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>replaceTerms</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;replaceTerms&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                          java.lang.String&nbsp;qualifiedName,
+                                          java.lang.String&nbsp;name,
+                                          java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)
+                                   throws com.atlan.exception.AtlanException</pre>
+<div class="block">Replace the terms linked to the GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to replace the GuacamoleTable's assigned terms</dd>
 <dd><code>qualifiedName</code> - for the GuacamoleTable</dd>
 <dd><code>name</code> - human-readable name of the GuacamoleTable</dd>
 <dd><code>terms</code> - the list of terms to replace on the GuacamoleTable, or null to remove all terms from the GuacamoleTable</dd>
@@ -1250,6 +1957,31 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="appendTerms(com.atlan.AtlanClient,java.lang.String,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>appendTerms</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;appendTerms&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                         java.lang.String&nbsp;qualifiedName,
+                                         java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)
+                                  throws com.atlan.exception.AtlanException</pre>
+<div class="block">Link additional terms to the GuacamoleTable, without replacing existing terms linked to the GuacamoleTable.
+ Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing terms,
+ and a second to append the new terms.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to append terms to the GuacamoleTable</dd>
+<dd><code>qualifiedName</code> - for the GuacamoleTable</dd>
+<dd><code>terms</code> - the list of terms to append to the GuacamoleTable</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the GuacamoleTable that was updated  (note that it will NOT contain details of the appended terms)</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="removeTerms(java.lang.String,java.util.List)">
 <!--   -->
 </a>
@@ -1273,6 +2005,31 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="removeTerms(com.atlan.AtlanClient,java.lang.String,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeTerms</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;removeTerms&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                         java.lang.String&nbsp;qualifiedName,
+                                         java.util.List&lt;com.atlan.model.assets.IGlossaryTerm&gt;&nbsp;terms)
+                                  throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove terms from a GuacamoleTable, without replacing all existing terms linked to the GuacamoleTable.
+ Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing terms,
+ and a second to remove the provided terms.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to remove terms from the GuacamoleTable</dd>
+<dd><code>qualifiedName</code> - for the GuacamoleTable</dd>
+<dd><code>terms</code> - the list of terms to remove from the GuacamoleTable, which must be referenced by GUID</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the GuacamoleTable that was updated (note that it will NOT contain details of the resulting terms)</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="appendAtlanTags(java.lang.String,java.util.List)">
 <!--   -->
 </a>
@@ -1287,6 +2044,31 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
  and a second to append the new Atlan tags.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
+<a id="appendAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>appendAtlanTags</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;appendAtlanTags&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                             java.lang.String&nbsp;qualifiedName,
+                                             java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)
+                                      throws com.atlan.exception.AtlanException</pre>
+<div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.
+ Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing Atlan tags,
+ and a second to append the new Atlan tags.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to append Atlan tags to the GuacamoleTable</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
 <dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1325,6 +2107,37 @@ implements <a href="IGuacamoleTable.html" title="interface in com.probable.guaca
 </dl>
 </li>
 </ul>
+<a id="appendAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List,boolean,boolean,boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>appendAtlanTags</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable</a>&nbsp;appendAtlanTags&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                             java.lang.String&nbsp;qualifiedName,
+                                             java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
+                                             boolean&nbsp;propagate,
+                                             boolean&nbsp;removePropagationsOnDelete,
+                                             boolean&nbsp;restrictLineagePropagation)
+                                      throws com.atlan.exception.AtlanException</pre>
+<div class="block">Add Atlan tags to a GuacamoleTable, without replacing existing Atlan tags linked to the GuacamoleTable.
+ Note: this operation must make two API calls — one to retrieve the GuacamoleTable's existing Atlan tags,
+ and a second to append the new Atlan tags.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to append Atlan tags to the GuacamoleTable</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
+<dd><code>propagate</code> - whether to propagate the Atlan tag (true) or not (false)</dd>
+<dd><code>removePropagationsOnDelete</code> - whether to remove the propagated Atlan tags when the Atlan tag is removed from this asset (true) or not (false)</dd>
+<dd><code>restrictLineagePropagation</code> - whether to avoid propagating through lineage (true) or do propagate through lineage (false)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the updated GuacamoleTable</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems</dd>
+</dl>
+</li>
+</ul>
 <a id="addAtlanTags(java.lang.String,java.util.List)">
 <!--   -->
 </a>
@@ -1341,6 +2154,31 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 <div class="block">Add Atlan tags to a GuacamoleTable.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems, or if any of the Atlan tags already exist on the GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
+<a id="addAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addAtlanTags</h4>
+<pre class="methodSignature">@Deprecated
+public static&nbsp;void&nbsp;addAtlanTags&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                java.lang.String&nbsp;qualifiedName,
+                                java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames)
+                         throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#appendAtlanTags(java.lang.String,java.util.List)"><code>appendAtlanTags(String, List)</code></a> instead</div>
+</div>
+<div class="block">Add Atlan tags to a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to add Atlan tags to the GuacamoleTable</dd>
 <dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
 <dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -1377,6 +2215,37 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 </dl>
 </li>
 </ul>
+<a id="addAtlanTags(com.atlan.AtlanClient,java.lang.String,java.util.List,boolean,boolean,boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addAtlanTags</h4>
+<pre class="methodSignature">@Deprecated
+public static&nbsp;void&nbsp;addAtlanTags&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                java.lang.String&nbsp;qualifiedName,
+                                java.util.List&lt;java.lang.String&gt;&nbsp;atlanTagNames,
+                                boolean&nbsp;propagate,
+                                boolean&nbsp;removePropagationsOnDelete,
+                                boolean&nbsp;restrictLineagePropagation)
+                         throws com.atlan.exception.AtlanException</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
+<div class="deprecationComment">see <a href="#appendAtlanTags(java.lang.String,java.util.List,boolean,boolean,boolean)"><code>appendAtlanTags(String, List, boolean, boolean, boolean)</code></a> instead</div>
+</div>
+<div class="block">Add Atlan tags to a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant on which to add Atlan tags to the GuacamoleTable</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>atlanTagNames</code> - human-readable names of the Atlan tags to add</dd>
+<dd><code>propagate</code> - whether to propagate the Atlan tag (true) or not (false)</dd>
+<dd><code>removePropagationsOnDelete</code> - whether to remove the propagated Atlan tags when the Atlan tag is removed from this asset (true) or not (false)</dd>
+<dd><code>restrictLineagePropagation</code> - whether to avoid propagating through lineage (true) or do propagate through lineage (false)</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems, or if any of the Atlan tags already exist on the GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
 <a id="removeAtlanTag(java.lang.String,java.lang.String)">
 <!--   -->
 </a>
@@ -1396,13 +2265,34 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 </dl>
 </li>
 </ul>
-<a id="builder()">
+<a id="removeAtlanTag(com.atlan.AtlanClient,java.lang.String,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>builder</h4>
-<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;&nbsp;builder()</pre>
+<h4>removeAtlanTag</h4>
+<pre class="methodSignature">public static&nbsp;void&nbsp;removeAtlanTag&#8203;(com.atlan.AtlanClient&nbsp;client,
+                                  java.lang.String&nbsp;qualifiedName,
+                                  java.lang.String&nbsp;atlanTagName)
+                           throws com.atlan.exception.AtlanException</pre>
+<div class="block">Remove an Atlan tag from a GuacamoleTable.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>client</code> - connectivity to the Atlan tenant from which to remove an Atlan tag from a GuacamoleTable</dd>
+<dd><code>qualifiedName</code> - of the GuacamoleTable</dd>
+<dd><code>atlanTagName</code> - human-readable name of the Atlan tag to remove</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.atlan.exception.AtlanException</code> - on any API problems, or if the Atlan tag does not exist on the GuacamoleTable</dd>
+</dl>
+</li>
+</ul>
+<a id="_internal()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>_internal</h4>
+<pre class="methodSignature">public static&nbsp;<a href="GuacamoleTable.GuacamoleTableBuilder.html" title="class in com.probable.guacamole.model.assets">GuacamoleTable.GuacamoleTableBuilder</a>&lt;?,&#8203;?&gt;&nbsp;_internal()</pre>
 </li>
 </ul>
 <a id="toBuilder()">
@@ -1484,21 +2374,6 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 </dl>
 </li>
 </ul>
-<a id="getDbtTests()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getDbtTests</h4>
-<pre class="methodSignature">public&nbsp;java.util.SortedSet&lt;com.atlan.model.assets.IDbtTest&gt;&nbsp;getDbtTests()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getDbtTests</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ISQL</code></dd>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getDbtTests</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ITable</code></dd>
-</dl>
-</li>
-</ul>
 <a id="getDatabaseQualifiedName()">
 <!--   -->
 </a>
@@ -1550,6 +2425,24 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 <dd><code>getDbtSources</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ISQL</code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getDbtSources</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ITable</code></dd>
+</dl>
+</li>
+</ul>
+<a id="getDbtTests()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDbtTests</h4>
+<pre class="methodSignature">public&nbsp;java.util.SortedSet&lt;com.atlan.model.assets.IDbtTest&gt;&nbsp;getDbtTests()</pre>
+<div class="block">TBC</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="IGuacamoleTable.html#getDbtTests()">getDbtTests</a></code>&nbsp;in interface&nbsp;<code><a href="IGuacamoleTable.html" title="interface in com.probable.guacamole.model.assets">IGuacamoleTable</a></code></dd>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getDbtTests</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ISQL</code></dd>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>getDbtTests</code>&nbsp;in interface&nbsp;<code>com.atlan.model.assets.ITable</code></dd>
 </dl>
 </li>
 </ul>
@@ -2209,6 +3102,19 @@ public static&nbsp;void&nbsp;addAtlanTags&#8203;(java.lang.String&nbsp;qualified
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code>hashCode</code>&nbsp;in class&nbsp;<code>com.atlan.model.assets.Asset</code></dd>
+</dl>
+</li>
+</ul>
+<a id="toString()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toString</h4>
+<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;toString()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>toString</code>&nbsp;in class&nbsp;<code>com.atlan.model.assets.Asset</code></dd>
 </dl>
 </li>
 </ul>
