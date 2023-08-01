@@ -37,7 +37,7 @@ public class EventLogger implements AtlanEventHandler {
 
     /** {@inheritDoc} */
     @Override
-    public Asset getCurrentState(Asset fromEvent, Logger log) {
+    public Asset getCurrentState(AtlanClient client, Asset fromEvent, Logger log) {
         // Do nothing, just pass-through the asset as-received
         return fromEvent;
     }

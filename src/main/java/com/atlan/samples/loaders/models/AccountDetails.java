@@ -6,7 +6,6 @@ import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.ADLSAccount;
-import com.atlan.model.assets.Asset;
 import com.atlan.util.AssetBatch;
 import java.util.*;
 import lombok.EqualsAndHashCode;
@@ -108,7 +107,7 @@ public class AccountDetails extends AssetDetails {
                 if (updateOnly) {
                     String qualifiedName = ADLSAccount.generateQualifiedName(accountName, connectionQualifiedName);
                     try {
-                        Asset.retrieveMinimal(ADLSAccount.TYPE_NAME, qualifiedName);
+                        ADLSAccount.get(Atlan.getDefaultClient(), qualifiedName, false);
                         ADLSAccount toUpdate = ADLSAccount.updater(qualifiedName, accountName)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())

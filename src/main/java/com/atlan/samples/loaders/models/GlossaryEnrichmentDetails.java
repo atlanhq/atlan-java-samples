@@ -126,7 +126,7 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
                 }
                 Glossary glossary = builder.build();
                 String readmeContents = details.getReadme();
-                if (readmeContents != null && readmeContents.length() > 0) {
+                if (readmeContents != null && !readmeContents.isEmpty()) {
                     readmes.put(details.getIdentity(), readmeContents);
                 }
                 try {

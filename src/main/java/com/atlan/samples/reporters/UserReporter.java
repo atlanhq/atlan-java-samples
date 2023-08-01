@@ -56,7 +56,7 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
 
             log.info("Retrieving user details for tenant: {}", Atlan.getBaseUrl());
             List<AtlanUser> users;
-            users = AtlanUser.retrieveAll();
+            users = AtlanUser.list();
             users.sort(Comparator.comparing(AtlanUser::getFirstName, stringComparator)
                     .thenComparing(AtlanUser::getLastName, stringComparator));
 

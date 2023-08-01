@@ -151,7 +151,7 @@ public class ExcelReader {
             if (name != null) {
                 if (name.contains(caseSensitiveDelimiter)) {
                     columns.add(name);
-                } else if (name.length() > 0) {
+                } else if (!name.isEmpty()) {
                     columns.add(name.toUpperCase(Locale.ROOT));
                 }
             }

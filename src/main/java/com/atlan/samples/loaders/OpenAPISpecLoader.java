@@ -116,7 +116,7 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
 
         // Retrieve the connection, to ensure async access is resolved
         try {
-            Asset.retrieveMinimal(Connection.TYPE_NAME, connectionQualifiedName);
+            Connection.get(Atlan.getDefaultClient(), connectionQualifiedName, false);
         } catch (AtlanException e) {
             log.error("Unable to retrieve the connection for the API.", e);
             System.exit(1);

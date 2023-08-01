@@ -3,6 +3,7 @@
 package com.atlan.samples.events;
 
 import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ConflictException;
@@ -65,10 +66,10 @@ public class DaapScoreCalculator implements AtlanEventHandler {
 
     /** {@inheritDoc} */
     @Override
-    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
+    public Asset getCurrentState(AtlanClient client, Asset fromEvent, Logger log) throws AtlanException {
         Set<String> searchAttrs = new HashSet<>(SCORED_ATTRS);
-        searchAttrs.addAll(Atlan.getDefaultClient().getCustomMetadataCache().getAttributesForSearchResults(CM_DAAP));
-        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, searchAttrs, true, true);
+        searchAttrs.addAll(client.getCustomMetadataCache().getAttributesForSearchResults(CM_DAAP));
+        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(client, fromEvent, searchAttrs, true, true);
         if (asset == null) {
             throw new NotFoundException(
                     ErrorCode.ASSET_NOT_FOUND_BY_QN, fromEvent.getQualifiedName(), fromEvent.getTypeName());
@@ -100,7 +101,7 @@ public class DaapScoreCalculator implements AtlanEventHandler {
             int sReadme = 0;
             IReadme readme = asset.getReadme();
             if (readme != null && readme.getGuid() != null) {
-                readme = Readme.retrieveByGuid(readme.getGuid());
+                readme = Readme.get(readme.getGuid());
                 String description = readme.getDescription();
                 if (description != null) {
                     if (description.length() > 1000) {

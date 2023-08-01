@@ -129,15 +129,15 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
                     String typeName = details.getType();
                     String qualifiedName = details.getQualifiedName();
                     try {
-                        Asset.retrieveMinimal(typeName, qualifiedName);
-                        builder = IndistinctAsset.builder().typeName(typeName).qualifiedName(qualifiedName);
+                        Asset.get(Atlan.getDefaultClient(), typeName, qualifiedName, false);
+                        builder = IndistinctAsset._internal().typeName(typeName).qualifiedName(qualifiedName);
                     } catch (NotFoundException e) {
                         log.warn("Unable to find existing asset — skipping: {}", qualifiedName);
                     } catch (AtlanException e) {
                         log.error("Unable to lookup whether asset exists or not.", e);
                     }
                 } else {
-                    builder = IndistinctAsset.builder()
+                    builder = IndistinctAsset._internal()
                             .typeName(details.getType())
                             .qualifiedName(details.getQualifiedName());
                 }
@@ -176,17 +176,17 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
                         }
                     }
                     String readmeContents = details.getReadme();
-                    if (readmeContents != null && readmeContents.length() > 0) {
+                    if (readmeContents != null && !readmeContents.isEmpty()) {
                         readmes.put(details.getIdentity(), readmeContents);
                         assetIdentityToResult.put(details.getIdentity(), asset);
                     }
-                    cacheResult(assetIdentityToResult, batch.add(asset), asset);
+                    cacheResult(assetIdentityToResult, batch.add(asset));
                     if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
                         cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
                     }
                 }
             }
-            cacheResult(assetIdentityToResult, batch.flush(), null);
+            cacheResult(assetIdentityToResult, batch.flush());
         } catch (AtlanException e) {
             log.error("Unable to batch-upsert assets.", e);
         }
@@ -237,7 +237,7 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
         }
     }
 
-    private static void cacheResult(Map<String, Asset> cache, AssetMutationResponse response, Asset asset) {
+    private static void cacheResult(Map<String, Asset> cache, AssetMutationResponse response) {
         Set<String> cachedGuids = new HashSet<>();
         if (response != null) {
             List<Asset> created = response.getCreatedAssets();
@@ -256,7 +256,7 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
                 // Cache for no-ops as well — where we will only have an entry in the GUID map
                 if (!cachedGuids.contains(guid)) {
                     try {
-                        Asset minimal = Asset.retrieveMinimal(guid);
+                        Asset minimal = Asset.get(Atlan.getDefaultClient(), guid, false);
                         String identity = getIdentity(minimal.getTypeName(), minimal.getQualifiedName());
                         cache.put(identity, minimal);
                     } catch (AtlanException e) {

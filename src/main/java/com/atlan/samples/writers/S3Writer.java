@@ -16,7 +16,7 @@ public class S3Writer {
 
     private static final Logger log = LoggerFactory.getLogger(S3Writer.class);
 
-    private S3Client s3Client;
+    private final S3Client s3Client;
 
     public S3Writer(S3Client s3Client) {
         this.s3Client = s3Client;

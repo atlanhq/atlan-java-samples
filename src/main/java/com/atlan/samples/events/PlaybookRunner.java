@@ -7,6 +7,7 @@ import static com.atlan.util.QueryFactory.have;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
@@ -56,8 +57,8 @@ public class PlaybookRunner implements AtlanEventHandler {
 
     /** {@inheritDoc} */
     @Override
-    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
-        return Asset.retrieveFull(fromEvent.getGuid());
+    public Asset getCurrentState(AtlanClient client, Asset fromEvent, Logger log) throws AtlanException {
+        return Asset.get(client, fromEvent.getGuid(), true);
     }
 
     /** {@inheritDoc} */
@@ -157,7 +158,7 @@ public class PlaybookRunner implements AtlanEventHandler {
      */
     private Map<String, List<PlaybookRule>> fetchPlaybooks() throws AtlanException {
         Map<String, List<PlaybookRule>> map = new LinkedHashMap<>();
-        WorkflowSearchResponse response = Atlan.getDefaultClient().playbooks().list(50);
+        WorkflowSearchResponse response = Atlan.getDefaultClient().playbooks.list(50);
         if (response != null && response.getHits() != null) {
             List<WorkflowSearchResult> hits = response.getHits().getHits();
             for (WorkflowSearchResult hit : hits) {

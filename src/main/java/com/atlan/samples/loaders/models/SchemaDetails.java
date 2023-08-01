@@ -5,7 +5,6 @@ package com.atlan.samples.loaders.models;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Schema;
 import com.atlan.util.AssetBatch;
 import java.util.*;
@@ -112,7 +111,7 @@ public class SchemaDetails extends AssetDetails {
                 if (updateOnly) {
                     String qualifiedName = Schema.generateQualifiedName(schemaName, databaseQualifiedName);
                     try {
-                        Asset.retrieveMinimal(Schema.TYPE_NAME, qualifiedName);
+                        Schema.get(Atlan.getDefaultClient(), qualifiedName, false);
                         Schema toUpdate = Schema.updater(qualifiedName, schemaName)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())

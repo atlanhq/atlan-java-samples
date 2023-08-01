@@ -62,7 +62,8 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
             return failed(keys, data);
         }
         try {
-            Asset current = handler.getCurrentState(event.getPayload().getAsset(), log);
+            Asset current = handler.getCurrentState(
+                    Atlan.getDefaultClient(), event.getPayload().getAsset(), log);
             Collection<Asset> updated = handler.calculateChanges(current, log);
             if (!updated.isEmpty()) {
                 handler.saveChanges(Atlan.getDefaultClient(), updated, log);
@@ -108,7 +109,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
      * @param data the Numaflow message
      * @return a message list indicating the message failed to be processed
      */
-    protected static MessageList failed(String keys[], Datum data) {
+    protected static MessageList failed(String[] keys, Datum data) {
         return failed(keys, data.getValue());
     }
 
@@ -119,7 +120,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
      * @param data the Numaflow message
      * @return a message list indicating the message failed to be processed
      */
-    protected static MessageList failed(String keys[], byte[] data) {
+    protected static MessageList failed(String[] keys, byte[] data) {
         log.info("Routing to: {}", FAILURE);
         return MessageList.newBuilder()
                 .addMessage(new Message(data, keys, new String[] {FAILURE}))
@@ -133,7 +134,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
      * @param data the Numaflow message
      * @return a message list indicating the message was successfully processed
      */
-    protected static MessageList succeeded(String keys[], Datum data) {
+    protected static MessageList succeeded(String[] keys, Datum data) {
         return succeeded(keys, data.getValue());
     }
 
@@ -144,7 +145,7 @@ public abstract class AbstractNumaflowHandler extends MapHandler {
      * @param data the Numaflow message
      * @return a message list indicating the message was successfully processed
      */
-    protected static MessageList succeeded(String keys[], byte[] data) {
+    protected static MessageList succeeded(String[] keys, byte[] data) {
         log.info("Routing to: {}", SUCCESS);
         return MessageList.newBuilder()
                 .addMessage(new Message(data, keys, new String[] {SUCCESS}))

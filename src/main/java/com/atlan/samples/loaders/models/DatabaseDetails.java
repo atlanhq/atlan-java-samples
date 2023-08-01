@@ -5,7 +5,6 @@ package com.atlan.samples.loaders.models;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Database;
 import com.atlan.util.AssetBatch;
 import java.util.*;
@@ -110,7 +109,7 @@ public class DatabaseDetails extends AssetDetails {
                 if (updateOnly) {
                     String qualifiedName = Database.generateQualifiedName(databaseName, connectionQualifiedName);
                     try {
-                        Asset.retrieveMinimal(Database.TYPE_NAME, qualifiedName);
+                        Database.get(Atlan.getDefaultClient(), qualifiedName, false);
                         Database toUpdate = Database.updater(qualifiedName, databaseName)
                                 .description(details.getDescription())
                                 .certificateStatus(details.getCertificate())

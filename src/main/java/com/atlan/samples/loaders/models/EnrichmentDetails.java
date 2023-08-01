@@ -66,7 +66,7 @@ public abstract class EnrichmentDetails extends AssetDetails {
                     }
                     if (attrDef != null) {
                         String value = row.get(colName);
-                        if (value != null && value.length() > 0) {
+                        if (value != null && !value.isEmpty()) {
                             if (!cmMap.containsKey(cmName)) {
                                 cmMap.put(
                                         cmName,

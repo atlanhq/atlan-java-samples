@@ -246,25 +246,25 @@ public class LineageDetails extends AssetDetails {
                     inputs.add(input);
                     outputs.add(output);
                     if (details.getDescription() != null
-                            && details.getDescription().length() > 0) {
+                            && !details.getDescription().isEmpty()) {
                         description = details.getDescription();
                     }
                     if (details.getCertificate() != null) {
                         certificate = details.getCertificate();
                     }
                     if (details.getCertificateStatusMessage() != null
-                            && details.getCertificateStatusMessage().length() > 0) {
+                            && !details.getCertificateStatusMessage().isEmpty()) {
                         certificateMessage = details.getCertificateStatusMessage();
                     }
                     if (details.getAnnouncementType() != null) {
                         announcementType = details.getAnnouncementType();
                     }
                     if (details.getAnnouncementTitle() != null
-                            && details.getAnnouncementTitle().length() > 0) {
+                            && !details.getAnnouncementTitle().isEmpty()) {
                         announcementTitle = details.getAnnouncementTitle();
                     }
                     if (details.getAnnouncementMessage() != null
-                            && details.getAnnouncementMessage().length() > 0) {
+                            && !details.getAnnouncementMessage().isEmpty()) {
                         announcementMessage = details.getAnnouncementMessage();
                     }
                     if (details.getOwnerUsers() != null) {
@@ -273,11 +273,11 @@ public class LineageDetails extends AssetDetails {
                     if (details.getOwnerGroups() != null) {
                         ownerGroups.addAll(details.getOwnerGroups());
                     }
-                    if (details.getSqlCode() != null && details.getSqlCode().length() > 0) {
+                    if (details.getSqlCode() != null && !details.getSqlCode().isEmpty()) {
                         sqlCode = details.getSqlCode();
                     }
                     if (details.getProcessUrl() != null
-                            && details.getProcessUrl().length() > 0) {
+                            && !details.getProcessUrl().isEmpty()) {
                         processUrl = details.getProcessUrl();
                     }
                     if (details.getAtlanTags() != null) {
@@ -328,7 +328,7 @@ public class LineageDetails extends AssetDetails {
         private String qualifiedName;
 
         public static AssetHeader of(String typeName, String qualifiedName) {
-            if (typeName != null && typeName.length() > 0 && qualifiedName != null && qualifiedName.length() > 0) {
+            if (typeName != null && !typeName.isEmpty() && qualifiedName != null && !qualifiedName.isEmpty()) {
                 return AssetHeader.builder()
                         .typeName(typeName)
                         .qualifiedName(qualifiedName)

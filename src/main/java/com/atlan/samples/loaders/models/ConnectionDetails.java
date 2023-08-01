@@ -245,7 +245,7 @@ public class ConnectionDetails extends AssetDetails {
         for (String qualifiedName : cache.values()) {
             try {
                 log.info("...... retrieving connection (to confirm async permissions available): {}", qualifiedName);
-                Asset.retrieveMinimal(Connection.TYPE_NAME, qualifiedName);
+                Connection.get(Atlan.getDefaultClient(), qualifiedName, false);
                 log.info("......... success — able to access: {}", qualifiedName);
             } catch (AtlanException e) {
                 log.error(
@@ -270,7 +270,7 @@ public class ConnectionDetails extends AssetDetails {
         ConnectionDetails header = getHeader(name, type);
         if (!cache.containsKey(header)) {
             // Only run the search if we don't already have the connection details in the cache
-            List<Connection> found = Connection.findByName(name, type, null);
+            List<Connection> found = Connection.findByName(name, type);
             if (found.size() == 1) {
                 log.info("...... found: {} ({})", name, found.get(0).getQualifiedName());
                 cache.put(header, found.get(0).getQualifiedName());

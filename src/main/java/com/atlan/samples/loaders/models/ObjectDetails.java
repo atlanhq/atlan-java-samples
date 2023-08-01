@@ -82,7 +82,7 @@ public class ObjectDetails extends AssetDetails {
         if (getMissingFields(row, REQUIRED).isEmpty()) {
             String connectionQN = ConnectionDetails.getQualifiedName(connectionCache, row);
             String bucketQN = BucketDetails.getQualifiedName(connectionCache, row);
-            if (bucketQN != null && bucketQN.length() > 0) {
+            if (bucketQN != null && !bucketQN.isEmpty()) {
                 builder = builder.connectionQualifiedName(connectionQN)
                         .containerQualifiedName(bucketQN)
                         .bucketName(row.get(BucketDetails.COL_BUCKET_NAME))
@@ -127,11 +127,11 @@ public class ObjectDetails extends AssetDetails {
                 switch (objectType) {
                     case S3:
                         String connectionQN = details.getConnectionQualifiedName();
-                        if (objectARN != null && objectARN.length() > 0) {
+                        if (objectARN != null && !objectARN.isEmpty()) {
                             if (updateOnly) {
                                 String qualifiedName = IS3.generateQualifiedName(connectionQN, objectARN);
                                 try {
-                                    Asset.retrieveMinimal(S3Object.TYPE_NAME, qualifiedName);
+                                    S3Object.get(Atlan.getDefaultClient(), qualifiedName, false);
                                     S3Object toUpdate = S3Object.updater(qualifiedName, objectName)
                                             .description(details.getDescription())
                                             .certificateStatus(details.getCertificate())
@@ -183,7 +183,7 @@ public class ObjectDetails extends AssetDetails {
                         if (updateOnly) {
                             String qualifiedName = GCSObject.generateQualifiedName(objectName, parentQN);
                             try {
-                                Asset.retrieveMinimal(GCSObject.TYPE_NAME, qualifiedName);
+                                GCSObject.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 GCSObject toUpdate = GCSObject.updater(qualifiedName, objectName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())
@@ -232,7 +232,7 @@ public class ObjectDetails extends AssetDetails {
                         if (updateOnly) {
                             String qualifiedName = ADLSObject.generateQualifiedName(objectName, parentQN);
                             try {
-                                Asset.retrieveMinimal(ADLSObject.TYPE_NAME, qualifiedName);
+                                ADLSObject.get(Atlan.getDefaultClient(), qualifiedName, false);
                                 ADLSObject toUpdate = ADLSObject.updater(qualifiedName, objectName)
                                         .description(details.getDescription())
                                         .certificateStatus(details.getCertificate())

@@ -99,10 +99,10 @@ public abstract class AssetDetails {
         String certificate = row.get(COL_CERTIFICATE);
         String announcement = row.get(COL_ANNOUNCEMENT);
 
-        if (certificate != null && certificate.length() > 0) {
+        if (certificate != null && !certificate.isEmpty()) {
             builder.certificate(CertificateStatus.fromValue(certificate));
         }
-        if (announcement != null && announcement.length() > 0) {
+        if (announcement != null && !announcement.isEmpty()) {
             builder.announcementType(AtlanAnnouncementType.fromValue(announcement));
         }
         return builder;
@@ -116,7 +116,7 @@ public abstract class AssetDetails {
      * @return the boolean equivalent
      */
     protected static boolean getBoolean(String candidate) {
-        if (candidate == null || candidate.length() == 0) {
+        if (candidate == null || candidate.isEmpty()) {
             return false;
         } else {
             String upper = candidate.toUpperCase(Locale.ROOT);
@@ -132,7 +132,7 @@ public abstract class AssetDetails {
      * @return a list of the contents of the cell, divided into single values, or an empty list
      */
     protected static List<String> getMultiValuedList(String candidate, String delim) {
-        if (candidate != null && candidate.length() > 0) {
+        if (candidate != null && !candidate.isEmpty()) {
             return Arrays.asList(candidate.split(Pattern.quote(delim)));
         }
         return Collections.emptyList();
@@ -149,7 +149,7 @@ public abstract class AssetDetails {
         List<String> missingFields = new ArrayList<>();
         for (String columnName : requiredFields) {
             String candidate = row.get(columnName);
-            if (candidate == null || candidate.length() == 0) {
+            if (candidate == null || candidate.isEmpty()) {
                 missingFields.add(columnName);
             }
         }
@@ -169,7 +169,7 @@ public abstract class AssetDetails {
         List<String> nonEmptyFields = new ArrayList<>();
         for (String columnName : requiredEmptyFields) {
             String candidate = row.get(columnName);
-            if (candidate != null && candidate.length() > 0) {
+            if (candidate != null && !candidate.isEmpty()) {
                 nonEmptyFields.add(columnName);
             }
         }
@@ -191,7 +191,7 @@ public abstract class AssetDetails {
                 String qn = details.getKey();
                 List<String> atlanTags = new ArrayList<>(details.getValue());
                 try {
-                    Asset column = Asset.retrieveMinimal(typeName, qn);
+                    Asset column = Asset.get(Atlan.getDefaultClient(), typeName, qn, false);
                     Set<AtlanTag> existing = column.getAtlanTags();
                     List<String> toRemove = new ArrayList<>();
                     for (AtlanTag one : existing) {
@@ -215,7 +215,7 @@ public abstract class AssetDetails {
                 List<String> atlanTags = details.getValue();
                 try {
                     log.info("...... tagging: {}", qn);
-                    Atlan.getDefaultClient().assets().addAtlanTags(typeName, qn, atlanTags);
+                    Atlan.getDefaultClient().assets.addAtlanTags(typeName, qn, atlanTags);
                 } catch (AtlanException e) {
                     log.error("Unable to tag {} {} with: {}", typeName, qn, atlanTags, e);
                 }

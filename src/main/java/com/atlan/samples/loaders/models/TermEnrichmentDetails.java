@@ -298,7 +298,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                         }
                     }
                     String readmeContents = details.getReadme();
-                    if (readmeContents != null && readmeContents.length() > 0) {
+                    if (readmeContents != null && !readmeContents.isEmpty()) {
                         readmes.put(details.getIdentity(), readmeContents);
                     }
                     if (details.hasTermToTermRelationships()) {

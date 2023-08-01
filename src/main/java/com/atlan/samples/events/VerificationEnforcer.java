@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
+import com.atlan.AtlanClient;
 import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.ErrorCode;
@@ -47,8 +48,8 @@ public class VerificationEnforcer implements AtlanEventHandler {
 
     /** {@inheritDoc} */
     @Override
-    public Asset getCurrentState(Asset fromEvent, Logger log) throws AtlanException {
-        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(fromEvent, REQUIRED_ATTRS, false, false);
+    public Asset getCurrentState(AtlanClient client, Asset fromEvent, Logger log) throws AtlanException {
+        Asset asset = AtlanEventHandler.getCurrentViewOfAsset(client, fromEvent, REQUIRED_ATTRS, false, false);
         if (asset == null) {
             throw new NotFoundException(
                     ErrorCode.ASSET_NOT_FOUND_BY_QN, fromEvent.getQualifiedName(), fromEvent.getTypeName());
