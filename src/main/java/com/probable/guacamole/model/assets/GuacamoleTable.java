@@ -8,24 +8,7 @@ import com.atlan.exception.AtlanException;
 import com.atlan.exception.ErrorCode;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
-import com.atlan.model.assets.Asset;
-import com.atlan.model.assets.Attribute;
-import com.atlan.model.assets.Connection;
-import com.atlan.model.assets.IAsset;
-import com.atlan.model.assets.IAtlanQuery;
-import com.atlan.model.assets.ICatalog;
-import com.atlan.model.assets.IColumn;
-import com.atlan.model.assets.IDbtModel;
-import com.atlan.model.assets.IDbtSource;
-import com.atlan.model.assets.IDbtTest;
-import com.atlan.model.assets.IGlossaryTerm;
-import com.atlan.model.assets.ILineageProcess;
-import com.atlan.model.assets.IReferenceable;
-import com.atlan.model.assets.ISQL;
-import com.atlan.model.assets.ISchema;
-import com.atlan.model.assets.ITable;
-import com.atlan.model.assets.ITablePartition;
-import com.atlan.model.assets.Schema;
+import com.atlan.model.assets.*;
 import com.atlan.model.core.AssetFilter;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.AtlanConnectorType;
@@ -64,6 +47,10 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     @Getter(onMethod_ = {@Override})
     @Builder.Default
     String typeName = TYPE_NAME;
+
+    /** TBC */
+    @Attribute
+    IAirflowTask airflowTask;
 
     /** TBC */
     @Attribute

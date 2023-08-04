@@ -4,7 +4,6 @@ package com.atlan.samples.loaders.models;
 
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
-import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.GlossaryCategory;
 import com.atlan.model.assets.Readme;
@@ -158,30 +157,29 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
         // Note that we need to do this in multiple passes, so parent categories are always
         // created before children, and we won't really be able to batch them due to
         // the hierarchical nature of the categories...
+        boolean bulkInitialized = false;
         for (CategoryEnrichmentDetails details : categories.values()) {
+            if (!bulkInitialized) {
+                // If we've not yet initialized the cache, then bulk-initialize it now (only once)
+                categoryCache.get(details.getIdentity());
+                bulkInitialized = true;
+            }
             Asset glossary = details.getGlossary();
             String categoryPath = details.getCategoryPath();
             String[] tokens = categoryPath.split(Pattern.quote("@"));
             if (tokens.length == level) {
                 String categoryName = tokens[tokens.length - 1];
                 GlossaryCategory.GlossaryCategoryBuilder<?, ?> builder = null;
-                if (!categoryCache.containsKey(details.getIdentity())) {
-                    try {
-                        GlossaryCategory found = GlossaryCategory.findByNameFast(
-                                categoryName, glossary.getQualifiedName(), List.of("anchor"));
-                        builder = found.trimToRequired().guid(found.getGuid());
-                    } catch (NotFoundException e) {
-                        if (updateOnly) {
-                            log.warn(
-                                    "Unable to find existing category — skipping: {}@{}",
-                                    categoryName,
-                                    glossary.getName());
-                        } else {
-                            builder = GlossaryCategory.creator(
-                                    categoryName, glossary.getGuid(), glossary.getQualifiedName());
-                        }
-                    } catch (AtlanException e) {
-                        log.error("Unable to even search for the category: {}", details.getIdentity(), e);
+                // Explicitly check key first, to avoid any further cache re-initialization
+                // given its bulk nature
+                if (!categoryCache.containsKey(details.getIdentity())
+                        || categoryCache.get(details.getIdentity()) == null) {
+                    if (updateOnly) {
+                        log.warn(
+                                "Unable to find existing category — skipping: {}@{}", categoryName, glossary.getName());
+                    } else {
+                        builder =
+                                GlossaryCategory.creator(categoryName, glossary.getGuid(), glossary.getQualifiedName());
                     }
                 }
                 if (builder != null) {
@@ -228,7 +226,8 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
                                 for (Asset one : created) {
-                                    if (one.getName().equals(categoryName)) {
+                                    if (one instanceof GlossaryCategory
+                                            && one.getName().equals(categoryName)) {
                                         categoryCache.put(details.getIdentity(), one);
                                     }
                                 }
@@ -236,7 +235,8 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                             List<Asset> updated = response.getUpdatedAssets();
                             if (updated != null) {
                                 for (Asset one : updated) {
-                                    if (one.getName().equals(categoryName)) {
+                                    if (one instanceof GlossaryCategory
+                                            && one.getName().equals(categoryName)) {
                                         categoryCache.put(details.getIdentity(), one);
                                     }
                                 }
