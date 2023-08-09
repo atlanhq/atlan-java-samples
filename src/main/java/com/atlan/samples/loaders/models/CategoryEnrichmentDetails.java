@@ -178,8 +178,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                         log.warn(
                                 "Unable to find existing category — skipping: {}@{}", categoryName, glossary.getName());
                     } else {
-                        builder =
-                                GlossaryCategory.creator(categoryName, glossary.getGuid(), glossary.getQualifiedName());
+                        builder = GlossaryCategory.creator(categoryName, glossary.getGuid());
                     }
                 }
                 if (builder != null) {
@@ -280,8 +279,7 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                 String readmeContent = entry.getValue();
                 Asset category = categoryCache.get(categoryIdentity);
                 if (category != null) {
-                    Readme readme = Readme.creator(category, category.getName(), readmeContent)
-                            .build();
+                    Readme readme = Readme.creator(category, readmeContent).build();
                     readmeBatch.add(readme);
                 } else {
                     log.error("Unable to find category GUID for {} — cannot add README.", categoryIdentity);

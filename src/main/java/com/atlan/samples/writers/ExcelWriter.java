@@ -6,20 +6,19 @@ import com.atlan.model.enums.AtlanEnum;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 /**
  * Utility class for creating and writing to Excel files, using Apache POI.
  */
 public class ExcelWriter {
 
-    private final Workbook workbook;
+    private final SXSSFWorkbook workbook;
     private final CellStyle headerStyle;
     private final CellStyle dataStyle;
     private final CellStyle linkStyle;
@@ -27,10 +26,11 @@ public class ExcelWriter {
     /**
      * Construct a new Excel file writer.
      *
+     * @param batch how many records to write in-memory before flushing to disk
      * @throws IOException on any errors creating or accessing the file
      */
-    public ExcelWriter() throws IOException {
-        workbook = new XSSFWorkbook();
+    public ExcelWriter(int batch) throws IOException {
+        workbook = new SXSSFWorkbook(batch);
         headerStyle = createHeaderStyle();
         dataStyle = createDataStyle();
         linkStyle = createLinkStyle();
@@ -53,53 +53,10 @@ public class ExcelWriter {
      * @throws IOException on any errors creating or accessing the file
      */
     public void create(String fileLocation) throws IOException {
-        create(fileLocation, null);
-    }
-
-    /**
-     * Flush out the contents of the workbook to a file, creating the XLSX file.
-     *
-     * @param fileLocation location of the Excel file to create
-     * @param autoSizeSheets the names of worksheets whose columns should be auto-expanded
-     * @throws IOException on any errors creating or accessing the file
-     */
-    public void create(String fileLocation, Collection<String> autoSizeSheets) throws IOException {
-        if (autoSizeSheets != null && !autoSizeSheets.isEmpty()) {
-            for (String sheetName : autoSizeSheets) {
-                Sheet worksheet = workbook.getSheet(sheetName);
-                Row header = worksheet.getRow(0);
-                int colCount = header.getLastCellNum();
-                int rowCount = worksheet.getLastRowNum();
-                for (int i = 0; i < colCount; i++) {
-                    int maxLength = 0;
-                    for (int j = 0; j < rowCount; j++) {
-                        Cell cell = worksheet.getRow(j).getCell(i);
-                        if (cell != null) {
-                            switch (cell.getCellType()) {
-                                case BOOLEAN:
-                                    maxLength = Math.max(maxLength, 5);
-                                    break;
-                                case NUMERIC:
-                                    String tmp = "" + cell.getNumericCellValue();
-                                    maxLength = Math.max(maxLength, tmp.length());
-                                    break;
-                                case STRING:
-                                default:
-                                    maxLength = Math.max(
-                                            maxLength, cell.getStringCellValue().length());
-                                    break;
-                            }
-                        }
-                    }
-                    // Note: maximum size allowed by the library is 255x256, so don't attempt to create
-                    // a width wider than this
-                    worksheet.setColumnWidth(i, Math.min(maxLength * 256, 255 * 256));
-                }
-            }
-        }
         FileOutputStream fos = new FileOutputStream(fileLocation);
         workbook.write(fos);
         workbook.close();
+        workbook.dispose(); // cleanup temporary files
         fos.close();
     }
 
@@ -113,6 +70,7 @@ public class ExcelWriter {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         workbook.write(baos);
         workbook.close();
+        workbook.dispose(); // cleanup temporary files
         return baos;
     }
 
@@ -178,6 +136,7 @@ public class ExcelWriter {
             String name = entry.getKey();
             String desc = entry.getValue();
             addHeaderCell(header, colIdx, name, desc);
+            worksheet.setColumnWidth(colIdx, Math.min(name.length() * 256, 255 * 256));
             colIdx++;
         }
     }

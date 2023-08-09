@@ -33,7 +33,6 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     private static Map<String, List<String>> CM_ATTRIBUTE_ORDER;
     private static Map<String, String> CM_ATTRIBUTE_HEADERS;
     private static Set<String> CM_ATTRIBUTES_FOR_SEARCH;
-    private static final Set<String> autoSizeSheets = new HashSet<>();
 
     private enum FilterType {
         BY_GROUP,
@@ -211,7 +210,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
         try {
 
-            log.info("Creating Excel file (in-memory)...");
+            log.info("Creating Excel file (streaming)...");
             if (context != null && context.getClientContext() != null) {
                 log.debug(
                         " ... client environment: {}",
@@ -229,29 +228,25 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             Map<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
             Map<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
 
-            ExcelWriter xlsx = new ExcelWriter();
+            ExcelWriter xlsx = new ExcelWriter(getBatchSize());
 
             // Before anything else, cache the glossaries and terms (for x-ref purposes)
             cacheGlossaries();
             cacheTerms();
 
             Sheet assets = xlsx.createSheet("Asset enrichment");
-            autoSizeSheets.add("Asset enrichment");
             xlsx.addHeader(assets, ASSET_ENRICHMENT);
             getAssets(xlsx, assets);
 
             Sheet glossaries = xlsx.createSheet("Glossary enrichment");
-            autoSizeSheets.add("Glossary enrichment");
             xlsx.addHeader(glossaries, GLOSSARY_ENRICHMENT);
             getGlossaries(xlsx, glossaries);
 
             Sheet categories = xlsx.createSheet("Category enrichment");
-            autoSizeSheets.add("Category enrichment");
             xlsx.addHeader(categories, CATEGORY_ENRICHMENT);
             findCategories(xlsx, categories);
 
             Sheet terms = xlsx.createSheet("Term enrichment");
-            autoSizeSheets.add("Term enrichment");
             xlsx.addHeader(terms, TERM_ENRICHMENT);
             getTerms(xlsx, terms);
 
@@ -263,7 +258,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             } else {
                 // Otherwise we'll write out to a file (locally)
                 log.info("Writing report to file: {}", getFilename());
-                xlsx.create(getFilename(), autoSizeSheets);
+                xlsx.create(getFilename());
             }
 
         } catch (AtlanException e) {
@@ -351,53 +346,64 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .relationAttribute("description")
                 .relationAttribute("userDescription")
                 .build();
-        log.info("Retrieving first {} asset details from: {}", getBatchSize(), Atlan.getBaseUrl());
+        log.info("Retrieving asset details from {} in batches of: {}", Atlan.getBaseUrl(), getBatchSize());
         IndexSearchResponse response = request.search();
-        for (Asset result : response) {
-            String guid = result.getGuid();
-            if (!processed.containsKey(guid)) {
-                List<Asset> childAssets = getChildAssets(result);
-                long descriptionCounts = 0;
-                for (Asset child : childAssets) {
-                    String childDesc = getDescription(child);
-                    descriptionCounts += !childDesc.isEmpty() ? 1 : 0;
+        long totalResults = response.getApproximateCount();
+        int count = 1;
+        while (response != null
+                && response.getAssets() != null
+                && !response.getAssets().isEmpty()) {
+            long current = Math.min(count++ * ((long) getBatchSize()), totalResults);
+            log.info(
+                    " ... processing asset details: {}/{} ({}%)",
+                    current, totalResults, Math.round(((double) current / totalResults) * 100));
+            for (Asset result : response.getAssets()) {
+                String guid = result.getGuid();
+                if (!processed.containsKey(guid)) {
+                    List<Asset> childAssets = getChildAssets(result);
+                    long descriptionCounts = 0;
+                    for (Asset child : childAssets) {
+                        String childDesc = getDescription(child);
+                        descriptionCounts += !childDesc.isEmpty() ? 1 : 0;
+                    }
+                    List<DataCell> row = new ArrayList<>();
+                    row.add(DataCell.of(result.getConnectorType()));
+                    row.add(DataCell.of(result.getQualifiedName()));
+                    row.add(DataCell.of(result.getTypeName()));
+                    row.add(DataCell.of(result.getName()));
+                    row.add(DataCell.of(result.getDescription()));
+                    row.add(DataCell.of(result.getUserDescription()));
+                    row.add(DataCell.of(getUserOwners(result, getDelimiter())));
+                    row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
+                    row.add(DataCell.of(result.getCertificateStatus()));
+                    row.add(DataCell.of(result.getCertificateStatusMessage()));
+                    row.add(DataCell.of(result.getCertificateUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
+                    row.add(DataCell.of(result.getAnnouncementType()));
+                    row.add(DataCell.of(result.getAnnouncementTitle()));
+                    row.add(DataCell.of(result.getAnnouncementMessage()));
+                    row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
+                    row.add(DataCell.of(result.getCreatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
+                    row.add(DataCell.of(result.getUpdatedBy()));
+                    row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
+                    row.add(DataCell.of(getREADME(result)));
+                    row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
+                    row.add(DataCell.of(getCount(result.getLinks())));
+                    row.add(DataCell.of(
+                            DIRECT_ATLAN_TAG_ONLY
+                                    ? getDirectAtlanTags(result, getDelimiter())
+                                    : getAtlanTags(result, getDelimiter())));
+                    row.add(DataCell.of(childAssets.size()));
+                    row.add(DataCell.of(descriptionCounts));
+                    row.add(DataCell.of(getAssetLink(guid)));
+                    addCustomMetadata(row, result);
+                    xlsx.appendRow(sheet, row);
+                    processed.put(guid, result.getQualifiedName());
                 }
-                List<DataCell> row = new ArrayList<>();
-                row.add(DataCell.of(result.getConnectorType()));
-                row.add(DataCell.of(result.getQualifiedName()));
-                row.add(DataCell.of(result.getTypeName()));
-                row.add(DataCell.of(result.getName()));
-                row.add(DataCell.of(result.getDescription()));
-                row.add(DataCell.of(result.getUserDescription()));
-                row.add(DataCell.of(getUserOwners(result, getDelimiter())));
-                row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
-                row.add(DataCell.of(result.getCertificateStatus()));
-                row.add(DataCell.of(result.getCertificateStatusMessage()));
-                row.add(DataCell.of(result.getCertificateUpdatedBy()));
-                row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
-                row.add(DataCell.of(result.getAnnouncementType()));
-                row.add(DataCell.of(result.getAnnouncementTitle()));
-                row.add(DataCell.of(result.getAnnouncementMessage()));
-                row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
-                row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
-                row.add(DataCell.of(result.getCreatedBy()));
-                row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
-                row.add(DataCell.of(result.getUpdatedBy()));
-                row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
-                row.add(DataCell.of(getREADME(result)));
-                row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
-                row.add(DataCell.of(getCount(result.getLinks())));
-                row.add(DataCell.of(
-                        DIRECT_ATLAN_TAG_ONLY
-                                ? getDirectAtlanTags(result, getDelimiter())
-                                : getAtlanTags(result, getDelimiter())));
-                row.add(DataCell.of(childAssets.size()));
-                row.add(DataCell.of(descriptionCounts));
-                row.add(DataCell.of(getAssetLink(guid)));
-                addCustomMetadata(row, result);
-                xlsx.appendRow(sheet, row);
-                processed.put(guid, result.getQualifiedName());
             }
+            response = response.getNextPage();
         }
     }
 
