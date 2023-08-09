@@ -58,7 +58,7 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
             users.sort(Comparator.comparing(AtlanUser::getFirstName, stringComparator)
                     .thenComparing(AtlanUser::getLastName, stringComparator));
 
-            log.info("Creating Excel file (in-memory)...");
+            log.info("Creating Excel file (streaming)...");
             if (context != null && context.getClientContext() != null) {
                 log.debug(
                         " ... client environment: {}",

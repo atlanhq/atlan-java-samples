@@ -51,7 +51,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
 
         try {
 
-            log.info("Creating Excel file (in-memory)...");
+            log.info("Creating Excel file (streaming)...");
             if (context != null && context.getClientContext() != null) {
                 log.debug(
                         " ... client environment: {}",
