@@ -212,7 +212,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                     if (updateOnly) {
                         log.warn("Unable to find existing term — skipping: {}@{}", termName, glossary.getName());
                     } else {
-                        builder = GlossaryTerm.creator(termName, glossary.getGuid(), glossary.getQualifiedName());
+                        builder = GlossaryTerm.creator(termName, glossary.getGuid());
                     }
                 } catch (AtlanException e) {
                     log.error("Unable to even search for the term: {}", details.getIdentity(), e);
@@ -326,8 +326,7 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                 String readmeContent = entry.getValue();
                 Asset term = termIdentityToResult.get(termIdentity);
                 if (term != null) {
-                    Readme readme =
-                            Readme.creator(term, term.getName(), readmeContent).build();
+                    Readme readme = Readme.creator(term, readmeContent).build();
                     readmeBatch.add(readme);
                 } else {
                     log.error("Unable to find term GUID for {} — cannot add README.", termIdentity);
