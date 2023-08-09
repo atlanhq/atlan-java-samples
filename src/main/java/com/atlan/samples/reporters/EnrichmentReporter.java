@@ -33,7 +33,6 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     private static Map<String, List<String>> CM_ATTRIBUTE_ORDER;
     private static Map<String, String> CM_ATTRIBUTE_HEADERS;
     private static Set<String> CM_ATTRIBUTES_FOR_SEARCH;
-    private static final Set<String> autoSizeSheets = new HashSet<>();
 
     private enum FilterType {
         BY_GROUP,
@@ -236,22 +235,18 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             cacheTerms();
 
             Sheet assets = xlsx.createSheet("Asset enrichment");
-            autoSizeSheets.add("Asset enrichment");
             xlsx.addHeader(assets, ASSET_ENRICHMENT);
             getAssets(xlsx, assets);
 
             Sheet glossaries = xlsx.createSheet("Glossary enrichment");
-            autoSizeSheets.add("Glossary enrichment");
             xlsx.addHeader(glossaries, GLOSSARY_ENRICHMENT);
             getGlossaries(xlsx, glossaries);
 
             Sheet categories = xlsx.createSheet("Category enrichment");
-            autoSizeSheets.add("Category enrichment");
             xlsx.addHeader(categories, CATEGORY_ENRICHMENT);
             findCategories(xlsx, categories);
 
             Sheet terms = xlsx.createSheet("Term enrichment");
-            autoSizeSheets.add("Term enrichment");
             xlsx.addHeader(terms, TERM_ENRICHMENT);
             getTerms(xlsx, terms);
 
@@ -263,7 +258,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             } else {
                 // Otherwise we'll write out to a file (locally)
                 log.info("Writing report to file: {}", getFilename());
-                xlsx.create(getFilename(), autoSizeSheets);
+                xlsx.create(getFilename());
             }
 
         } catch (AtlanException e) {

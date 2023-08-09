@@ -27,8 +27,6 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
 
     private static final Map<String, String> USER_REPORT_HEADERS = createUserDetailsReportHeaders();
 
-    private static final Set<String> autoSizeSheets = new HashSet<>();
-
     private static final Comparator<String> stringComparator = Comparator.nullsFirst(String::compareTo);
 
     public static void main(String[] args) {
@@ -71,7 +69,6 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
             // Adding content in the Excel report
             ExcelWriter xlsx = new ExcelWriter(getBatchSize());
             Sheet userinfo = xlsx.createSheet("User Details");
-            autoSizeSheets.add("User Details");
             xlsx.addHeader(userinfo, USER_REPORT_HEADERS);
             addUserDetailRecords(xlsx, userinfo, users);
 
@@ -84,7 +81,7 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
             } else {
                 // Otherwise we'll write out to a file (locally)
                 log.info("Writing report to file: {}", getFilename());
-                xlsx.create(getFilename(), autoSizeSheets);
+                xlsx.create(getFilename());
             }
         } catch (AtlanException e) {
             log.error("Failed to retrieve asset details from: {}", Atlan.getBaseUrl(), e);

@@ -27,8 +27,6 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
 
     private static final Map<String, String> SLACK_DISCUSSIONS = createSlackDiscussionHeader();
 
-    private static final Set<String> autoSizeSheets = new HashSet<>();
-
     private static final HashMap<String, Long> assetToSlackDiscussions = new HashMap<>();
     private static final HashMap<String, IAsset> guidToLinkedAsset = new HashMap<>();
 
@@ -66,7 +64,6 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
             ExcelWriter xlsx = new ExcelWriter(getBatchSize());
 
             Sheet assets = xlsx.createSheet("Slack discussions");
-            autoSizeSheets.add("Slack discussions");
             xlsx.addHeader(assets, SLACK_DISCUSSIONS);
             getSlackDiscussions(xlsx, assets);
 
@@ -78,7 +75,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
             } else {
                 // Otherwise we'll write out to a file (locally)
                 log.info("Writing report to file: {}", getFilename());
-                xlsx.create(getFilename(), autoSizeSheets);
+                xlsx.create(getFilename());
             }
 
         } catch (AtlanException e) {
