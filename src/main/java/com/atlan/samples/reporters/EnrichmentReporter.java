@@ -5,7 +5,6 @@ package com.atlan.samples.reporters;
 import static com.atlan.samples.writers.ExcelWriter.DataCell;
 import static com.atlan.util.QueryFactory.*;
 
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -336,10 +335,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
         }
         Query query = builder.build()._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .sortOption(Sort.by(KeywordFields.GUID, SortOrder.Asc))
-                        .build())
+        IndexSearchRequest request = IndexSearchRequest.builder(
+                        IndexSearchDSL.builder(query).size(getBatchSize()).build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
                 .attributes(childRelationships)
                 .attributes(CM_ATTRIBUTES_FOR_SEARCH)
