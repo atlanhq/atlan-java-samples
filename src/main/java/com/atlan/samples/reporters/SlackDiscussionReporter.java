@@ -63,7 +63,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
 
             parseParametersFromEvent(event);
 
-            ExcelWriter xlsx = new ExcelWriter();
+            ExcelWriter xlsx = new ExcelWriter(getBatchSize());
 
             Sheet assets = xlsx.createSheet("Slack discussions");
             autoSizeSheets.add("Slack discussions");

@@ -68,8 +68,8 @@ public class UserReporter extends AbstractReporter implements RequestHandler<Map
                 log.debug(" ... client custom: {}", context.getClientContext().getCustom());
             }
 
-            // Adding content in the excel report
-            ExcelWriter xlsx = new ExcelWriter();
+            // Adding content in the Excel report
+            ExcelWriter xlsx = new ExcelWriter(getBatchSize());
             Sheet userinfo = xlsx.createSheet("User Details");
             autoSizeSheets.add("User Details");
             xlsx.addHeader(userinfo, USER_REPORT_HEADERS);

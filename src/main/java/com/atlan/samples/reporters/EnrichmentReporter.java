@@ -229,7 +229,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             Map<String, String> CATEGORY_ENRICHMENT = createCategoryEnrichmentHeader();
             Map<String, String> TERM_ENRICHMENT = createTermEnrichmentHeader();
 
-            ExcelWriter xlsx = new ExcelWriter();
+            ExcelWriter xlsx = new ExcelWriter(getBatchSize());
 
             // Before anything else, cache the glossaries and terms (for x-ref purposes)
             cacheGlossaries();
