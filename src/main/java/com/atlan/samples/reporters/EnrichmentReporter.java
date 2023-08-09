@@ -335,9 +335,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
         }
         Query query = builder.build()._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .build())
+        IndexSearchRequest request = IndexSearchRequest.builder(
+                        IndexSearchDSL.builder(query).size(getBatchSize()).build())
                 .attributes(ENRICHMENT_ATTRIBUTES)
                 .attributes(childRelationships)
                 .attributes(CM_ATTRIBUTES_FOR_SEARCH)
