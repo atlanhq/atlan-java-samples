@@ -76,8 +76,8 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.20.96'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.2'
     implementation 'io.swagger.parser.v3:swagger-parser:2.1.16'
-    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j', version: '2.19.0'
-    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.19.0'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.20.0'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j2-impl', version: '2.20.0'
     testImplementation group: 'org.testng', name: 'testng', version: '7.8.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
 }
