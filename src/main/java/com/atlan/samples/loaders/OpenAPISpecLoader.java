@@ -79,7 +79,7 @@ public class OpenAPISpecLoader extends AbstractLoader implements RequestHandler<
         String connectionQualifiedName = null;
         log.info("Looking for existing API connection named: {}", _apiName);
         try {
-            List<Connection> found = Connection.findByName(_apiName, AtlanConnectorType.API, null);
+            List<Connection> found = Connection.findByName(_apiName, AtlanConnectorType.API);
             if (found.size() > 1) {
                 log.warn("... found multiple API connections with name {}", _apiName);
             }

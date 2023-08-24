@@ -99,7 +99,7 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
             Glossary.GlossaryBuilder<?, ?> builder = null;
             if (!glossaryNameToResult.containsKey(glossaryName)) {
                 try {
-                    Glossary found = Glossary.findByName(glossaryName, null);
+                    Glossary found = Glossary.findByName(glossaryName);
                     builder = found.trimToRequired();
                 } catch (NotFoundException e) {
                     if (updateOnly) {

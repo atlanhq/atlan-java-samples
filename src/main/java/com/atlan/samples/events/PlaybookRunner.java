@@ -2,9 +2,6 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.atlan.samples.events;
 
-import static com.atlan.util.QueryFactory.CompoundQuery;
-import static com.atlan.util.QueryFactory.have;
-
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.Atlan;
 import com.atlan.AtlanClient;
@@ -12,10 +9,8 @@ import com.atlan.events.AtlanEventHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.enums.CertificateStatus;
-import com.atlan.model.enums.KeywordFields;
 import com.atlan.model.enums.PlaybookActionOperator;
 import com.atlan.model.enums.PlaybookActionType;
-import com.atlan.model.search.IndexSearchDSL;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.model.workflow.*;
@@ -99,13 +94,12 @@ public class PlaybookRunner implements AtlanEventHandler {
                 Query query = filter.getDsl().getQuery();
                 // Add the asset in the event to the search criteria of the rule,
                 // to confirm there is a match (that we should apply the associated actions)
-                IndexSearchRequest match = IndexSearchRequest.builder(IndexSearchDSL.builder(CompoundQuery.builder()
-                                        .must(query)
-                                        .must(have(KeywordFields.GUID).eq(original.getGuid()))
-                                        .build()
-                                        ._toQuery())
-                                .build())
-                        .build();
+                IndexSearchRequest match = Atlan.getDefaultClient()
+                        .assets
+                        .select()
+                        .where(query)
+                        .where(Asset.GUID.eq(original.getGuid()))
+                        .toRequest();
                 Asset asset = null;
                 IndexSearchResponse response = match.search();
                 if (response != null
