@@ -3,22 +3,23 @@
 package com.atlan.samples.reporters;
 
 import static com.atlan.samples.writers.ExcelWriter.DataCell;
-import static com.atlan.util.QueryFactory.*;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.CustomMetadataAttributes;
-import com.atlan.model.enums.KeywordFields;
+import com.atlan.model.fields.AtlanField;
 import com.atlan.model.search.*;
 import com.atlan.model.typedefs.AttributeDef;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -45,35 +46,35 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     private static boolean INCLUDE_FIELD_LEVEL = false;
     private static boolean DIRECT_ATLAN_TAG_ONLY = false;
 
-    private static final Map<String, String> categoryGuidToPath = new HashMap<>();
-    private static final Map<String, Glossary> glossaryGuidToDetails = new HashMap<>();
-    private static final Map<String, GlossaryTerm> termGuidToDetails = new HashMap<>();
-    private static final Map<String, String> processed = new HashMap<>();
+    private static final Map<String, String> categoryGuidToPath = new ConcurrentHashMap<>();
+    private static final Map<String, Glossary> glossaryGuidToDetails = new ConcurrentHashMap<>();
+    private static final Map<String, GlossaryTerm> termGuidToDetails = new ConcurrentHashMap<>();
+    private static final Map<String, String> processed = new ConcurrentHashMap<>();
 
-    static final List<String> ENRICHMENT_ATTRIBUTES = List.of(
-            "name",
-            "description",
-            "userDescription",
-            "ownerUsers",
-            "ownerGroups",
-            "certificateStatus",
-            "certificateStatusMessage",
-            "certificateUpdatedBy",
-            "certificateUpdatedAt",
-            "announcementType",
-            "announcementTitle",
-            "announcementMessage",
-            "announcementUpdatedBy",
-            "announcementUpdatedAt",
-            "createdBy",
-            "createTime",
-            "updatedBy",
-            "updateTime",
-            "readme",
-            "classificationNames",
-            "links",
-            "connectorName",
-            "meanings");
+    static final List<AtlanField> ENRICHMENT_ATTRIBUTES = List.of(
+            Asset.NAME,
+            Asset.DESCRIPTION,
+            Asset.USER_DESCRIPTION,
+            Asset.OWNER_USERS,
+            Asset.OWNER_GROUPS,
+            Asset.CERTIFICATE_STATUS,
+            Asset.CERTIFICATE_STATUS_MESSAGE,
+            Asset.CERTIFICATE_UPDATED_BY,
+            Asset.CERTIFICATE_UPDATED_AT,
+            Asset.ANNOUNCEMENT_TYPE,
+            Asset.ANNOUNCEMENT_TITLE,
+            Asset.ANNOUNCEMENT_MESSAGE,
+            Asset.ANNOUNCEMENT_UPDATED_BY,
+            Asset.ANNOUNCEMENT_UPDATED_AT,
+            Asset.CREATED_BY,
+            Asset.CREATE_TIME,
+            Asset.UPDATED_BY,
+            Asset.UPDATE_TIME,
+            Asset.README,
+            Asset.ATLAN_TAGS,
+            Asset.LINKS,
+            Asset.CONNECTOR_TYPE,
+            Asset.ASSIGNED_TERMS);
 
     private static final List<String> assetTypes = List.of(
             Table.TYPE_NAME,
@@ -121,45 +122,44 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             TableauDashboard.TYPE_NAME,
             TableauDatasource.TYPE_NAME,
             TableauDatasourceField.TYPE_NAME);
-    private static final List<String> childRelationships = List.of(
-            "columns",
-            "looks",
-            "tiles",
-            "fields",
-            "explores",
-            "queries",
-            "models",
-            "views",
-            "metabaseDashboards",
-            "metabaseQuestions",
-            "modeCollections",
-            "modeReports",
-            "modeCharts",
-            "modeCollections",
-            "modeQueries",
-            "dashboards",
-            "datasets",
-            "reports",
-            "tables",
-            "datasources",
-            "dataflows",
-            "pages",
-            "measures",
-            "presetDashboards",
-            "presetDatasets",
-            "presetCharts",
-            "adlsObjects",
-            "gcsObjects",
-            "objects",
-            "lookupFields",
-            "projects",
-            "workbooks",
-            "flows",
-            "worksheets",
-            "datasourceFields",
-            "calculatedFields");
+    private static final List<AtlanField> childRelationships = List.of(
+            Table.COLUMNS,
+            LookerDashboard.LOOKS,
+            LookerQuery.TILES,
+            LookerModel.FIELDS,
+            LookerModel.EXPLORES,
+            LookerModel.QUERIES,
+            LookerProject.MODELS,
+            LookerProject.VIEWS,
+            MetabaseCollection.METABASE_DASHBOARDS,
+            MetabaseCollection.METABASE_QUESTIONS,
+            ModeWorkspace.MODE_COLLECTIONS,
+            ModeCollection.MODE_REPORTS,
+            ModeQuery.MODE_CHARTS,
+            ModeReport.MODE_QUERIES,
+            PowerBIWorkspace.DASHBOARDS,
+            PowerBIWorkspace.DATASETS,
+            PowerBIWorkspace.REPORTS,
+            PowerBIDataset.TABLES,
+            PowerBIDataset.DATASOURCES,
+            PowerBIDataset.DATAFLOWS,
+            PowerBIReport.PAGES,
+            PowerBITable.MEASURES,
+            PresetWorkspace.PRESET_DASHBOARDS,
+            PresetDashboard.PRESET_DATASETS,
+            PresetDashboard.PRESET_CHARTS,
+            ADLSContainer.ADLS_OBJECTS,
+            GCSBucket.GCS_OBJECTS,
+            S3Bucket.OBJECTS,
+            SalesforceObject.LOOKUP_FIELDS,
+            TableauSite.PROJECTS,
+            TableauProject.WORKBOOKS,
+            TableauProject.FLOWS,
+            TableauDashboard.WORKSHEETS,
+            TableauWorksheet.DATASOURCE_FIELDS,
+            TableauWorksheet.CALCULATED_FIELDS);
 
-    static final List<String> RELATION_ATTRIBUTES = List.of("name", "description");
+    static final List<AtlanField> RELATION_ATTRIBUTES = List.of(Asset.NAME, Asset.DESCRIPTION);
 
     public static void main(String[] args) {
         EnrichmentReporter er = new EnrichmentReporter();
@@ -273,76 +273,61 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     void cacheGlossaries() throws AtlanException {
         log.info("Finding glossaries...");
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(Glossary.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .sortOption(Sort.by(KeywordFields.NAME))
-                        .build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
-                .relationAttributes(RELATION_ATTRIBUTES)
-                .build();
-        IndexSearchResponse response = request.search();
-        response.stream()
+        Glossary.select()
+                .pageSize(getBatchSize())
+                .sort(Asset.NAME.order(SortOrder.Asc))
+                .sort(Asset.GUID.order(SortOrder.Asc))
+                .includesOnResults(ENRICHMENT_ATTRIBUTES)
+                ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
+                .includesOnRelations(RELATION_ATTRIBUTES)
+                .stream(true)
                 .filter(a -> a instanceof Glossary)
                 .forEach(g -> glossaryGuidToDetails.put(g.getGuid(), (Glossary) g));
     }
 
     void cacheTerms() throws AtlanException {
         log.info("Finding terms...");
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GlossaryTerm.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .sortOption(Sort.by(KeywordFields.NAME))
-                        .build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
-                .attribute("anchor")
-                .attribute("categories")
-                .attribute("seeAlso")
-                .attribute("preferredTerms")
-                .attribute("synonyms")
-                .attribute("antonyms")
-                .attribute("translatedTerms")
-                .attribute("validValuesFor")
-                .attribute("classifies")
-                .relationAttributes(RELATION_ATTRIBUTES)
-                .build();
-        IndexSearchResponse response = request.search();
-        response.stream()
+        GlossaryTerm.select()
+                .pageSize(getBatchSize())
+                .sort(Asset.NAME.order(SortOrder.Asc))
+                .sort(Asset.GUID.order(SortOrder.Asc))
+                .includesOnResults(ENRICHMENT_ATTRIBUTES)
+                ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
+                .includeOnResults(GlossaryTerm.ANCHOR)
+                .includeOnResults(GlossaryTerm.CATEGORIES)
+                .includeOnResults(GlossaryTerm.SEE_ALSO)
+                .includeOnResults(GlossaryTerm.PREFERRED_TERMS)
+                .includeOnResults(GlossaryTerm.SYNONYMS)
+                .includeOnResults(GlossaryTerm.ANTONYMS)
+                .includeOnResults(GlossaryTerm.TRANSLATED_TERMS)
+                .includeOnResults(GlossaryTerm.VALID_VALUES_FOR)
+                .includeOnResults(GlossaryTerm.CLASSIFIES)
+                .includesOnRelations(RELATION_ATTRIBUTES)
+                .stream(true)
                 .filter(a -> a instanceof GlossaryTerm)
                 .forEach(t -> termGuidToDetails.put(t.getGuid(), (GlossaryTerm) t));
     }
 
     void getAssets(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
-        CompoundQuery.CompoundQueryBuilder builder = CompoundQuery.builder().must(beActive());
+        AtlanClient client = Atlan.getDefaultClient();
+        FluentSearch.FluentSearchBuilder<?, ?> builder = client.assets.select();
         if (!INCLUDE_FIELD_LEVEL) {
-            builder = builder.must(beOneOfTypes(assetTypes));
+            builder = builder.where(FluentSearch.assetTypes(assetTypes));
         }
         if (FILTER_TYPE == FilterType.BY_GROUP) {
-            builder = builder.must(have(KeywordFields.OWNER_GROUPS).present());
+            builder = builder.where(Asset.OWNER_GROUPS.hasAnyValue());
         } else if (FILTER_TYPE == FilterType.BY_ATLAN_TAG) {
-            builder = builder.must(beTaggedByAtLeastOneOf(ATLAN_TAG_LIST));
+            builder = builder.where(FluentSearch.tagged(client, ATLAN_TAG_LIST));
         } else if (FILTER_TYPE == FilterType.BY_PREFIX) {
-            builder = builder.must(have(KeywordFields.QUALIFIED_NAME).startingWith(PREFIX));
+            builder = builder.where(Asset.QUALIFIED_NAME.startsWith(PREFIX));
         }
-        Query query = builder.build()._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(
-                        IndexSearchDSL.builder(query).size(getBatchSize()).build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .attributes(childRelationships)
-                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
-                .relationAttribute("description")
-                .relationAttribute("userDescription")
-                .build();
+        builder.pageSize(getBatchSize())
+                .includesOnResults(ENRICHMENT_ATTRIBUTES)
+                .includesOnResults(childRelationships)
+                ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
+                .includeOnRelations(Asset.DESCRIPTION)
+                .includeOnRelations(Asset.USER_DESCRIPTION);
+        IndexSearchRequest request = builder.toRequest();
         log.info("Retrieving asset details from {} in batches of: {}", Atlan.getBaseUrl(), getBatchSize());
         IndexSearchResponse response = request.search();
         long totalResults = response.getApproximateCount();
@@ -435,24 +420,17 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
 
     void findCategories(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         log.info("Finding categories...");
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GlossaryCategory.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .sortOption(Sort.by(KeywordFields.NAME))
-                        .build())
-                .attributes(ENRICHMENT_ATTRIBUTES)
-                .attributes(CM_ATTRIBUTES_FOR_SEARCH)
-                .attribute("anchor")
-                .attribute("parentCategory")
-                .relationAttributes(RELATION_ATTRIBUTES)
-                .build();
-        IndexSearchResponse response = request.search();
-        Map<String, GlossaryCategory> categoryGuidToDetails = new HashMap<>();
-        response.stream()
+        Map<String, GlossaryCategory> categoryGuidToDetails = new ConcurrentHashMap<>();
+        GlossaryCategory.select()
+                .pageSize(getBatchSize())
+                .sort(Asset.NAME.order(SortOrder.Asc))
+                .sort(Asset.GUID.order(SortOrder.Asc))
+                .includesOnResults(ENRICHMENT_ATTRIBUTES)
+                ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
+                .includeOnResults(GlossaryCategory.ANCHOR)
+                .includeOnResults(GlossaryCategory.PARENT_CATEGORY)
+                .includesOnRelations(RELATION_ATTRIBUTES)
+                .stream(true)
                 .filter(a -> a instanceof GlossaryCategory)
                 .forEach(c -> categoryGuidToDetails.put(c.getGuid(), (GlossaryCategory) c));
         for (GlossaryCategory category : categoryGuidToDetails.values()) {

@@ -9,12 +9,11 @@ import com.atlan.exception.ErrorCode;
 import com.atlan.exception.InvalidRequestException;
 import com.atlan.exception.NotFoundException;
 import com.atlan.model.assets.*;
-import com.atlan.model.core.AssetFilter;
 import com.atlan.model.enums.AtlanAnnouncementType;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.relations.UniqueAttributes;
-import com.atlan.util.QueryFactory;
+import com.atlan.model.search.FluentSearch;
 import com.atlan.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -130,6 +129,11 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     /** TBC */
     @Attribute
     @Singular
+    SortedSet<IAirflowTask> inputToAirflowTasks;
+
+    /** TBC */
+    @Attribute
+    @Singular
     SortedSet<ILineageProcess> inputToProcesses;
 
     /** TBC */
@@ -151,6 +155,11 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
     /** TBC */
     @Attribute
     Long lastProfiledAt;
+
+    /** TBC */
+    @Attribute
+    @Singular
+    SortedSet<IAirflowTask> outputFromAirflowTasks;
 
     /** TBC */
     @Attribute
@@ -280,8 +289,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      *
      * @return an asset filter that includes all GuacamoleTable assets
      */
-    public static AssetFilter.AssetFilterBuilder all() {
-        return all(Atlan.getDefaultClient());
+    public static FluentSearch.FluentSearchBuilder<?, ?> select() {
+        return select(Atlan.getDefaultClient());
     }
 
     /**
@@ -293,8 +302,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @param client connectivity to the Atlan tenant from which to retrieve the assets
      * @return an asset filter that includes all GuacamoleTable assets
      */
-    public static AssetFilter.AssetFilterBuilder all(AtlanClient client) {
-        return all(client, false);
+    public static FluentSearch.FluentSearchBuilder<?, ?> select(AtlanClient client) {
+        return select(client, false);
     }
 
     /**
@@ -306,8 +315,8 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @param includeArchived when true, archived (soft-deleted) GuacamoleTables will be included
      * @return an asset filter that includes all GuacamoleTable assets
      */
-    public static AssetFilter.AssetFilterBuilder all(boolean includeArchived) {
-        return all(Atlan.getDefaultClient(), includeArchived);
+    public static FluentSearch.FluentSearchBuilder<?, ?> select(boolean includeArchived) {
+        return select(Atlan.getDefaultClient(), includeArchived);
     }
 
     /**
@@ -320,11 +329,11 @@ public class GuacamoleTable extends Asset implements IGuacamoleTable, ITable, IS
      * @param includeArchived when true, archived (soft-deleted) GuacamoleTables will be included
      * @return an asset filter that includes all GuacamoleTable assets
      */
-    public static AssetFilter.AssetFilterBuilder all(AtlanClient client, boolean includeArchived) {
-        AssetFilter.AssetFilterBuilder builder =
-                AssetFilter.builder().client(client).filter(QueryFactory.type(TYPE_NAME));
+    public static FluentSearch.FluentSearchBuilder<?, ?> select(AtlanClient client, boolean includeArchived) {
+        FluentSearch.FluentSearchBuilder<?, ?> builder =
+                client.assets.select().where(FluentSearch.assetType(TYPE_NAME));
         if (!includeArchived) {
-            builder.filter(QueryFactory.active());
+            builder.where(FluentSearch.ACTIVE);
         }
         return builder;
     }

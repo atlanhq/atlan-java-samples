@@ -3,21 +3,18 @@
 package com.atlan.samples.reporters;
 
 import static com.atlan.samples.writers.ExcelWriter.DataCell;
-import static com.atlan.util.QueryFactory.*;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
-import com.atlan.model.enums.KeywordFields;
-import com.atlan.model.search.*;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,8 +24,8 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
 
     private static final Map<String, String> SLACK_DISCUSSIONS = createSlackDiscussionHeader();
 
-    private static final HashMap<String, Long> assetToSlackDiscussions = new HashMap<>();
-    private static final HashMap<String, IAsset> guidToLinkedAsset = new HashMap<>();
+    private static final Map<String, Long> assetToSlackDiscussions = new ConcurrentHashMap<>();
+    private static final Map<String, IAsset> guidToLinkedAsset = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
         SlackDiscussionReporter sdr = new SlackDiscussionReporter();
@@ -92,38 +89,32 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
     void getSlackDiscussions(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         // TODO: Ideally filter the links retrieved to only those for slack.com, but this does not
         //  appear possible with the index on the 'link' attribute
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(Link.TYPE_NAME))
-                .build()
-                ._toQuery();
-        IndexSearchRequest request = IndexSearchRequest.builder(IndexSearchDSL.builder(query)
-                        .size(getBatchSize())
-                        .sortOption(Sort.by(KeywordFields.GUID, SortOrder.Asc))
-                        .build())
-                .attribute("asset")
-                .attribute("link")
-                .attribute("reference")
-                .relationAttribute("qualifiedName")
-                .relationAttribute("typeName")
-                .relationAttribute("name")
-                .build();
         log.info("Retrieving first {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
-        IndexSearchResponse response = request.search();
-        response.stream().filter(a -> a instanceof Link).forEach(l -> {
-            Link link = (Link) l;
-            if (link.getAsset() != null) {
-                String assetGuid = link.getAsset().getGuid();
-                String url = link.getLink();
-                if (url.contains("slack.com")) {
-                    if (!assetToSlackDiscussions.containsKey(assetGuid)) {
-                        assetToSlackDiscussions.put(assetGuid, 0L);
+        Link.select()
+                .pageSize(getBatchSize())
+                .sort(Asset.GUID.order(SortOrder.Asc))
+                .includeOnResults(Link.ASSET)
+                .includeOnResults(Link.LINK)
+                .includeOnResults(Link.REFERENCE)
+                .includeOnRelations(Asset.QUALIFIED_NAME)
+                .includeOnRelations(Asset.TYPE_NAME)
+                .includeOnRelations(Asset.NAME)
+                .stream(true)
+                .filter(a -> a instanceof Link)
+                .forEach(l -> {
+                    Link link = (Link) l;
+                    if (link.getAsset() != null) {
+                        String assetGuid = link.getAsset().getGuid();
+                        String url = link.getLink();
+                        if (url.contains("slack.com")) {
+                            if (!assetToSlackDiscussions.containsKey(assetGuid)) {
+                                assetToSlackDiscussions.put(assetGuid, 0L);
+                            }
+                            assetToSlackDiscussions.put(assetGuid, assetToSlackDiscussions.get(assetGuid) + 1);
+                            guidToLinkedAsset.put(assetGuid, link.getAsset());
+                        }
                     }
-                    assetToSlackDiscussions.put(assetGuid, assetToSlackDiscussions.get(assetGuid) + 1);
-                    guidToLinkedAsset.put(assetGuid, link.getAsset());
-                }
-            }
-        });
+                });
         for (Map.Entry<String, Long> entry : assetToSlackDiscussions.entrySet()) {
             String assetGuid = entry.getKey();
             Long linkCount = entry.getValue();

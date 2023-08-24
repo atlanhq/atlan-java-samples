@@ -2,12 +2,11 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.probable.guacamole.instances;
 
-import static com.atlan.util.QueryFactory.*;
-
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.atlan.Atlan;
+import com.atlan.AtlanClient;
 import com.atlan.exception.AtlanException;
 import com.atlan.exception.NotFoundException;
+import com.atlan.model.assets.Asset;
 import com.atlan.model.assets.Connection;
 import com.atlan.model.assets.Database;
 import com.atlan.model.assets.Schema;
@@ -15,6 +14,7 @@ import com.atlan.model.core.AssetMutationResponse;
 import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.AtlanDeleteType;
 import com.atlan.model.enums.CertificateStatus;
+import com.atlan.model.search.FluentSearch;
 import com.atlan.model.search.IndexSearchRequest;
 import com.atlan.model.search.IndexSearchResponse;
 import com.atlan.util.AssetBatch;
@@ -22,8 +22,6 @@ import com.probable.guacamole.ExtendedModelGenerator;
 import com.probable.guacamole.model.assets.GuacamoleColumn;
 import com.probable.guacamole.model.assets.GuacamoleTable;
 import com.probable.guacamole.model.enums.GuacamoleTemperature;
-import com.probable.guacamole.model.enums.KeywordFields;
-import com.probable.guacamole.model.enums.NumericFields;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -153,13 +151,11 @@ public class InstanceManager extends ExtendedModelGenerator {
     }
 
     void searchEntities() {
-        Query query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOneOfTypes(List.of(GuacamoleTable.TYPE_NAME, GuacamoleColumn.TYPE_NAME)))
-                .build()
-                ._toQuery();
-
-        IndexSearchRequest request = IndexSearchRequest.builder(query).build();
+        AtlanClient client = Atlan.getDefaultClient();
+        IndexSearchRequest request = client.assets
+                .select()
+                .where(FluentSearch.assetTypes(List.of(GuacamoleTable.TYPE_NAME, GuacamoleColumn.TYPE_NAME)))
+                .toRequest();
 
         try {
             IndexSearchResponse response = request.search();
@@ -170,14 +166,11 @@ public class InstanceManager extends ExtendedModelGenerator {
             log.error("Unable to search.", e);
         }
 
-        query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GuacamoleColumn.TYPE_NAME))
-                .must(have(KeywordFields.NAME).eq("column1"))
-                .build()
-                ._toQuery();
-
-        request = IndexSearchRequest.builder(query).build();
+        request = client.assets
+                .select()
+                .where(FluentSearch.assetType(GuacamoleColumn.TYPE_NAME))
+                .where(Asset.NAME.eq("column1"))
+                .toRequest();
 
         try {
             IndexSearchResponse response = request.search();
@@ -188,14 +181,10 @@ public class InstanceManager extends ExtendedModelGenerator {
             log.error("Unable to search.", e);
         }
 
-        query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GuacamoleColumn.TYPE_NAME))
-                .must(have(NumericFields.GUACAMOLE_WIDTH).gt(150L))
-                .build()
-                ._toQuery();
-
-        request = IndexSearchRequest.builder(query).build();
+        /*request = client.assets.select()
+                .where(FluentSearch.assetType(GuacamoleColumn.TYPE_NAME))
+                .where(GuacamoleColumn.GUACAMOLE_WIDTH.gt(150L))
+                .toRequest();
 
         try {
             IndexSearchResponse response = request.search();
@@ -204,16 +193,13 @@ public class InstanceManager extends ExtendedModelGenerator {
             assert response.getAssets().size() == 1;
         } catch (AtlanException e) {
             log.error("Unable to search.", e);
-        }
+        }*/
 
-        query = CompoundQuery.builder()
-                .must(beActive())
-                .must(beOfType(GuacamoleTable.TYPE_NAME))
-                .must(have(KeywordFields.DESCRIPTION).startingWith("Now"))
-                .build()
-                ._toQuery();
-
-        request = IndexSearchRequest.builder(query).build();
+        request = client.assets
+                .select()
+                .where(FluentSearch.assetType(GuacamoleTable.TYPE_NAME))
+                .where(Asset.DESCRIPTION.startsWith("Now"))
+                .toRequest();
 
         try {
             IndexSearchResponse response = request.search();
