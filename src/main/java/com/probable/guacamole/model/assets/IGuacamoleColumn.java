@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.probable.guacamole.model.assets;
 
+import com.atlan.model.assets.IAirflowTask;
 import com.atlan.model.assets.IAtlanQuery;
 import com.atlan.model.assets.IColumn;
 import com.atlan.model.assets.IDbtMetric;
@@ -18,6 +19,9 @@ import com.atlan.model.assets.IMCMonitor;
 import com.atlan.model.assets.IMaterializedView;
 import com.atlan.model.assets.IMetric;
 import com.atlan.model.assets.IReadme;
+import com.atlan.model.assets.ISchemaRegistrySubject;
+import com.atlan.model.assets.ISnowflakeDynamicTable;
+import com.atlan.model.assets.ISodaCheck;
 import com.atlan.model.assets.ITable;
 import com.atlan.model.assets.ITablePartition;
 import com.atlan.model.assets.IView;
@@ -26,6 +30,8 @@ import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.AtlanStatus;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.enums.SourceCostUnitType;
+import com.atlan.model.fields.NumericField;
+import com.atlan.model.fields.RelationField;
 import com.atlan.model.relations.UniqueAttributes;
 import com.atlan.model.structs.ColumnValueFrequencyMap;
 import com.atlan.model.structs.Histogram;
@@ -49,6 +55,15 @@ import javax.annotation.processing.Generated;
 public interface IGuacamoleColumn {
 
     public static final String TYPE_NAME = "GuacamoleColumn";
+
+    /** Time (epoch) when this column was imagined, in milliseconds. */
+    NumericField GUACAMOLE_CONCEPTUALIZED = new NumericField("guacamoleConceptualized", "guacamoleConceptualized");
+
+    /** Specialized table that contains this specialized column. */
+    RelationField GUACAMOLE_TABLE = new RelationField("guacamoleTable");
+
+    /** Maximum size of a Guacamole column. */
+    NumericField GUACAMOLE_WIDTH = new NumericField("guacamoleWidth", "guacamoleWidth");
 
     /** TBC */
     SortedSet<String> getAdminGroups();
@@ -195,6 +210,9 @@ public interface IGuacamoleColumn {
     String getAssetDbtUniqueId();
 
     /** TBC */
+    String getAssetIcon();
+
+    /** TBC */
     SortedSet<String> getAssetMcIncidentNames();
 
     /** TBC */
@@ -229,6 +247,24 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     SortedSet<String> getAssetMcMonitorTypes();
+
+    /** TBC */
+    Long getAssetSodaCheckCount();
+
+    /** TBC */
+    String getAssetSodaCheckStatuses();
+
+    /** TBC */
+    String getAssetSodaDQStatus();
+
+    /** TBC */
+    Long getAssetSodaLastScanAt();
+
+    /** TBC */
+    Long getAssetSodaLastSyncRunAt();
+
+    /** TBC */
+    String getAssetSodaSourceURL();
 
     /** TBC */
     SortedSet<String> getAssetTags();
@@ -399,6 +435,9 @@ public interface IGuacamoleColumn {
     Boolean getHasLineage();
 
     /** TBC */
+    SortedSet<IAirflowTask> getInputToAirflowTasks();
+
+    /** TBC */
     SortedSet<ILineageProcess> getInputToProcesses();
 
     /** TBC */
@@ -489,6 +528,9 @@ public interface IGuacamoleColumn {
     Integer getOrder();
 
     /** TBC */
+    SortedSet<IAirflowTask> getOutputFromAirflowTasks();
+
+    /** TBC */
     SortedSet<ILineageProcess> getOutputFromProcesses();
 
     /** TBC */
@@ -553,6 +595,15 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     String getSchemaQualifiedName();
+
+    /** TBC */
+    SortedSet<ISchemaRegistrySubject> getSchemaRegistrySubjects();
+
+    /** TBC */
+    ISnowflakeDynamicTable getSnowflakeDynamicTable();
+
+    /** TBC */
+    SortedSet<ISodaCheck> getSodaChecks();
 
     /** TBC */
     SourceCostUnitType getSourceCostUnit();
@@ -628,6 +679,9 @@ public interface IGuacamoleColumn {
 
     /** TBC */
     SortedSet<String> getStarredBy();
+
+    /** TBC */
+    Integer getStarredCount();
 
     /** TBC */
     List<StarredDetails> getStarredDetails();

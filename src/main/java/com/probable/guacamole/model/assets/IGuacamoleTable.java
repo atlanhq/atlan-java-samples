@@ -2,6 +2,7 @@
 /* Copyright 2023 Atlan Pte. Ltd. */
 package com.probable.guacamole.model.assets;
 
+import com.atlan.model.assets.IAirflowTask;
 import com.atlan.model.assets.IAtlanQuery;
 import com.atlan.model.assets.IColumn;
 import com.atlan.model.assets.IDbtModel;
@@ -16,6 +17,8 @@ import com.atlan.model.assets.IMCMonitor;
 import com.atlan.model.assets.IMetric;
 import com.atlan.model.assets.IReadme;
 import com.atlan.model.assets.ISchema;
+import com.atlan.model.assets.ISchemaRegistrySubject;
+import com.atlan.model.assets.ISodaCheck;
 import com.atlan.model.assets.ITable;
 import com.atlan.model.assets.ITablePartition;
 import com.atlan.model.enums.AtlanAnnouncementType;
@@ -23,6 +26,10 @@ import com.atlan.model.enums.AtlanConnectorType;
 import com.atlan.model.enums.AtlanStatus;
 import com.atlan.model.enums.CertificateStatus;
 import com.atlan.model.enums.SourceCostUnitType;
+import com.atlan.model.fields.BooleanField;
+import com.atlan.model.fields.KeywordField;
+import com.atlan.model.fields.NumericField;
+import com.atlan.model.fields.RelationField;
 import com.atlan.model.relations.UniqueAttributes;
 import com.atlan.model.structs.PopularityInsights;
 import com.atlan.model.structs.StarredDetails;
@@ -45,6 +52,18 @@ import javax.annotation.processing.Generated;
 public interface IGuacamoleTable {
 
     public static final String TYPE_NAME = "GuacamoleTable";
+
+    /** Whether this table is currently archived (true) or not (false). */
+    BooleanField GUACAMOLE_ARCHIVED = new BooleanField("guacamoleArchived", "guacamoleArchived");
+
+    /** Specialized columns contained within this specialized table. */
+    RelationField GUACAMOLE_COLUMNS = new RelationField("guacamoleColumns");
+
+    /** Consolidated quantification metric spanning number of columns, rows, and sparsity of population. */
+    NumericField GUACAMOLE_SIZE = new NumericField("guacamoleSize", "guacamoleSize");
+
+    /** Rough measure of the IOPS allocated to the table's processing. */
+    KeywordField GUACAMOLE_TEMPERATURE = new KeywordField("guacamoleTemperature", "guacamoleTemperature");
 
     /** TBC */
     SortedSet<String> getAdminGroups();
@@ -194,6 +213,9 @@ public interface IGuacamoleTable {
     String getAssetDbtUniqueId();
 
     /** TBC */
+    String getAssetIcon();
+
+    /** TBC */
     SortedSet<String> getAssetMcIncidentNames();
 
     /** TBC */
@@ -228,6 +250,24 @@ public interface IGuacamoleTable {
 
     /** TBC */
     SortedSet<String> getAssetMcMonitorTypes();
+
+    /** TBC */
+    Long getAssetSodaCheckCount();
+
+    /** TBC */
+    String getAssetSodaCheckStatuses();
+
+    /** TBC */
+    String getAssetSodaDQStatus();
+
+    /** TBC */
+    Long getAssetSodaLastScanAt();
+
+    /** TBC */
+    Long getAssetSodaLastSyncRunAt();
+
+    /** TBC */
+    String getAssetSodaSourceURL();
 
     /** TBC */
     SortedSet<String> getAssetTags();
@@ -320,6 +360,9 @@ public interface IGuacamoleTable {
     Boolean getHasLineage();
 
     /** TBC */
+    SortedSet<IAirflowTask> getInputToAirflowTasks();
+
+    /** TBC */
     SortedSet<ILineageProcess> getInputToProcesses();
 
     /** TBC */
@@ -369,6 +412,9 @@ public interface IGuacamoleTable {
 
     /** TBC */
     String getName();
+
+    /** TBC */
+    SortedSet<IAirflowTask> getOutputFromAirflowTasks();
 
     /** TBC */
     SortedSet<ILineageProcess> getOutputFromProcesses();
@@ -434,7 +480,13 @@ public interface IGuacamoleTable {
     String getSchemaQualifiedName();
 
     /** TBC */
+    SortedSet<ISchemaRegistrySubject> getSchemaRegistrySubjects();
+
+    /** TBC */
     Long getSizeBytes();
+
+    /** TBC */
+    SortedSet<ISodaCheck> getSodaChecks();
 
     /** TBC */
     SourceCostUnitType getSourceCostUnit();
@@ -510,6 +562,9 @@ public interface IGuacamoleTable {
 
     /** TBC */
     SortedSet<String> getStarredBy();
+
+    /** TBC */
+    Integer getStarredCount();
 
     /** TBC */
     List<StarredDetails> getStarredDetails();
