@@ -7,13 +7,19 @@
                 <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
             </PatternLayout>
         </Console>
+        <File name="FileAppender" fileName="debug.log">
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+        </File>
     </Appenders>
     <Loggers>
-        <Root level="INFO">
-            <AppenderRef ref="ConsoleAppender"/>
+        <Root level="DEBUG">
+            <AppenderRef ref="ConsoleAppender" level="INFO"/>
+            <AppenderRef ref="FileAppender"/>
         </Root>
         <Logger name="software.amazon.awssdk" level="WARN" />
         <Logger name="software.amazon.awssdk.request" level="DEBUG" />
-        <Logger name="com.atlan" level="INFO" />
+        <Logger name="com.atlan" level="DEBUG"/>
     </Loggers>
 </Configuration>
