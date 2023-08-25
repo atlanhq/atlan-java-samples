@@ -181,7 +181,8 @@ public class InstanceManager extends ExtendedModelGenerator {
             log.error("Unable to search.", e);
         }
 
-        /*request = client.assets.select()
+        request = client.assets
+                .select()
                 .where(FluentSearch.assetType(GuacamoleColumn.TYPE_NAME))
                 .where(GuacamoleColumn.GUACAMOLE_WIDTH.gt(150L))
                 .toRequest();
@@ -193,7 +194,7 @@ public class InstanceManager extends ExtendedModelGenerator {
             assert response.getAssets().size() == 1;
         } catch (AtlanException e) {
             log.error("Unable to search.", e);
-        }*/
+        }
 
         request = client.assets
                 .select()
