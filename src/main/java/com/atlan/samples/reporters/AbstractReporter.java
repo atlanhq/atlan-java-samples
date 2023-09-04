@@ -3,8 +3,13 @@
 package com.atlan.samples.reporters;
 
 import com.atlan.Atlan;
+import com.atlan.cache.ReflectionCache;
 import com.atlan.model.assets.*;
 import com.atlan.model.core.AtlanTag;
+import com.atlan.model.enums.AtlanEnum;
+import com.atlan.model.fields.AtlanField;
+import com.atlan.model.structs.AtlanStruct;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -64,12 +69,16 @@ public abstract class AbstractReporter {
     }
 
     protected void setFilenameWithPrefix(Map<String, String> event, String prefix) {
+        setFilenameWithPrefix(event, prefix, "xlsx");
+    }
+
+    protected void setFilenameWithPrefix(Map<String, String> event, String prefix, String extension) {
         String timestamp = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
         String filename = event.getOrDefault("FILE_PREFIX", prefix);
-        if (filename.endsWith(".xls") || filename.endsWith(".xlsx")) {
-            filename = filename.substring(0, filename.lastIndexOf(".xls"));
+        if (filename.endsWith("." + extension)) {
+            filename = filename.substring(0, filename.lastIndexOf("." + extension));
         }
-        filename += "-" + timestamp + ".xlsx";
+        filename += "-" + timestamp + "." + extension;
         setFilename(filename);
     }
 
@@ -94,12 +103,12 @@ public abstract class AbstractReporter {
         return description == null ? "" : description;
     }
 
-    protected static String getUserOwners(Asset asset, String delimiter) {
-        return getDelimitedList(asset.getOwnerUsers(), delimiter);
+    protected String getUserOwners(Asset asset) {
+        return getDelimitedList(asset.getOwnerUsers());
     }
 
-    protected static String getGroupOwners(Asset asset, String delimiter) {
-        return getDelimitedList(asset.getOwnerGroups(), delimiter);
+    protected String getGroupOwners(Asset asset) {
+        return getDelimitedList(asset.getOwnerGroups());
     }
 
     protected static int getCount(Collection<?> collection) {
@@ -107,6 +116,22 @@ public abstract class AbstractReporter {
             return 0;
         } else {
             return collection.size();
+        }
+    }
+
+    protected static String getValue(AtlanEnum e) {
+        if (e == null) {
+            return "";
+        } else {
+            return e.getValue();
+        }
+    }
+
+    protected static String protectFromNull(Object o) {
+        if (o == null) {
+            return "";
+        } else {
+            return o.toString();
         }
     }
 
@@ -126,15 +151,14 @@ public abstract class AbstractReporter {
      * whether directly or through propagation.
      *
      * @param asset for which to find Atlan tags
-     * @param delimiter the separator to use between multiple values
      * @return comma-separated list of the Atlan tags
      */
-    protected static String getAtlanTags(Asset asset, String delimiter) {
+    protected String getAtlanTags(Asset asset) {
         Set<AtlanTag> atlanTags = asset.getAtlanTags();
         if (atlanTags != null) {
             Set<String> atlanTagNames =
                     atlanTags.stream().map(AtlanTag::getTypeName).collect(Collectors.toSet());
-            return getDelimitedList(atlanTagNames, delimiter);
+            return getDelimitedList(atlanTagNames);
         }
         return "";
     }
@@ -144,10 +168,9 @@ public abstract class AbstractReporter {
      * to the provided asset.
      *
      * @param asset for which to find direct Atlan tags
-     * @param delimiter the separator to use between multiple values
      * @return comma-separated list of the direct Atlan tags
      */
-    protected static String getDirectAtlanTags(Asset asset, String delimiter) {
+    protected String getDirectAtlanTags(Asset asset) {
         Set<String> atlanTagNames = new TreeSet<>();
         if (asset != null) {
             Set<AtlanTag> atlanTags = asset.getAtlanTags();
@@ -160,22 +183,107 @@ public abstract class AbstractReporter {
                 }
             }
         }
-        return getDelimitedList(atlanTagNames, delimiter);
+        return getDelimitedList(atlanTagNames);
     }
 
     /**
      * Retrieve a list of multiple values as a single string, separated by the provided delimiter.
      *
      * @param items to combine into a single string
-     * @param delimiter to use to separate each item
      * @return a single string of all items separated by the delimiter
      */
-    protected static String getDelimitedList(Collection<String> items, String delimiter) {
+    protected String getDelimitedList(Collection<String> items) {
         if (items == null) {
             return "";
         } else {
-            return String.join(delimiter, items);
+            return String.join(getDelimiter(), items);
         }
+    }
+
+    /**
+     * Translates the provided value for the provided field on the provided asset into a string
+     * representation that can be encoded into a single cell of Excel / CSV.
+     *
+     * @param from the asset from which to read the value
+     * @param field the attribute rom which to read the value
+     * @return the string-encoded form that can be placed in a single cell
+     */
+    protected String getStringValueForField(Asset from, AtlanField field) {
+        try {
+            // Start by retrieving the value from the asset, then figure out how to serialize it
+            String deserializedName = ReflectionCache.getDeserializedName(from.getClass(), field.getAtlanFieldName());
+            return serializeValueToCSV(from.getGuid(), ReflectionCache.getValue(from, deserializedName));
+        } catch (IOException e) {
+            log.error(
+                    "Unable to retrieve attribute {} on: {}::{}",
+                    field.getAtlanFieldName(),
+                    from.getTypeName(),
+                    from.getQualifiedName(),
+                    e);
+        }
+        // If we fall through, return an empty string
+        return "";
+    }
+
+    @SuppressWarnings("unchecked")
+    protected String serializeValueToCSV(String fromGuid, Object value) {
+        // Then figure out how to CSV-string serialize it
+        if (value instanceof String) {
+            return (String) value;
+        } else if (value instanceof Collection) {
+            Optional<?> element1 = ((Collection<?>) value).stream().findFirst();
+            if (element1.isPresent()) {
+                Object first = element1.get();
+                if (first instanceof AtlanTag) {
+                    Collection<AtlanTag> tags = (Collection<AtlanTag>) value;
+                    List<String> directTags = new ArrayList<>();
+                    for (AtlanTag tag : tags) {
+                        if (fromGuid.equals(tag.getEntityGuid())) {
+                            directTags.add(tag.getTypeName());
+                        }
+                    }
+                    return getDelimitedList(directTags);
+                } else if (first instanceof Asset) {
+                    return getDelimitedList(((Collection<Asset>) value)
+                            .stream().map(this::serializeAssetRefToCSV).collect(Collectors.toList()));
+                } else if (first instanceof String) {
+                    return getDelimitedList((Collection<String>) value);
+                } else if (first instanceof AtlanStruct) {
+                    return getDelimitedList(((Collection<AtlanStruct>) value)
+                            .stream().map(this::serializeStructToCSV).collect(Collectors.toList()));
+                } else {
+                    log.warn("Unhandled collection of values: {}", first.getClass());
+                }
+            }
+            return "";
+        } else if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            List<String> values = new ArrayList<>();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                values.add(entry.getKey() + "=" + serializeValueToCSV(fromGuid, entry.getValue()));
+            }
+            return getDelimitedList(values);
+        } else if (value instanceof Asset) {
+            return serializeAssetRefToCSV((Asset) value);
+        } else if (value instanceof AtlanEnum) {
+            return ((AtlanEnum) value).getValue();
+        } else if (value instanceof AtlanStruct) {
+            return serializeStructToCSV((AtlanStruct) value);
+        } else if (value != null) {
+            // For everything else, just turn it directly into a string
+            return value.toString();
+        }
+        // If we fall through, return an empty string
+        return "";
+    }
+
+    protected String serializeAssetRefToCSV(Asset asset) {
+        return asset.getTypeName() + "@" + asset.getQualifiedName();
+    }
+
+    protected String serializeStructToCSV(AtlanStruct struct) {
+        // TODO: probably some format that's better than this...
+        return struct.toString();
     }
 
     public void setFilename(String _filename) {

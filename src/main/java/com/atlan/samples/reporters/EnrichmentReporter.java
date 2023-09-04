@@ -355,8 +355,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     row.add(DataCell.of(result.getName()));
                     row.add(DataCell.of(result.getDescription()));
                     row.add(DataCell.of(result.getUserDescription()));
-                    row.add(DataCell.of(getUserOwners(result, getDelimiter())));
-                    row.add(DataCell.of(getGroupOwners(result, getDelimiter())));
+                    row.add(DataCell.of(getUserOwners(result)));
+                    row.add(DataCell.of(getGroupOwners(result)));
                     row.add(DataCell.of(result.getCertificateStatus()));
                     row.add(DataCell.of(result.getCertificateStatusMessage()));
                     row.add(DataCell.of(result.getCertificateUpdatedBy()));
@@ -373,10 +373,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                     row.add(DataCell.of(getREADME(result)));
                     row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
                     row.add(DataCell.of(getCount(result.getLinks())));
-                    row.add(DataCell.of(
-                            DIRECT_ATLAN_TAG_ONLY
-                                    ? getDirectAtlanTags(result, getDelimiter())
-                                    : getAtlanTags(result, getDelimiter())));
+                    row.add(DataCell.of(DIRECT_ATLAN_TAG_ONLY ? getDirectAtlanTags(result) : getAtlanTags(result)));
                     row.add(DataCell.of(childAssets.size()));
                     row.add(DataCell.of(descriptionCounts));
                     row.add(DataCell.of(getAssetLink(guid)));
@@ -395,8 +392,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             row.add(DataCell.of(glossary.getName()));
             row.add(DataCell.of(glossary.getDescription()));
             row.add(DataCell.of(glossary.getUserDescription()));
-            row.add(DataCell.of(getUserOwners(glossary, getDelimiter())));
-            row.add(DataCell.of(getGroupOwners(glossary, getDelimiter())));
+            row.add(DataCell.of(getUserOwners(glossary)));
+            row.add(DataCell.of(getGroupOwners(glossary)));
             row.add(DataCell.of(glossary.getCertificateStatus()));
             row.add(DataCell.of(glossary.getCertificateStatusMessage()));
             row.add(DataCell.of(glossary.getCertificateUpdatedBy()));
@@ -442,8 +439,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             row.add(DataCell.of(categoryPath));
             row.add(DataCell.of(category.getDescription()));
             row.add(DataCell.of(category.getUserDescription()));
-            row.add(DataCell.of(getUserOwners(category, getDelimiter())));
-            row.add(DataCell.of(getGroupOwners(category, getDelimiter())));
+            row.add(DataCell.of(getUserOwners(category)));
+            row.add(DataCell.of(getGroupOwners(category)));
             row.add(DataCell.of(category.getCertificateStatus()));
             row.add(DataCell.of(category.getCertificateStatusMessage()));
             row.add(DataCell.of(category.getCertificateUpdatedBy()));
@@ -484,13 +481,10 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
             row.add(DataCell.of(term.getDescription()));
             row.add(DataCell.of(term.getUserDescription()));
             row.add(DataCell.of(getCategories(term)));
-            row.add(DataCell.of(getUserOwners(term, getDelimiter())));
-            row.add(DataCell.of(getGroupOwners(term, getDelimiter())));
+            row.add(DataCell.of(getUserOwners(term)));
+            row.add(DataCell.of(getGroupOwners(term)));
             row.add(DataCell.of(term.getCertificateStatus()));
-            row.add(DataCell.of(
-                    DIRECT_ATLAN_TAG_ONLY
-                            ? getDirectAtlanTags(term, getDelimiter())
-                            : getAtlanTags(term, getDelimiter())));
+            row.add(DataCell.of(DIRECT_ATLAN_TAG_ONLY ? getDirectAtlanTags(term) : getAtlanTags(term)));
             row.add(DataCell.of(term.getCertificateStatusMessage()));
             row.add(DataCell.of(term.getCertificateUpdatedBy()));
             row.add(DataCell.of(getFormattedDateTime(term.getCertificateUpdatedAt())));
@@ -527,7 +521,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 categoryPaths.add(path);
             }
         }
-        return getDelimitedList(categoryPaths, getDelimiter());
+        return getDelimitedList(categoryPaths);
     }
 
     String getTerms(Set<IGlossaryTerm> terms, Map<String, GlossaryTerm> guidMap) {
@@ -540,7 +534,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 qualifiedTerms.add(related.getName() + "@" + (glossary == null ? "" : glossary.getName()));
             }
         }
-        return getDelimitedList(qualifiedTerms, getDelimiter());
+        return getDelimitedList(qualifiedTerms);
     }
 
     @SuppressWarnings("unchecked")
@@ -558,7 +552,7 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                         if (value == null) {
                             row.add(DataCell.of(""));
                         } else if (value instanceof Collection) {
-                            row.add(DataCell.of(getDelimitedList((Collection<String>) value, getDelimiter())));
+                            row.add(DataCell.of(getDelimitedList((Collection<String>) value)));
                         } else if (value instanceof Boolean) {
                             row.add(DataCell.of((Boolean) value));
                         } else if (value instanceof Long) {
