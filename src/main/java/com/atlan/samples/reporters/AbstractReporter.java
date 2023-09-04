@@ -278,7 +278,11 @@ public abstract class AbstractReporter {
     }
 
     protected String serializeAssetRefToCSV(Asset asset) {
-        return asset.getTypeName() + "@" + asset.getQualifiedName();
+        String qualifiedName = asset.getQualifiedName();
+        if ((qualifiedName == null || qualifiedName.isEmpty()) && asset.getUniqueAttributes() != null) {
+            qualifiedName = asset.getUniqueAttributes().getQualifiedName();
+        }
+        return asset.getTypeName() + "@" + qualifiedName;
     }
 
     protected String serializeStructToCSV(AtlanStruct struct) {

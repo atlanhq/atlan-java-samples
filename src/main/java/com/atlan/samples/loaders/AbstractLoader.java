@@ -175,16 +175,23 @@ public abstract class AbstractLoader {
                     // TODO: parameters to decide whether to propagate these or not?
                     results.add(AtlanTag.of(tag));
                 }
-            } else if (Asset.class.isAssignableFrom(innerType)) {
+            } else if (AtlanStruct.class.isAssignableFrom(innerType)) {
+                for (String struct : values) {
+                    results.add(deserializeStructToCSV(struct, innerType));
+                }
+            } else if (AtlanEnum.class.isAssignableFrom(innerType)) {
+                for (String enumVal : values) {
+                    results.add(deserializeEnumFromCSV(enumVal, innerType));
+                }
+            } else if (innerType.isInterface()) {
+                // Note: relationships between assets are defined via interfaces (like IGlossaryTerm)
+                // rather than directly to Asset-extending types (like GlossaryTerm), so we'll check
+                // for interfaces as the inner type rather than Asset-assignability
                 for (String asset : values) {
                     results.add(deserializeAssetRefFromCSV(asset));
                 }
             } else if (String.class.isAssignableFrom(innerType)) {
                 results.addAll(Arrays.asList(values));
-            } else if (AtlanStruct.class.isAssignableFrom(innerType)) {
-                for (String struct : values) {
-                    results.add(deserializeStructToCSV(struct, innerType));
-                }
             } else {
                 throw new IOException("Unhandled collection of values: " + innerType);
             }
@@ -212,7 +219,7 @@ public abstract class AbstractLoader {
         } else if (AtlanStruct.class.isAssignableFrom(type)) {
             return deserializeStructToCSV(value, type);
         } else {
-            // For everything else, just turn it directly into a string
+            // For everything else, throw for now that it isn't handled
             throw new IOException("Unhandled data type for " + fieldName + ": " + type);
         }
     }
@@ -222,8 +229,9 @@ public abstract class AbstractLoader {
         String typeName = tokens[0];
         try {
             Class<?> assetClass = Serde.getAssetClassForType(typeName);
-            Method method = assetClass.getMethod("refByQualifiedName", String.class, String.class);
-            return method.invoke(null, typeName, tokens[1]);
+            Method method = assetClass.getMethod("refByQualifiedName", String.class);
+            String qualifiedName = String.join("@", Arrays.copyOfRange(tokens, 1, tokens.length));
+            return method.invoke(null, qualifiedName);
         } catch (ClassNotFoundException e) {
             throw new IOException(
                     "No class " + typeName + " found — unable to translate to an asset reference: " + assetRef, e);

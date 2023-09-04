@@ -65,8 +65,10 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
 
         parseParametersFromEvent(event);
 
-        FluentSearch.FluentSearchBuilder<?, ?> assets =
-                getAssetsToExtract().pageSize(getBatchSize()).includesOnResults(getAttributesToExtract());
+        FluentSearch.FluentSearchBuilder<?, ?> assets = getAssetsToExtract()
+                .pageSize(getBatchSize())
+                .includesOnResults(getAttributesToExtract())
+                .includeOnRelations(Asset.QUALIFIED_NAME);
 
         try (CSVWriter csv = new CSVWriter(getFilename())) {
             List<String> headerNames = Stream.of(Asset.QUALIFIED_NAME, Asset.TYPE_NAME)

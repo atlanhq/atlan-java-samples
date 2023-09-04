@@ -44,7 +44,8 @@ public class ExportAllDataAssets extends AssetReporter {
                 Asset.CREATE_TIME,
                 Asset.UPDATED_BY,
                 Asset.UPDATE_TIME,
-                IAWS.AWS_ARN);
+                Asset.ASSIGNED_TERMS,
+                IAWS.AWS_ARN); // Note that for any type that has extra mandatory fields, those must be included
         // TODO: need to add idempotency for these... Asset.ATLAN_TAGS);
     }
 
