@@ -19,6 +19,8 @@ build/
 enrichment-report*.xlsx
 slack-discussion-report*.xlsx
 user-details-report*.xlsx
+asset-report*.csv
+debug.log
 
 # Generated code and docs
 src/generate/**
