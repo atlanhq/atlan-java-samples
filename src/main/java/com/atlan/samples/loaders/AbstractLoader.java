@@ -130,18 +130,34 @@ public abstract class AbstractLoader {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected static <T extends AtlanEnum> T getEnum(String value, Class<T> clazz) {
-        if (value != null && !value.isEmpty()) {
-            try {
-                return (T) clazz.getMethod("fromValue", String.class).invoke(null, value);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                log.warn("Unable to translate {} to a {}.", value, clazz.getName(), e);
-            }
+    /**
+     * Deserialize a value intended for a custom metadata attribute.
+     * This should be as simple as determining whether the value is multi-valued or single-valued,
+     * and splitting it into multiple values if it is multi-valued.
+     *
+     * @param value from the CSV cell
+     * @return the deserialized value
+     */
+    protected Object deserializeCMValueFromCSV(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        } else if (value.contains(getDelimiter())) {
+            return getEmbeddedList(value, getDelimiter());
+        } else {
+            return value;
         }
-        return null;
     }
 
+    /**
+     * Deserialize a value intended for a normal (non-custom metadata) attribute.
+     * This requires figuring out what kind of value we should expect for that given attribute, so
+     * uses reflection to reverse-engineer this.
+     *
+     * @param value from the CSV cell
+     * @param setter method used to set the value for that attribute on an asset (from reflection)
+     * @return the deserialized value
+     * @throws IOException on any issues deserializing the value
+     */
     protected Object deserializeValueFromCSV(String value, Method setter) throws IOException {
         Class<?> paramClass = ReflectionCache.getParameterOfMethod(setter);
         Class<?> innerClass = null;
@@ -224,6 +240,13 @@ public abstract class AbstractLoader {
         }
     }
 
+    /**
+     * Deserializes an asset reference (typeName@qualifiedName) from a CSV cell value.
+     *
+     * @param assetRef value of the CSV cell
+     * @return an asset reference by qualifiedName to that particular asset
+     * @throws IOException on any issues deserializing the value
+     */
     protected Object deserializeAssetRefFromCSV(String assetRef) throws IOException {
         String[] tokens = assetRef.split(Pattern.quote("@"));
         String typeName = tokens[0];
@@ -240,11 +263,28 @@ public abstract class AbstractLoader {
         }
     }
 
+    /**
+     * Deserializes a struct value from a CSV cell value.
+     * Note: not yet implemented!
+     *
+     * @param struct value of the CSV cell
+     * @param structClass expected kind of struct
+     * @return a struct instance
+     * @throws IOException on any issues deserializing the value
+     */
     protected Object deserializeStructToCSV(String struct, Class<?> structClass) throws IOException {
         // TODO: figure out how to deserialize a "toString" representation...
         throw new IOException("Structs are currently unhandled in the loader.");
     }
 
+    /**
+     * Deserializes an enumerated value from a CSV cell value.
+     *
+     * @param enumValue value of the CSV cell
+     * @param enumClass expected kind of enum
+     * @return an enum value instance
+     * @throws IOException on any issues deserializing the value
+     */
     protected Object deserializeEnumFromCSV(String enumValue, Class<?> enumClass) throws IOException {
         try {
             Method method = enumClass.getMethod("fromValue", String.class);

@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.Asset;
 import com.atlan.model.fields.AtlanField;
+import com.atlan.model.fields.CustomMetadataField;
 import com.atlan.model.search.FluentSearch;
 import com.atlan.samples.writers.CSVWriter;
 import com.atlan.samples.writers.RowGenerator;
@@ -75,7 +76,7 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
                     .map(AtlanField::getAtlanFieldName)
                     .collect(Collectors.toList());
             headerNames.addAll(getAttributesToExtract().stream()
-                    .map(AtlanField::getAtlanFieldName)
+                    .map(AssetReporter::getHeaderForField)
                     .collect(Collectors.toList()));
             csv.writeHeader(headerNames);
             long start = System.currentTimeMillis();
@@ -89,6 +90,16 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
         }
 
         return getFilename();
+    }
+
+    private static String getHeaderForField(AtlanField field) {
+        if (field instanceof CustomMetadataField) {
+            // For custom metadata, translate the header to human-readable names
+            CustomMetadataField cm = (CustomMetadataField) field;
+            return cm.getSetName() + "::" + cm.getAttributeName();
+        } else {
+            return field.getAtlanFieldName();
+        }
     }
 
     /**

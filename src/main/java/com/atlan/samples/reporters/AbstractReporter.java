@@ -8,6 +8,7 @@ import com.atlan.model.assets.*;
 import com.atlan.model.core.AtlanTag;
 import com.atlan.model.enums.AtlanEnum;
 import com.atlan.model.fields.AtlanField;
+import com.atlan.model.fields.CustomMetadataField;
 import com.atlan.model.structs.AtlanStruct;
 import java.io.IOException;
 import java.time.Instant;
@@ -211,8 +212,20 @@ public abstract class AbstractReporter {
     protected String getStringValueForField(Asset from, AtlanField field) {
         try {
             // Start by retrieving the value from the asset, then figure out how to serialize it
-            String deserializedName = ReflectionCache.getDeserializedName(from.getClass(), field.getAtlanFieldName());
-            return serializeValueToCSV(from.getGuid(), ReflectionCache.getValue(from, deserializedName));
+            Object value;
+            if (field instanceof CustomMetadataField) {
+                CustomMetadataField cmf = (CustomMetadataField) field;
+                value = from.getCustomMetadata(cmf.getSetName(), cmf.getAttributeName());
+                if (from.getGuid().equals("dafeb71f-3b70-4c20-9194-2e5cb182de0b")) {
+                    log.info("Found value: {}", value);
+                    log.info("Full asset: {}", from);
+                }
+            } else {
+                String deserializedName =
+                        ReflectionCache.getDeserializedName(from.getClass(), field.getAtlanFieldName());
+                value = ReflectionCache.getValue(from, deserializedName);
+            }
+            return serializeValueToCSV(from.getGuid(), value);
         } catch (IOException e) {
             log.error(
                     "Unable to retrieve attribute {} on: {}::{}",
@@ -225,6 +238,13 @@ public abstract class AbstractReporter {
         return "";
     }
 
+    /**
+     * Serialize the provided value into a form that can be stored in a single cell of CSV.
+     *
+     * @param fromGuid the GUID of the asset being serialized (needed to determine direct vs propagated Atlan tags)
+     * @param value the value to be serialized
+     * @return a String representation of the value that can be stored in a single cell of CSV
+     */
     @SuppressWarnings("unchecked")
     protected String serializeValueToCSV(String fromGuid, Object value) {
         // Then figure out how to CSV-string serialize it
@@ -277,6 +297,12 @@ public abstract class AbstractReporter {
         return "";
     }
 
+    /**
+     * Serialize the provided asset reference into a form that can be stored in a single cell of CSV.
+     *
+     * @param asset the related asset to be serialized
+     * @return a String representation of the related asset
+     */
     protected String serializeAssetRefToCSV(Asset asset) {
         String qualifiedName = asset.getQualifiedName();
         if ((qualifiedName == null || qualifiedName.isEmpty()) && asset.getUniqueAttributes() != null) {
@@ -285,6 +311,13 @@ public abstract class AbstractReporter {
         return asset.getTypeName() + "@" + qualifiedName;
     }
 
+    /**
+     * Serialize the provided struct into a form that can be stored in a single cell of CSV.
+     * Note: this is not yet implemented!
+     *
+     * @param struct the struct instance to be serialized
+     * @return a String representation of the struct instance
+     */
     protected String serializeStructToCSV(AtlanStruct struct) {
         // TODO: probably some format that's better than this...
         return struct.toString();

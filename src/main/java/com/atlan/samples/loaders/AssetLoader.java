@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.cache.ReflectionCache;
 import com.atlan.model.assets.Asset;
+import com.atlan.model.core.CustomMetadataAttributes;
 import com.atlan.model.fields.AtlanField;
 import com.atlan.samples.readers.AssetGenerator;
 import com.atlan.samples.readers.CSVReader;
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,29 +46,53 @@ public abstract class AssetLoader extends AbstractLoader implements RequestHandl
                     Class<?> assetClass = Serde.getAssetClassForType(typeName);
                     Method method = assetClass.getMethod("_internal");
                     Asset.AssetBuilder<?, ?> builder = (Asset.AssetBuilder<?, ?>) method.invoke(null);
+                    Map<String, CustomMetadataAttributes.CustomMetadataAttributesBuilder<?, ?>> customMetadataMap =
+                            new HashMap<>();
                     for (int i = 0; i < header.size(); i++) {
                         String fieldName = header.get(i);
                         if (fieldName != null && !fieldName.isEmpty()) {
-                            String deserializedFieldName = ReflectionCache.getDeserializedName(assetClass, fieldName);
-                            try {
-                                String rValue = row.get(i);
-                                Method setter = ReflectionCache.getSetter(builder.getClass(), deserializedFieldName);
-                                if (setter != null) {
-                                    Object value = deserializeValueFromCSV(rValue, setter);
-                                    if (value != null) {
-                                        ReflectionCache.setValue(builder, deserializedFieldName, value);
-                                    }
+                            String rValue = row.get(i);
+                            if (fieldName.contains("::")) {
+                                // Custom metadata field...
+                                String[] tokens = fieldName.split(Pattern.quote("::"));
+                                String setName = tokens[0];
+                                String attrName = tokens[1];
+                                if (!customMetadataMap.containsKey(setName)) {
+                                    customMetadataMap.put(setName, CustomMetadataAttributes.builder());
                                 }
-                            } catch (IOException e) {
-                                log.error("Unable to deserialize a value from the CSV.", e);
-                            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                                log.error(
-                                        "Unable to set value for {} on: {}::{}",
-                                        deserializedFieldName,
-                                        typeName,
-                                        qualifiedName,
-                                        e);
+                                Object value = deserializeCMValueFromCSV(rValue);
+                                customMetadataMap.get(setName).attribute(attrName, value);
+                            } else {
+                                // "Normal" field...
+                                String deserializedFieldName =
+                                        ReflectionCache.getDeserializedName(assetClass, fieldName);
+                                try {
+                                    Method setter =
+                                            ReflectionCache.getSetter(builder.getClass(), deserializedFieldName);
+                                    if (setter != null) {
+                                        Object value = deserializeValueFromCSV(rValue, setter);
+                                        if (value != null) {
+                                            ReflectionCache.setValue(builder, deserializedFieldName, value);
+                                        }
+                                    }
+                                } catch (IOException e) {
+                                    log.error("Unable to deserialize a value from the CSV.", e);
+                                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                                    log.error(
+                                            "Unable to set value for {} on: {}::{}",
+                                            deserializedFieldName,
+                                            typeName,
+                                            qualifiedName,
+                                            e);
+                                }
                             }
+                        }
+                    }
+                    if (!customMetadataMap.isEmpty()) {
+                        for (Map.Entry<String, CustomMetadataAttributes.CustomMetadataAttributesBuilder<?, ?>> entry :
+                                customMetadataMap.entrySet()) {
+                            builder.customMetadata(
+                                    entry.getKey(), entry.getValue().build());
                         }
                     }
                     Asset candidate = builder.build();

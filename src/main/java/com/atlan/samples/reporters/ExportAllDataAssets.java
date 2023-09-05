@@ -25,6 +25,13 @@ public class ExportAllDataAssets extends AssetReporter {
     /** {@inheritDoc} */
     @Override
     public List<AtlanField> getAttributesToExtract() {
+        /*try {
+            // Example: including custom metadata fields (of course, add this 'rating' variable to the list
+            // below to include it in the set of attributes to extract.
+            CustomMetadataField rating = new CustomMetadataField(Atlan.getDefaultClient(), "QD", "Rating");
+        } catch (AtlanException e) {
+            e.printStackTrace();
+        }*/
         return List.of(
                 Asset.NAME,
                 Asset.DESCRIPTION,
