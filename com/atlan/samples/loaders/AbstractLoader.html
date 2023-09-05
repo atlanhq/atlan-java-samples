@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":9,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -132,7 +132,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="DocumentationTemplateLoader.html" title="class in com.atlan.samples.loaders">DocumentationTemplateLoader</a></code>, <code><a href="EnrichmentLoader.html" title="class in com.atlan.samples.loaders">EnrichmentLoader</a></code>, <code><a href="OpenAPISpecLoader.html" title="class in com.atlan.samples.loaders">OpenAPISpecLoader</a></code></dd>
+<dd><code><a href="AssetLoader.html" title="class in com.atlan.samples.loaders">AssetLoader</a></code>, <code><a href="DocumentationTemplateLoader.html" title="class in com.atlan.samples.loaders">DocumentationTemplateLoader</a></code>, <code><a href="EnrichmentLoader.html" title="class in com.atlan.samples.loaders">EnrichmentLoader</a></code>, <code><a href="OpenAPISpecLoader.html" title="class in com.atlan.samples.loaders">OpenAPISpecLoader</a></code></dd>
 </dl>
 <hr>
 <pre>public abstract class <span class="typeNameLabel">AbstractLoader</span>
@@ -172,7 +172,7 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -187,43 +187,89 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected java.lang.Object</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deserializeAssetRefFromCSV(java.lang.String)">deserializeAssetRefFromCSV</a></span>&#8203;(java.lang.String&nbsp;assetRef)</code></th>
+<td class="colLast">
+<div class="block">Deserializes an asset reference (typeName@qualifiedName) from a CSV cell value.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>protected java.lang.Object</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deserializeCMValueFromCSV(java.lang.String)">deserializeCMValueFromCSV</a></span>&#8203;(java.lang.String&nbsp;value)</code></th>
+<td class="colLast">
+<div class="block">Deserialize a value intended for a custom metadata attribute.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>protected java.lang.Object</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deserializeEnumFromCSV(java.lang.String,java.lang.Class)">deserializeEnumFromCSV</a></span>&#8203;(java.lang.String&nbsp;enumValue,
+                      java.lang.Class&lt;?&gt;&nbsp;enumClass)</code></th>
+<td class="colLast">
+<div class="block">Deserializes an enumerated value from a CSV cell value.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>protected java.lang.Object</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deserializeStructToCSV(java.lang.String,java.lang.Class)">deserializeStructToCSV</a></span>&#8203;(java.lang.String&nbsp;struct,
+                      java.lang.Class&lt;?&gt;&nbsp;structClass)</code></th>
+<td class="colLast">
+<div class="block">Deserializes a struct value from a CSV cell value.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>protected java.lang.Object</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#deserializeValueFromCSV(java.lang.String,java.lang.reflect.Method)">deserializeValueFromCSV</a></span>&#8203;(java.lang.String&nbsp;value,
+                       java.lang.reflect.Method&nbsp;setter)</code></th>
+<td class="colLast">
+<div class="block">Deserialize a value intended for a normal (non-custom metadata) attribute.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBatchSize()">getBatchSize</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBucket()">getBucket</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDelimiter()">getDelimiter</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code>protected static java.util.List&lt;java.lang.String&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEmbeddedList(java.lang.String,java.lang.String)">getEmbeddedList</a></span>&#8203;(java.lang.String&nbsp;value,
+               java.lang.String&nbsp;delimiter)</code></th>
+<td class="colLast">
+<div class="block">Retrieve a list of embedded values from a single string, itself separated by the provided delimiter.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getFilename()">getFilename</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>software.amazon.awssdk.regions.Region</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRegion()">getRegion</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isUpdateOnly()">isUpdateOnly</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parseParametersFromEvent(java.util.Map)">parseParametersFromEvent</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event)</code></th>
 <td class="colLast">
 <div class="block">Extract the configuration parameters to use from the lambda payload (or equivalent).</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setFilename(java.lang.String)">setFilename</a></span>&#8203;(java.lang.String&nbsp;_filename)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -300,6 +346,127 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>assetMap</code> - mapping of assets to consider, keyed by qualifiedName with the value a list of Atlan tag names to add the asset to</dd>
 <dd><code>typeName</code> - of all the assets</dd>
+</dl>
+</li>
+</ul>
+<a id="getEmbeddedList(java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getEmbeddedList</h4>
+<pre class="methodSignature">protected static&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;getEmbeddedList&#8203;(java.lang.String&nbsp;value,
+                                                                  java.lang.String&nbsp;delimiter)</pre>
+<div class="block">Retrieve a list of embedded values from a single string, itself separated by the provided delimiter.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - to decompose into a collection of values</dd>
+<dd><code>delimiter</code> - used to separate each item in the value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of all values embedded in the provided value</dd>
+</dl>
+</li>
+</ul>
+<a id="deserializeCMValueFromCSV(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deserializeCMValueFromCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.Object&nbsp;deserializeCMValueFromCSV&#8203;(java.lang.String&nbsp;value)</pre>
+<div class="block">Deserialize a value intended for a custom metadata attribute.
+ This should be as simple as determining whether the value is multi-valued or single-valued,
+ and splitting it into multiple values if it is multi-valued.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - from the CSV cell</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the deserialized value</dd>
+</dl>
+</li>
+</ul>
+<a id="deserializeValueFromCSV(java.lang.String,java.lang.reflect.Method)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deserializeValueFromCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.Object&nbsp;deserializeValueFromCSV&#8203;(java.lang.String&nbsp;value,
+                                                   java.lang.reflect.Method&nbsp;setter)
+                                            throws java.io.IOException</pre>
+<div class="block">Deserialize a value intended for a normal (non-custom metadata) attribute.
+ This requires figuring out what kind of value we should expect for that given attribute, so
+ uses reflection to reverse-engineer this.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - from the CSV cell</dd>
+<dd><code>setter</code> - method used to set the value for that attribute on an asset (from reflection)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the deserialized value</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - on any issues deserializing the value</dd>
+</dl>
+</li>
+</ul>
+<a id="deserializeAssetRefFromCSV(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deserializeAssetRefFromCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.Object&nbsp;deserializeAssetRefFromCSV&#8203;(java.lang.String&nbsp;assetRef)
+                                               throws java.io.IOException</pre>
+<div class="block">Deserializes an asset reference (typeName@qualifiedName) from a CSV cell value.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>assetRef</code> - value of the CSV cell</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an asset reference by qualifiedName to that particular asset</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - on any issues deserializing the value</dd>
+</dl>
+</li>
+</ul>
+<a id="deserializeStructToCSV(java.lang.String,java.lang.Class)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deserializeStructToCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.Object&nbsp;deserializeStructToCSV&#8203;(java.lang.String&nbsp;struct,
+                                                  java.lang.Class&lt;?&gt;&nbsp;structClass)
+                                           throws java.io.IOException</pre>
+<div class="block">Deserializes a struct value from a CSV cell value.
+ Note: not yet implemented!</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>struct</code> - value of the CSV cell</dd>
+<dd><code>structClass</code> - expected kind of struct</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a struct instance</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - on any issues deserializing the value</dd>
+</dl>
+</li>
+</ul>
+<a id="deserializeEnumFromCSV(java.lang.String,java.lang.Class)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>deserializeEnumFromCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.Object&nbsp;deserializeEnumFromCSV&#8203;(java.lang.String&nbsp;enumValue,
+                                                  java.lang.Class&lt;?&gt;&nbsp;enumClass)
+                                           throws java.io.IOException</pre>
+<div class="block">Deserializes an enumerated value from a CSV cell value.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>enumValue</code> - value of the CSV cell</dd>
+<dd><code>enumClass</code> - expected kind of enum</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an enum value instance</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.io.IOException</code> - on any issues deserializing the value</dd>
 </dl>
 </li>
 </ul>

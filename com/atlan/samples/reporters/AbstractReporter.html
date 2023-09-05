@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":10,"i3":10,"i4":9,"i5":9,"i6":10,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":10,"i16":10,"i17":10};
+var data = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":9,"i5":10,"i6":10,"i7":9,"i8":10,"i9":10,"i10":9,"i11":10,"i12":9,"i13":10,"i14":10,"i15":10,"i16":9,"i17":10,"i18":9,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -132,7 +132,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li class="blockList">
 <dl>
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="EnrichmentReporter.html" title="class in com.atlan.samples.reporters">EnrichmentReporter</a></code>, <code><a href="SlackDiscussionReporter.html" title="class in com.atlan.samples.reporters">SlackDiscussionReporter</a></code>, <code><a href="UserReporter.html" title="class in com.atlan.samples.reporters">UserReporter</a></code></dd>
+<dd><code><a href="AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></code>, <code><a href="EnrichmentReporter.html" title="class in com.atlan.samples.reporters">EnrichmentReporter</a></code>, <code><a href="SlackDiscussionReporter.html" title="class in com.atlan.samples.reporters">SlackDiscussionReporter</a></code>, <code><a href="UserReporter.html" title="class in com.atlan.samples.reporters">UserReporter</a></code></dd>
 </dl>
 <hr>
 <pre>public abstract class <span class="typeNameLabel">AbstractReporter</span>
@@ -212,9 +212,8 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">getAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-            java.lang.String&nbsp;delimiter)</code></th>
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAtlanTags(com.atlan.model.assets.Asset)">getAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</code></th>
 <td class="colLast">
 <div class="block">Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
  whether directly or through propagation.</div>
@@ -236,9 +235,8 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDelimitedList(java.util.Collection,java.lang.String)">getDelimitedList</a></span>&#8203;(java.util.Collection&lt;java.lang.String&gt;&nbsp;items,
-                java.lang.String&nbsp;delimiter)</code></th>
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDelimitedList(java.util.Collection)">getDelimitedList</a></span>&#8203;(java.util.Collection&lt;java.lang.String&gt;&nbsp;items)</code></th>
 <td class="colLast">
 <div class="block">Retrieve a list of multiple values as a single string, separated by the provided delimiter.</div>
 </td>
@@ -254,9 +252,8 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDirectAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">getDirectAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                  java.lang.String&nbsp;delimiter)</code></th>
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDirectAtlanTags(com.atlan.model.assets.Asset)">getDirectAtlanTags</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</code></th>
 <td class="colLast">
 <div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) Atlan tags
  to the provided asset.</div>
@@ -273,9 +270,8 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGroupOwners(com.atlan.model.assets.Asset,java.lang.String)">getGroupOwners</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-              java.lang.String&nbsp;delimiter)</code></th>
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getGroupOwners(com.atlan.model.assets.Asset)">getGroupOwners</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
@@ -289,27 +285,74 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i14" class="altColor">
-<td class="colFirst"><code>protected static java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserOwners(com.atlan.model.assets.Asset,java.lang.String)">getUserOwners</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-             java.lang.String&nbsp;delimiter)</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStringValueForField(com.atlan.model.assets.Asset,com.atlan.model.fields.AtlanField)">getStringValueForField</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;from,
+                      com.atlan.model.fields.AtlanField&nbsp;field)</code></th>
+<td class="colLast">
+<div class="block">Translates the provided value for the provided field on the provided asset into a string
+ representation that can be encoded into a single cell of Excel / CSV.</div>
+</td>
 </tr>
 <tr id="i15" class="rowColor">
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserOwners(com.atlan.model.assets.Asset)">getUserOwners</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i16" class="altColor">
+<td class="colFirst"><code>protected static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getValue(com.atlan.model.enums.AtlanEnum)">getValue</a></span>&#8203;(com.atlan.model.enums.AtlanEnum&nbsp;e)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parseParametersFromEvent(java.util.Map)">parseParametersFromEvent</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event)</code></th>
 <td class="colLast">
 <div class="block">Extract the configuration parameters to use from the lambda payload (or equivalent).</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>protected static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#protectFromNull(java.lang.Object)">protectFromNull</a></span>&#8203;(java.lang.Object&nbsp;o)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#serializeAssetRefToCSV(com.atlan.model.assets.Asset)">serializeAssetRefToCSV</a></span>&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</code></th>
+<td class="colLast">
+<div class="block">Serialize the provided asset reference into a form that can be stored in a single cell of CSV.</div>
+</td>
+</tr>
+<tr id="i20" class="altColor">
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#serializeStructToCSV(com.atlan.model.structs.AtlanStruct)">serializeStructToCSV</a></span>&#8203;(com.atlan.model.structs.AtlanStruct&nbsp;struct)</code></th>
+<td class="colLast">
+<div class="block">Serialize the provided struct into a form that can be stored in a single cell of CSV.</div>
+</td>
+</tr>
+<tr id="i21" class="rowColor">
+<td class="colFirst"><code>protected java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#serializeValueToCSV(java.lang.String,java.lang.Object)">serializeValueToCSV</a></span>&#8203;(java.lang.String&nbsp;fromGuid,
+                   java.lang.Object&nbsp;value)</code></th>
+<td class="colLast">
+<div class="block">Serialize the provided value into a form that can be stored in a single cell of CSV.</div>
+</td>
+</tr>
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setFilename(java.lang.String)">setFilename</a></span>&#8203;(java.lang.String&nbsp;_filename)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setFilenameWithPrefix(java.util.Map,java.lang.String)">setFilenameWithPrefix</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event,
                      java.lang.String&nbsp;prefix)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i24" class="altColor">
+<td class="colFirst"><code>protected void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setFilenameWithPrefix(java.util.Map,java.lang.String,java.lang.String)">setFilenameWithPrefix</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event,
+                     java.lang.String&nbsp;prefix,
+                     java.lang.String&nbsp;extension)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -415,6 +458,17 @@ extends java.lang.Object</pre>
                                      java.lang.String&nbsp;prefix)</pre>
 </li>
 </ul>
+<a id="setFilenameWithPrefix(java.util.Map,java.lang.String,java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setFilenameWithPrefix</h4>
+<pre class="methodSignature">protected&nbsp;void&nbsp;setFilenameWithPrefix&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;event,
+                                     java.lang.String&nbsp;prefix,
+                                     java.lang.String&nbsp;extension)</pre>
+</li>
+</ul>
 <a id="getFormattedDateTime(java.lang.Long)">
 <!--   -->
 </a>
@@ -442,24 +496,22 @@ extends java.lang.Object</pre>
 <pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getDescription&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 </li>
 </ul>
-<a id="getUserOwners(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getUserOwners(com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getUserOwners</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getUserOwners&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                                java.lang.String&nbsp;delimiter)</pre>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getUserOwners&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 </li>
 </ul>
-<a id="getGroupOwners(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getGroupOwners(com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getGroupOwners</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getGroupOwners&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                                 java.lang.String&nbsp;delimiter)</pre>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getGroupOwners&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 </li>
 </ul>
 <a id="getCount(java.util.Collection)">
@@ -471,6 +523,24 @@ extends java.lang.Object</pre>
 <pre class="methodSignature">protected static&nbsp;int&nbsp;getCount&#8203;(java.util.Collection&lt;?&gt;&nbsp;collection)</pre>
 </li>
 </ul>
+<a id="getValue(com.atlan.model.enums.AtlanEnum)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getValue</h4>
+<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getValue&#8203;(com.atlan.model.enums.AtlanEnum&nbsp;e)</pre>
+</li>
+</ul>
+<a id="protectFromNull(java.lang.Object)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>protectFromNull</h4>
+<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;protectFromNull&#8203;(java.lang.Object&nbsp;o)</pre>
+</li>
+</ul>
 <a id="getREADME(com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
@@ -480,59 +550,123 @@ extends java.lang.Object</pre>
 <pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getREADME&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 </li>
 </ul>
-<a id="getAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getAtlanTags(com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getAtlanTags</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                               java.lang.String&nbsp;delimiter)</pre>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 <div class="block">Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
  whether directly or through propagation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>asset</code> - for which to find Atlan tags</dd>
-<dd><code>delimiter</code> - the separator to use between multiple values</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>comma-separated list of the Atlan tags</dd>
 </dl>
 </li>
 </ul>
-<a id="getDirectAtlanTags(com.atlan.model.assets.Asset,java.lang.String)">
+<a id="getDirectAtlanTags(com.atlan.model.assets.Asset)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getDirectAtlanTags</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getDirectAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset,
-                                                     java.lang.String&nbsp;delimiter)</pre>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getDirectAtlanTags&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
 <div class="block">Retrieve a comma-separated list of only the directly-assigned (not propagated) Atlan tags
  to the provided asset.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>asset</code> - for which to find direct Atlan tags</dd>
-<dd><code>delimiter</code> - the separator to use between multiple values</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>comma-separated list of the direct Atlan tags</dd>
 </dl>
 </li>
 </ul>
-<a id="getDelimitedList(java.util.Collection,java.lang.String)">
+<a id="getDelimitedList(java.util.Collection)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getDelimitedList</h4>
-<pre class="methodSignature">protected static&nbsp;java.lang.String&nbsp;getDelimitedList&#8203;(java.util.Collection&lt;java.lang.String&gt;&nbsp;items,
-                                                   java.lang.String&nbsp;delimiter)</pre>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getDelimitedList&#8203;(java.util.Collection&lt;java.lang.String&gt;&nbsp;items)</pre>
 <div class="block">Retrieve a list of multiple values as a single string, separated by the provided delimiter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>items</code> - to combine into a single string</dd>
-<dd><code>delimiter</code> - to use to separate each item</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a single string of all items separated by the delimiter</dd>
+</dl>
+</li>
+</ul>
+<a id="getStringValueForField(com.atlan.model.assets.Asset,com.atlan.model.fields.AtlanField)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getStringValueForField</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;getStringValueForField&#8203;(com.atlan.model.assets.Asset&nbsp;from,
+                                                  com.atlan.model.fields.AtlanField&nbsp;field)</pre>
+<div class="block">Translates the provided value for the provided field on the provided asset into a string
+ representation that can be encoded into a single cell of Excel / CSV.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>from</code> - the asset from which to read the value</dd>
+<dd><code>field</code> - the attribute rom which to read the value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the string-encoded form that can be placed in a single cell</dd>
+</dl>
+</li>
+</ul>
+<a id="serializeValueToCSV(java.lang.String,java.lang.Object)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>serializeValueToCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;serializeValueToCSV&#8203;(java.lang.String&nbsp;fromGuid,
+                                               java.lang.Object&nbsp;value)</pre>
+<div class="block">Serialize the provided value into a form that can be stored in a single cell of CSV.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>fromGuid</code> - the GUID of the asset being serialized (needed to determine direct vs propagated Atlan tags)</dd>
+<dd><code>value</code> - the value to be serialized</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a String representation of the value that can be stored in a single cell of CSV</dd>
+</dl>
+</li>
+</ul>
+<a id="serializeAssetRefToCSV(com.atlan.model.assets.Asset)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>serializeAssetRefToCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;serializeAssetRefToCSV&#8203;(com.atlan.model.assets.Asset&nbsp;asset)</pre>
+<div class="block">Serialize the provided asset reference into a form that can be stored in a single cell of CSV.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>asset</code> - the related asset to be serialized</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a String representation of the related asset</dd>
+</dl>
+</li>
+</ul>
+<a id="serializeStructToCSV(com.atlan.model.structs.AtlanStruct)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>serializeStructToCSV</h4>
+<pre class="methodSignature">protected&nbsp;java.lang.String&nbsp;serializeStructToCSV&#8203;(com.atlan.model.structs.AtlanStruct&nbsp;struct)</pre>
+<div class="block">Serialize the provided struct into a form that can be stored in a single cell of CSV.
+ Note: this is not yet implemented!</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>struct</code> - the struct instance to be serialized</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a String representation of the struct instance</dd>
 </dl>
 </li>
 </ul>
