@@ -157,12 +157,14 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
         // Note that we need to do this in multiple passes, so parent categories are always
         // created before children, and we won't really be able to batch them due to
         // the hierarchical nature of the categories...
-        boolean bulkInitialized = false;
+        Set<String> bulkInitialized = new HashSet<>();
+        long localCount = 0;
+        long totalResults = categories.size();
         for (CategoryEnrichmentDetails details : categories.values()) {
-            if (!bulkInitialized) {
-                // If we've not yet initialized the cache, then bulk-initialize it now (only once)
+            if (!bulkInitialized.contains(details.getGlossary().getQualifiedName())) {
+                // If we've not yet initialized the cache, then bulk-initialize it now (only once per glossary)
                 categoryCache.get(details.getIdentity());
-                bulkInitialized = true;
+                bulkInitialized.add(details.getGlossary().getQualifiedName());
             }
             Asset glossary = details.getGlossary();
             String categoryPath = details.getCategoryPath();
@@ -180,6 +182,8 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                     } else {
                         builder = GlossaryCategory.creator(categoryName, glossary.getGuid());
                     }
+                } else {
+                    builder = ((GlossaryCategory) categoryCache.get(details.getIdentity())).toBuilder();
                 }
                 if (builder != null) {
                     builder = builder.description(details.getDescription())
@@ -222,6 +226,10 @@ public class CategoryEnrichmentDetails extends EnrichmentDetails {
                                 ? category.saveReplacingCM(replaceClassifications)
                                 : category.saveMergingCM(replaceClassifications);
                         if (response != null) {
+                            localCount++;
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
                                 for (Asset one : created) {
