@@ -80,7 +80,7 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
                     .collect(Collectors.toList()));
             csv.writeHeader(headerNames);
             long start = System.currentTimeMillis();
-            csv.streamAssets(assets.stream(true), getAssetToValueTranslator(), assets.count());
+            csv.streamAssets(assets.stream(true), getAssetToValueTranslator(), assets.count(), getBatchSize());
             long finish = System.currentTimeMillis();
             log.info("Total time taken: {} ms", finish - start);
         } catch (AtlanException e) {
