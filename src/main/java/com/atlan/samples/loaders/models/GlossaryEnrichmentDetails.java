@@ -94,6 +94,8 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
         Map<String, Map<String, CustomMetadataAttributes>> cmToUpdate = new HashMap<>();
         GlossaryCache glossaryNameToResult = new GlossaryCache();
 
+        int localCount = 0;
+        int totalResults = glossaries.size();
         for (GlossaryEnrichmentDetails details : glossaries.values()) {
             String glossaryName = details.getName();
             Glossary.GlossaryBuilder<?, ?> builder = null;
@@ -134,6 +136,10 @@ public class GlossaryEnrichmentDetails extends EnrichmentDetails {
                             ? glossary.saveReplacingCM(replaceClassifications)
                             : glossary.saveMergingCM(replaceClassifications);
                     if (result != null) {
+                        localCount++;
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
                         List<Asset> created = result.getCreatedAssets();
                         for (Asset one : created) {
                             if (one instanceof Glossary && one.getName().equals(glossaryName)) {

@@ -10,11 +10,13 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.atlan.Atlan;
 import com.atlan.exception.AtlanException;
 import com.atlan.model.assets.*;
+import com.atlan.model.search.FluentSearch;
 import com.atlan.samples.writers.ExcelWriter;
 import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -89,8 +91,7 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
     void getSlackDiscussions(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
         // TODO: Ideally filter the links retrieved to only those for slack.com, but this does not
         //  appear possible with the index on the 'link' attribute
-        log.info("Retrieving first {} link details from: {}", getBatchSize(), Atlan.getBaseUrl());
-        Link.select()
+        FluentSearch.FluentSearchBuilder<?, ?> builder = Link.select()
                 .pageSize(getBatchSize())
                 .sort(Asset.GUID.order(SortOrder.Asc))
                 .includeOnResults(Link.ASSET)
@@ -98,23 +99,34 @@ public class SlackDiscussionReporter extends AbstractReporter implements Request
                 .includeOnResults(Link.REFERENCE)
                 .includeOnRelations(Asset.QUALIFIED_NAME)
                 .includeOnRelations(Asset.TYPE_NAME)
-                .includeOnRelations(Asset.NAME)
-                .stream(true)
-                .filter(a -> a instanceof Link)
-                .forEach(l -> {
-                    Link link = (Link) l;
-                    if (link.getAsset() != null) {
-                        String assetGuid = link.getAsset().getGuid();
-                        String url = link.getLink();
-                        if (url.contains("slack.com")) {
-                            if (!assetToSlackDiscussions.containsKey(assetGuid)) {
-                                assetToSlackDiscussions.put(assetGuid, 0L);
-                            }
-                            assetToSlackDiscussions.put(assetGuid, assetToSlackDiscussions.get(assetGuid) + 1);
-                            guidToLinkedAsset.put(assetGuid, link.getAsset());
-                        }
+                .includeOnRelations(Asset.NAME);
+        final long totalResults = builder.count();
+        AtomicLong count = new AtomicLong(0);
+        log.info(
+                "Investigating {} linked resources in {} in batches of: {}",
+                totalResults,
+                Atlan.getBaseUrl(),
+                getBatchSize());
+        builder.stream(true).filter(a -> a instanceof Link).forEach(l -> {
+            long localCount = count.getAndIncrement();
+            if (localCount % getBatchSize() == 0) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
+            Link link = (Link) l;
+            if (link.getAsset() != null) {
+                String assetGuid = link.getAsset().getGuid();
+                String url = link.getLink();
+                if (url.contains("slack.com")) {
+                    if (!assetToSlackDiscussions.containsKey(assetGuid)) {
+                        assetToSlackDiscussions.put(assetGuid, 0L);
                     }
-                });
+                    assetToSlackDiscussions.put(assetGuid, assetToSlackDiscussions.get(assetGuid) + 1);
+                    guidToLinkedAsset.put(assetGuid, link.getAsset());
+                }
+            }
+        });
         for (Map.Entry<String, Long> entry : assetToSlackDiscussions.entrySet()) {
             String assetGuid = entry.getKey();
             Long linkCount = entry.getValue();

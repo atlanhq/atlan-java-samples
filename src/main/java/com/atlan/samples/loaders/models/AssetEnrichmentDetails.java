@@ -180,13 +180,13 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
                         readmes.put(details.getIdentity(), readmeContents);
                         assetIdentityToResult.put(details.getIdentity(), asset);
                     }
-                    cacheResult(assetIdentityToResult, batch.add(asset));
+                    cacheResult(assetIdentityToResult, batch.add(asset), assets.size());
                     if (!replaceCM && !details.getCustomMetadataValues().isEmpty()) {
                         cmToUpdate.put(details.getIdentity(), details.getCustomMetadataValues());
                     }
                 }
             }
-            cacheResult(assetIdentityToResult, batch.flush());
+            cacheResult(assetIdentityToResult, batch.flush(), assets.size());
         } catch (AtlanException e) {
             log.error("Unable to batch-upsert assets.", e);
         }
@@ -237,9 +237,13 @@ public class AssetEnrichmentDetails extends EnrichmentDetails {
         }
     }
 
-    private static void cacheResult(Map<String, Asset> cache, AssetMutationResponse response) {
+    private static void cacheResult(Map<String, Asset> cache, AssetMutationResponse response, long totalResults) {
         Set<String> cachedGuids = new HashSet<>();
         if (response != null) {
+            int localCount = cache.size();
+            log.info(
+                    " ... processed {}/{} ({}%)",
+                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
             List<Asset> created = response.getCreatedAssets();
             for (Asset one : created) {
                 String identity = getIdentity(one.getTypeName(), one.getQualifiedName());
