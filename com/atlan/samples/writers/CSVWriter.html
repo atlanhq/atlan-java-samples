@@ -196,9 +196,10 @@ implements java.io.Closeable</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#streamAssets(java.util.stream.Stream,com.atlan.samples.writers.RowGenerator,long)">streamAssets</a></span>&#8203;(java.util.stream.Stream&lt;com.atlan.model.assets.Asset&gt;&nbsp;stream,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#streamAssets(java.util.stream.Stream,com.atlan.samples.writers.RowGenerator,long,int)">streamAssets</a></span>&#8203;(java.util.stream.Stream&lt;com.atlan.model.assets.Asset&gt;&nbsp;stream,
             <a href="RowGenerator.html" title="interface in com.atlan.samples.writers">RowGenerator</a>&nbsp;valuesForRow,
-            long&nbsp;totalAssetCount)</code></th>
+            long&nbsp;totalAssetCount,
+            int&nbsp;pageSize)</code></th>
 <td class="colLast">
 <div class="block">Parallel-write the provided asset stream into the CSV file.</div>
 </td>
@@ -295,7 +296,7 @@ implements java.io.Closeable</pre>
 </dl>
 </li>
 </ul>
-<a id="streamAssets(java.util.stream.Stream,com.atlan.samples.writers.RowGenerator,long)">
+<a id="streamAssets(java.util.stream.Stream,com.atlan.samples.writers.RowGenerator,long,int)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -303,7 +304,8 @@ implements java.io.Closeable</pre>
 <h4>streamAssets</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;streamAssets&#8203;(java.util.stream.Stream&lt;com.atlan.model.assets.Asset&gt;&nbsp;stream,
                          <a href="RowGenerator.html" title="interface in com.atlan.samples.writers">RowGenerator</a>&nbsp;valuesForRow,
-                         long&nbsp;totalAssetCount)</pre>
+                         long&nbsp;totalAssetCount,
+                         int&nbsp;pageSize)</pre>
 <div class="block">Parallel-write the provided asset stream into the CSV file.
  (For the highest performance, we recommend sending in a parallel stream of assets.)</div>
 <dl>
@@ -311,6 +313,7 @@ implements java.io.Closeable</pre>
 <dd><code>stream</code> - of assets, typically from a FluentSearch (parallel stream recommended)</dd>
 <dd><code>valuesForRow</code> - a function (could just be a lambda) that turns a single Asset into an iterable of String values</dd>
 <dd><code>totalAssetCount</code> - the total number of assets that will be output (used for logging / completion tracking)</dd>
+<dd><code>pageSize</code> - the page size being used by the asset stream</dd>
 </dl>
 </li>
 </ul>
