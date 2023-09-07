@@ -100,6 +100,9 @@ public class AccountDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), ADLSAccount.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
+        long totalResults = accounts.size();
+        long localCount = 0;
+
         try {
             for (AccountDetails details : accounts.values()) {
                 String connectionQualifiedName = details.getConnectionQualifiedName();
@@ -121,7 +124,12 @@ public class AccountDetails extends AssetDetails {
                         if (!details.getAtlanTags().isEmpty()) {
                             toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                         }
-                        batch.add(toUpdate);
+                        localCount++;
+                        if (batch.add(toUpdate) != null) {
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                        }
                     } catch (NotFoundException e) {
                         log.warn("Unable to find existing account — skipping: {}", qualifiedName, e);
                     } catch (AtlanException e) {
@@ -141,11 +149,20 @@ public class AccountDetails extends AssetDetails {
                     if (!details.getAtlanTags().isEmpty()) {
                         toClassify.put(account.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(account);
+                    localCount++;
+                    if (batch.add(account) != null) {
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                    }
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert account details.", e);
         }

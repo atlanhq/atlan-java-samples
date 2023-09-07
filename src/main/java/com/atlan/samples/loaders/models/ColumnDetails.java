@@ -117,6 +117,9 @@ public class ColumnDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), Column.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
+        long totalResults = columns.size();
+        long localCount = 0;
+
         try {
             for (ColumnDetails details : columns.values()) {
                 String parentQualifiedName = details.getParentQualifiedName();
@@ -142,7 +145,12 @@ public class ColumnDetails extends AssetDetails {
                         if (!details.getAtlanTags().isEmpty()) {
                             toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                         }
-                        batch.add(toUpdate);
+                        localCount++;
+                        if (batch.add(toUpdate) != null) {
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                        }
                     } catch (NotFoundException e) {
                         log.warn("Unable to find existing column — skipping: {}", qualifiedName, e);
                     } catch (AtlanException e) {
@@ -180,11 +188,20 @@ public class ColumnDetails extends AssetDetails {
                     if (!details.getAtlanTags().isEmpty()) {
                         toClassify.put(column.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(column);
+                    localCount++;
+                    if (batch.add(column) != null) {
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                    }
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert columns.", e);
         }

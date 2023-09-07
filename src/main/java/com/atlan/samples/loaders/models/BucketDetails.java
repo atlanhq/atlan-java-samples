@@ -131,6 +131,9 @@ public class BucketDetails extends AssetDetails {
         Map<String, List<String>> toClassifyGCS = new HashMap<>();
         Map<String, List<String>> toClassifyADLS = new HashMap<>();
 
+        long totalResults = buckets.size();
+        long localCount = 0;
+
         try {
             for (BucketDetails details : buckets.values()) {
                 String connectionQualifiedName = details.getConnectionQualifiedName();
@@ -158,7 +161,14 @@ public class BucketDetails extends AssetDetails {
                                     if (!details.getAtlanTags().isEmpty()) {
                                         toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                     }
-                                    batch.add(toUpdate);
+                                    localCount++;
+                                    if (batch.add(toUpdate) != null) {
+                                        log.info(
+                                                " ... processed {}/{} ({}%)",
+                                                localCount,
+                                                totalResults,
+                                                Math.round(((double) localCount / totalResults) * 100));
+                                    }
                                 } catch (NotFoundException e) {
                                     log.warn("Unable to find existing bucket — skipping: {}", qualifiedName, e);
                                 } catch (AtlanException e) {
@@ -178,7 +188,14 @@ public class BucketDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batch.add(s3);
+                                localCount++;
+                                if (batch.add(s3) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             }
                         } else {
                             log.error("Unable to create or update an S3 bucket without an ARN: {}", details);
@@ -202,7 +219,14 @@ public class BucketDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batch.add(toUpdate);
+                                localCount++;
+                                if (batch.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing bucket — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -222,7 +246,14 @@ public class BucketDetails extends AssetDetails {
                             if (!details.getAtlanTags().isEmpty()) {
                                 toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
                             }
-                            batch.add(gcs);
+                            localCount++;
+                            if (batch.add(gcs) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     case ADLS:
@@ -245,7 +276,14 @@ public class BucketDetails extends AssetDetails {
                                     if (!details.getAtlanTags().isEmpty()) {
                                         toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                     }
-                                    batch.add(toUpdate);
+                                    localCount++;
+                                    if (batch.add(toUpdate) != null) {
+                                        log.info(
+                                                " ... processed {}/{} ({}%)",
+                                                localCount,
+                                                totalResults,
+                                                Math.round(((double) localCount / totalResults) * 100));
+                                    }
                                 } catch (NotFoundException e) {
                                     log.warn("Unable to find existing container — skipping: {}", qualifiedName, e);
                                 } catch (AtlanException e) {
@@ -265,7 +303,14 @@ public class BucketDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batch.add(adls);
+                                localCount++;
+                                if (batch.add(adls) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             }
                         } else {
                             log.error("Unable to create or update an ADLS container without an account: {}", details);
@@ -277,7 +322,11 @@ public class BucketDetails extends AssetDetails {
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert bucket details.", e);
         }

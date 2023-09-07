@@ -218,6 +218,9 @@ public class LineageDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), LineageProcess.TYPE_NAME, batchSize);
         Map<String, List<String>> toTag = new HashMap<>();
 
+        long totalResults = processes.size();
+        long localCount = 0;
+
         try {
             for (Map.Entry<String, Set<LineageDetails>> entry : processes.entrySet()) {
                 Set<LineageDetails> assets = entry.getValue();
@@ -307,11 +310,20 @@ public class LineageDetails extends AssetDetails {
                     if (!atlanTagNames.isEmpty()) {
                         toTag.put(process.getQualifiedName(), new ArrayList<>(atlanTagNames));
                     }
-                    batch.add(process);
+                    localCount++;
+                    if (batch.add(process) != null) {
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                    }
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert lineage processes.", e);
         }

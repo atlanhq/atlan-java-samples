@@ -152,12 +152,14 @@ public class ConnectionDetails extends AssetDetails {
             Map<String, ConnectionDetails> connections, int batchSize, boolean updateOnly) {
 
         Map<ConnectionDetails, String> cache = new HashMap<>();
+        long totalResults = connections.size();
+        long localCount = 0;
 
         // 1. Search for existing connection with the name, so we can avoid creating if it
         //    already exists (since connection qualifiedNames have a time-based component, they
         //    are not automatically idempotent across create and update)
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), Connection.TYPE_NAME, batchSize);
-        log.info("... looking for existing ({}) connections...", connections.size());
+        log.info("... looking for existing ({}) connections...", totalResults);
         try {
             for (ConnectionDetails details : connections.values()) {
                 String name = details.getName();
@@ -175,7 +177,12 @@ public class ConnectionDetails extends AssetDetails {
                                 .announcementTitle(details.getAnnouncementTitle())
                                 .announcementMessage(details.getAnnouncementMessage())
                                 .build();
-                        batch.add(toUpdate);
+                        localCount++;
+                        if (batch.add(toUpdate) != null) {
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                        }
                         // No need to re-cache, the qualifiedName won't change
                     } catch (NotFoundException e) {
                         if (!updateOnly) {
@@ -215,7 +222,15 @@ public class ConnectionDetails extends AssetDetails {
                                         .announcementTitle(details.getAnnouncementTitle())
                                         .announcementMessage(details.getAnnouncementMessage())
                                         .build();
+                                localCount++;
                                 AssetMutationResponse response = batch.add(toCreate);
+                                if (response != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                                 cacheConnections(cache, response);
                                 // Need to add some delay, otherwise the connections will overlap as they could be
                                 // created
@@ -236,6 +251,11 @@ public class ConnectionDetails extends AssetDetails {
                 }
             }
             AssetMutationResponse response = batch.flush();
+            if (response != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
             cacheConnections(cache, response);
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert connection details.", e);
@@ -244,14 +264,9 @@ public class ConnectionDetails extends AssetDetails {
         // 3. Retrieve each connection in turn to ensure async permissions have been set for them
         for (String qualifiedName : cache.values()) {
             try {
-                log.info("...... retrieving connection (to confirm async permissions available): {}", qualifiedName);
                 Connection.get(Atlan.getDefaultClient(), qualifiedName, false);
-                log.info("......... success — able to access: {}", qualifiedName);
             } catch (AtlanException e) {
-                log.error(
-                        "Unexpected exception while waiting for async connections permissions for: {}",
-                        qualifiedName,
-                        e);
+                log.error("Unable to access connection: {}", qualifiedName, e);
             }
         }
         return cache;
