@@ -128,6 +128,9 @@ public class ContainerDetails extends AssetDetails {
         Map<String, List<String>> toClassifyViews = new HashMap<>();
         Map<String, List<String>> toClassifyMVs = new HashMap<>();
 
+        long totalResults = containers.size();
+        long localCount = 0;
+
         try {
             for (ContainerDetails details : containers.values()) {
                 String schemaQualifiedName = details.getSchemaQualifiedName();
@@ -153,7 +156,14 @@ public class ContainerDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyTables.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batchContainers.add(toUpdate);
+                                localCount++;
+                                if (batchContainers.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing table — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -173,7 +183,14 @@ public class ContainerDetails extends AssetDetails {
                             if (!details.getAtlanTags().isEmpty()) {
                                 toClassifyTables.put(table.getQualifiedName(), details.getAtlanTags());
                             }
-                            batchContainers.add(table);
+                            localCount++;
+                            if (batchContainers.add(table) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     case View.TYPE_NAME:
@@ -194,7 +211,14 @@ public class ContainerDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyViews.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batchContainers.add(toUpdate);
+                                localCount++;
+                                if (batchContainers.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing view — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -214,7 +238,14 @@ public class ContainerDetails extends AssetDetails {
                             if (!details.getAtlanTags().isEmpty()) {
                                 toClassifyViews.put(view.getQualifiedName(), details.getAtlanTags());
                             }
-                            batchContainers.add(view);
+                            localCount++;
+                            if (batchContainers.add(view) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     case MaterializedView.TYPE_NAME:
@@ -236,7 +267,14 @@ public class ContainerDetails extends AssetDetails {
                                 if (!details.getAtlanTags().isEmpty()) {
                                     toClassifyMVs.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
-                                batchContainers.add(toUpdate);
+                                localCount++;
+                                if (batchContainers.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing view — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -256,7 +294,14 @@ public class ContainerDetails extends AssetDetails {
                             if (!details.getAtlanTags().isEmpty()) {
                                 toClassifyMVs.put(mv.getQualifiedName(), details.getAtlanTags());
                             }
-                            batchContainers.add(mv);
+                            localCount++;
+                            if (batchContainers.add(mv) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     default:
@@ -265,7 +310,11 @@ public class ContainerDetails extends AssetDetails {
                 }
             }
             // And don't forget to flush out any that remain
-            batchContainers.flush();
+            if (batchContainers.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert container details.", e);
         }

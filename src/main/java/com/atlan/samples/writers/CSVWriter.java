@@ -67,14 +67,16 @@ public class CSVWriter implements Closeable {
      * @param stream of assets, typically from a FluentSearch (parallel stream recommended)
      * @param valuesForRow a function (could just be a lambda) that turns a single Asset into an iterable of String values
      * @param totalAssetCount the total number of assets that will be output (used for logging / completion tracking)
+     * @param pageSize the page size being used by the asset stream
      */
-    public void streamAssets(Stream<Asset> stream, RowGenerator valuesForRow, long totalAssetCount) {
+    public void streamAssets(
+            Stream<Asset> stream, RowGenerator valuesForRow, final long totalAssetCount, final int pageSize) {
         log.info("Extracting a total of {} assets...", totalAssetCount);
         AtomicLong count = new AtomicLong(0);
         ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
         stream.forEach(a -> {
             long localCount = count.getAndIncrement();
-            if (localCount % 50 == 0) {
+            if (localCount % pageSize == 0) {
                 log.info(
                         " ... processed {}/{} ({}%)",
                         localCount, totalAssetCount, Math.round(((double) localCount / totalAssetCount) * 100));

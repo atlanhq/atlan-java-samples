@@ -117,6 +117,9 @@ public class ObjectDetails extends AssetDetails {
         Map<String, List<String>> toClassifyGCS = new HashMap<>();
         Map<String, List<String>> toClassifyADLS = new HashMap<>();
 
+        long totalResults = objects.size();
+        long localCount = 0;
+
         try {
             for (ObjectDetails details : objects.values()) {
                 String parentQN = details.getContainerQualifiedName();
@@ -149,7 +152,14 @@ public class ObjectDetails extends AssetDetails {
                                         toClassifyS3.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                     }
                                     parents.add(parentQN);
-                                    batch.add(toUpdate);
+                                    localCount++;
+                                    if (batch.add(toUpdate) != null) {
+                                        log.info(
+                                                " ... processed {}/{} ({}%)",
+                                                localCount,
+                                                totalResults,
+                                                Math.round(((double) localCount / totalResults) * 100));
+                                    }
                                 } catch (NotFoundException e) {
                                     log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
                                 } catch (AtlanException e) {
@@ -173,7 +183,14 @@ public class ObjectDetails extends AssetDetails {
                                     toClassifyS3.put(s3.getQualifiedName(), details.getAtlanTags());
                                 }
                                 parents.add(parentQN);
-                                batch.add(s3);
+                                localCount++;
+                                if (batch.add(s3) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             }
                         } else {
                             log.error("Unable to create an S3 object without an ARN: {}", details);
@@ -201,7 +218,14 @@ public class ObjectDetails extends AssetDetails {
                                     toClassifyGCS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 parents.add(parentQN);
-                                batch.add(toUpdate);
+                                localCount++;
+                                if (batch.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -225,7 +249,14 @@ public class ObjectDetails extends AssetDetails {
                                 toClassifyGCS.put(gcs.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
-                            batch.add(gcs);
+                            localCount++;
+                            if (batch.add(gcs) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     case ADLS:
@@ -250,7 +281,14 @@ public class ObjectDetails extends AssetDetails {
                                     toClassifyADLS.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                                 }
                                 parents.add(parentQN);
-                                batch.add(toUpdate);
+                                localCount++;
+                                if (batch.add(toUpdate) != null) {
+                                    log.info(
+                                            " ... processed {}/{} ({}%)",
+                                            localCount,
+                                            totalResults,
+                                            Math.round(((double) localCount / totalResults) * 100));
+                                }
                             } catch (NotFoundException e) {
                                 log.warn("Unable to find existing object — skipping: {}", qualifiedName, e);
                             } catch (AtlanException e) {
@@ -274,7 +312,14 @@ public class ObjectDetails extends AssetDetails {
                                 toClassifyADLS.put(adls.getQualifiedName(), details.getAtlanTags());
                             }
                             parents.add(parentQN);
-                            batch.add(adls);
+                            localCount++;
+                            if (batch.add(adls) != null) {
+                                log.info(
+                                        " ... processed {}/{} ({}%)",
+                                        localCount,
+                                        totalResults,
+                                        Math.round(((double) localCount / totalResults) * 100));
+                            }
                         }
                         break;
                     default:
@@ -283,7 +328,11 @@ public class ObjectDetails extends AssetDetails {
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert object details.", e);
         }

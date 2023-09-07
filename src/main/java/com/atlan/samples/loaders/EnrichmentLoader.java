@@ -73,10 +73,10 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
             ExcelReader xlsx = new ExcelReader(getFilename());
 
             // 1. Create glossaries for each row in the Glossary enrichment sheet
-            log.info("Processing sheet: {}", GLOSSARY_ENRICHMENT);
             GlossaryCache glossaryCache;
             try {
                 List<Map<String, String>> glossaryData = xlsx.getRowsFromSheet(GLOSSARY_ENRICHMENT, 0);
+                log.info("Processing sheet {}, with {} rows.", GLOSSARY_ENRICHMENT, glossaryData.size());
                 Map<String, GlossaryEnrichmentDetails> glossaries = new LinkedHashMap<>();
                 for (Map<String, String> row : glossaryData) {
                     GlossaryEnrichmentDetails details = GlossaryEnrichmentDetails.getFromRow(row, getDelimiter());
@@ -97,10 +97,10 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
             }
 
             // 2. Create categories for each row in the Category enrichment sheet
-            log.info("Processing sheet: {}", CATEGORY_ENRICHMENT);
             CategoryCache categoryCache = new CategoryCache();
             try {
                 List<Map<String, String>> categoryData = xlsx.getRowsFromSheet(CATEGORY_ENRICHMENT, 0);
+                log.info("Processing sheet {}, with {} rows.", CATEGORY_ENRICHMENT, categoryData.size());
                 Map<String, CategoryEnrichmentDetails> categories = new LinkedHashMap<>();
                 for (Map<String, String> row : categoryData) {
                     CategoryEnrichmentDetails details =
@@ -127,10 +127,10 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
             }
 
             // 3. Create terms for each row in the Term enrichment sheet
-            log.info("Processing sheet: {}", TERM_ENRICHMENT);
             TermCache termCache;
             try {
                 List<Map<String, String>> termData = xlsx.getRowsFromSheet(TERM_ENRICHMENT, 0);
+                log.info("Processing sheet {}, with {} rows.", TERM_ENRICHMENT, termData.size());
                 Map<String, TermEnrichmentDetails> terms = new LinkedHashMap<>();
                 for (Map<String, String> row : termData) {
                     TermEnrichmentDetails details =
@@ -152,9 +152,9 @@ public class EnrichmentLoader extends AbstractLoader implements RequestHandler<M
             }
 
             // 4. Create assets for each row in the Asset enrichment sheet
-            log.info("Processing sheet: {}", ASSET_ENRICHMENT);
             try {
                 List<Map<String, String>> assetData = xlsx.getRowsFromSheet(ASSET_ENRICHMENT, 0);
+                log.info("Processing sheet {}, with {} rows.", ASSET_ENRICHMENT, assetData.size());
                 Map<String, AssetEnrichmentDetails> assets = new LinkedHashMap<>();
                 for (Map<String, String> row : assetData) {
                     AssetEnrichmentDetails details = AssetEnrichmentDetails.getFromRow(termCache, row, getDelimiter());

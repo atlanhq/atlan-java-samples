@@ -216,10 +216,6 @@ public abstract class AbstractReporter {
             if (field instanceof CustomMetadataField) {
                 CustomMetadataField cmf = (CustomMetadataField) field;
                 value = from.getCustomMetadata(cmf.getSetName(), cmf.getAttributeName());
-                if (from.getGuid().equals("dafeb71f-3b70-4c20-9194-2e5cb182de0b")) {
-                    log.info("Found value: {}", value);
-                    log.info("Full asset: {}", from);
-                }
             } else {
                 String deserializedName =
                         ReflectionCache.getDeserializedName(from.getClass(), field.getAtlanFieldName());

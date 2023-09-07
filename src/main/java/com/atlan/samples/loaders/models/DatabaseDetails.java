@@ -102,6 +102,9 @@ public class DatabaseDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), Database.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
+        long totalResults = databases.size();
+        long localCount = 0;
+
         try {
             for (DatabaseDetails details : databases.values()) {
                 String connectionQualifiedName = details.getConnectionQualifiedName();
@@ -123,7 +126,12 @@ public class DatabaseDetails extends AssetDetails {
                         if (!details.getAtlanTags().isEmpty()) {
                             toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                         }
-                        batch.add(toUpdate);
+                        localCount++;
+                        if (batch.add(toUpdate) != null) {
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                        }
                     } catch (NotFoundException e) {
                         log.warn("Unable to find existing database — skipping: {}", qualifiedName, e);
                     } catch (AtlanException e) {
@@ -143,11 +151,20 @@ public class DatabaseDetails extends AssetDetails {
                     if (!details.getAtlanTags().isEmpty()) {
                         toClassify.put(database.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(database);
+                    localCount++;
+                    if (batch.add(database) != null) {
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                    }
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert database details.", e);
         }

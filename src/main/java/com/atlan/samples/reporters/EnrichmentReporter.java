@@ -20,6 +20,7 @@ import com.atlan.samples.writers.S3Writer;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -272,22 +273,30 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     }
 
     void cacheGlossaries() throws AtlanException {
-        log.info("Finding glossaries...");
-        Glossary.select()
+        FluentSearch.FluentSearchBuilder<?, ?> builder = Glossary.select()
                 .pageSize(getBatchSize())
                 .sort(Asset.NAME.order(SortOrder.Asc))
                 .sort(Asset.GUID.order(SortOrder.Asc))
                 .includesOnResults(ENRICHMENT_ATTRIBUTES)
                 ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
-                .includesOnRelations(RELATION_ATTRIBUTES)
-                .stream(true)
-                .filter(a -> a instanceof Glossary)
-                .forEach(g -> glossaryGuidToDetails.put(g.getGuid(), (Glossary) g));
+                .includesOnRelations(RELATION_ATTRIBUTES);
+        final long totalResults = builder.count();
+        AtomicLong count = new AtomicLong(0);
+        log.info(
+                "Retrieving {} glossaries from {} in batches of: {}", totalResults, Atlan.getBaseUrl(), getBatchSize());
+        builder.stream(true).filter(a -> a instanceof Glossary).forEach(g -> {
+            long localCount = count.getAndIncrement();
+            if (localCount % getBatchSize() == 0) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
+            glossaryGuidToDetails.put(g.getGuid(), (Glossary) g);
+        });
     }
 
     void cacheTerms() throws AtlanException {
-        log.info("Finding terms...");
-        GlossaryTerm.select()
+        FluentSearch.FluentSearchBuilder<?, ?> builder = GlossaryTerm.select()
                 .pageSize(getBatchSize())
                 .sort(Asset.NAME.order(SortOrder.Asc))
                 .sort(Asset.GUID.order(SortOrder.Asc))
@@ -302,10 +311,19 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 .includeOnResults(GlossaryTerm.TRANSLATED_TERMS)
                 .includeOnResults(GlossaryTerm.VALID_VALUES_FOR)
                 .includeOnResults(GlossaryTerm.CLASSIFIES)
-                .includesOnRelations(RELATION_ATTRIBUTES)
-                .stream(true)
-                .filter(a -> a instanceof GlossaryTerm)
-                .forEach(t -> termGuidToDetails.put(t.getGuid(), (GlossaryTerm) t));
+                .includesOnRelations(RELATION_ATTRIBUTES);
+        final long totalResults = builder.count();
+        AtomicLong count = new AtomicLong(0);
+        log.info("Retrieving {} terms from {} in batches of: {}", totalResults, Atlan.getBaseUrl(), getBatchSize());
+        builder.stream(true).filter(a -> a instanceof GlossaryTerm).forEach(t -> {
+            long localCount = count.getAndIncrement();
+            if (localCount % getBatchSize() == 0) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
+            termGuidToDetails.put(t.getGuid(), (GlossaryTerm) t);
+        });
     }
 
     void getAssets(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
@@ -327,63 +345,62 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
                 .includeOnRelations(Asset.DESCRIPTION)
                 .includeOnRelations(Asset.USER_DESCRIPTION);
-        IndexSearchRequest request = builder.toRequest();
-        log.info("Retrieving asset details from {} in batches of: {}", Atlan.getBaseUrl(), getBatchSize());
-        IndexSearchResponse response = request.search();
-        long totalResults = response.getApproximateCount();
-        int count = 1;
-        while (response != null
-                && response.getAssets() != null
-                && !response.getAssets().isEmpty()) {
-            long current = Math.min(count++ * ((long) getBatchSize()), totalResults);
-            log.info(
-                    " ... processing asset details: {}/{} ({}%)",
-                    current, totalResults, Math.round(((double) current / totalResults) * 100));
-            for (Asset result : response.getAssets()) {
-                String guid = result.getGuid();
-                if (!processed.containsKey(guid)) {
-                    List<Asset> childAssets = getChildAssets(result);
-                    long descriptionCounts = 0;
-                    for (Asset child : childAssets) {
-                        String childDesc = getDescription(child);
-                        descriptionCounts += !childDesc.isEmpty() ? 1 : 0;
-                    }
-                    List<DataCell> row = new ArrayList<>();
-                    row.add(DataCell.of(result.getConnectorType()));
-                    row.add(DataCell.of(result.getQualifiedName()));
-                    row.add(DataCell.of(result.getTypeName()));
-                    row.add(DataCell.of(result.getName()));
-                    row.add(DataCell.of(result.getDescription()));
-                    row.add(DataCell.of(result.getUserDescription()));
-                    row.add(DataCell.of(getUserOwners(result)));
-                    row.add(DataCell.of(getGroupOwners(result)));
-                    row.add(DataCell.of(result.getCertificateStatus()));
-                    row.add(DataCell.of(result.getCertificateStatusMessage()));
-                    row.add(DataCell.of(result.getCertificateUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
-                    row.add(DataCell.of(result.getAnnouncementType()));
-                    row.add(DataCell.of(result.getAnnouncementTitle()));
-                    row.add(DataCell.of(result.getAnnouncementMessage()));
-                    row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
-                    row.add(DataCell.of(result.getCreatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
-                    row.add(DataCell.of(result.getUpdatedBy()));
-                    row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
-                    row.add(DataCell.of(getREADME(result)));
-                    row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
-                    row.add(DataCell.of(getCount(result.getLinks())));
-                    row.add(DataCell.of(DIRECT_ATLAN_TAG_ONLY ? getDirectAtlanTags(result) : getAtlanTags(result)));
-                    row.add(DataCell.of(childAssets.size()));
-                    row.add(DataCell.of(descriptionCounts));
-                    row.add(DataCell.of(getAssetLink(guid)));
-                    addCustomMetadata(row, result);
-                    xlsx.appendRow(sheet, row);
-                    processed.put(guid, result.getQualifiedName());
-                }
+        final long totalResults = builder.count();
+        AtomicLong count = new AtomicLong(0);
+        log.info(
+                "Retrieving {} asset details from {} in batches of: {}",
+                totalResults,
+                Atlan.getBaseUrl(),
+                getBatchSize());
+        builder.stream().forEach(result -> {
+            long localCount = count.getAndIncrement();
+            if (localCount % getBatchSize() == 0) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
             }
-            response = response.getNextPage();
-        }
+            String guid = result.getGuid();
+            if (!processed.containsKey(guid)) {
+                List<Asset> childAssets = getChildAssets(result);
+                long descriptionCounts = 0;
+                for (Asset child : childAssets) {
+                    String childDesc = getDescription(child);
+                    descriptionCounts += !childDesc.isEmpty() ? 1 : 0;
+                }
+                List<DataCell> row = new ArrayList<>();
+                row.add(DataCell.of(result.getConnectorType()));
+                row.add(DataCell.of(result.getQualifiedName()));
+                row.add(DataCell.of(result.getTypeName()));
+                row.add(DataCell.of(result.getName()));
+                row.add(DataCell.of(result.getDescription()));
+                row.add(DataCell.of(result.getUserDescription()));
+                row.add(DataCell.of(getUserOwners(result)));
+                row.add(DataCell.of(getGroupOwners(result)));
+                row.add(DataCell.of(result.getCertificateStatus()));
+                row.add(DataCell.of(result.getCertificateStatusMessage()));
+                row.add(DataCell.of(result.getCertificateUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getCertificateUpdatedAt())));
+                row.add(DataCell.of(result.getAnnouncementType()));
+                row.add(DataCell.of(result.getAnnouncementTitle()));
+                row.add(DataCell.of(result.getAnnouncementMessage()));
+                row.add(DataCell.of(result.getAnnouncementUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getAnnouncementUpdatedAt())));
+                row.add(DataCell.of(result.getCreatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getCreateTime())));
+                row.add(DataCell.of(result.getUpdatedBy()));
+                row.add(DataCell.of(getFormattedDateTime(result.getUpdateTime())));
+                row.add(DataCell.of(getREADME(result)));
+                row.add(DataCell.of(getTerms(result.getAssignedTerms(), termGuidToDetails)));
+                row.add(DataCell.of(getCount(result.getLinks())));
+                row.add(DataCell.of(DIRECT_ATLAN_TAG_ONLY ? getDirectAtlanTags(result) : getAtlanTags(result)));
+                row.add(DataCell.of(childAssets.size()));
+                row.add(DataCell.of(descriptionCounts));
+                row.add(DataCell.of(getAssetLink(guid)));
+                addCustomMetadata(row, result);
+                xlsx.appendRow(sheet, row);
+                processed.put(guid, result.getQualifiedName());
+            }
+        });
     }
 
     void getGlossaries(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
@@ -416,9 +433,8 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
     }
 
     void findCategories(ExcelWriter xlsx, Sheet sheet) throws AtlanException {
-        log.info("Finding categories...");
         Map<String, GlossaryCategory> categoryGuidToDetails = new ConcurrentHashMap<>();
-        GlossaryCategory.select()
+        FluentSearch.FluentSearchBuilder<?, ?> builder = GlossaryCategory.select()
                 .pageSize(getBatchSize())
                 .sort(Asset.NAME.order(SortOrder.Asc))
                 .sort(Asset.GUID.order(SortOrder.Asc))
@@ -426,10 +442,20 @@ public class EnrichmentReporter extends AbstractReporter implements RequestHandl
                 ._includesOnResults(CM_ATTRIBUTES_FOR_SEARCH)
                 .includeOnResults(GlossaryCategory.ANCHOR)
                 .includeOnResults(GlossaryCategory.PARENT_CATEGORY)
-                .includesOnRelations(RELATION_ATTRIBUTES)
-                .stream(true)
-                .filter(a -> a instanceof GlossaryCategory)
-                .forEach(c -> categoryGuidToDetails.put(c.getGuid(), (GlossaryCategory) c));
+                .includesOnRelations(RELATION_ATTRIBUTES);
+        final long totalResults = builder.count();
+        AtomicLong count = new AtomicLong(0);
+        log.info(
+                "Retrieving {} categories from {} in batches of: {}", totalResults, Atlan.getBaseUrl(), getBatchSize());
+        builder.stream(true).filter(a -> a instanceof GlossaryCategory).forEach(c -> {
+            long localCount = count.getAndIncrement();
+            if (localCount % getBatchSize() == 0) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
+            categoryGuidToDetails.put(c.getGuid(), (GlossaryCategory) c);
+        });
         for (GlossaryCategory category : categoryGuidToDetails.values()) {
             String categoryPath = getCategoryPath(category, categoryGuidToDetails);
             categoryGuidToPath.put(category.getGuid(), categoryPath);

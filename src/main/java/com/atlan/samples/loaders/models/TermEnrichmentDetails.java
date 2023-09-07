@@ -199,6 +199,8 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
         Map<String, String> readmes = new HashMap<>();
         Map<String, TermEnrichmentDetails> termToTerm = new HashMap<>();
 
+        long localCount = 0;
+        long totalResults = terms.size();
         for (TermEnrichmentDetails details : terms.values()) {
             Asset glossary = details.getGlossary();
             if (glossary != null) {
@@ -247,6 +249,10 @@ public class TermEnrichmentDetails extends EnrichmentDetails {
                                 ? term.saveReplacingCM(replaceAtlanTags)
                                 : term.saveMergingCM(replaceAtlanTags);
                         if (response != null) {
+                            localCount++;
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
                             List<Asset> created = response.getCreatedAssets();
                             if (created != null) {
                                 for (Asset one : created) {

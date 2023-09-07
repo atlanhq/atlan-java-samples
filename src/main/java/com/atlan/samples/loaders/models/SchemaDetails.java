@@ -104,6 +104,9 @@ public class SchemaDetails extends AssetDetails {
         AssetBatch batch = new AssetBatch(Atlan.getDefaultClient(), Schema.TYPE_NAME, batchSize);
         Map<String, List<String>> toClassify = new HashMap<>();
 
+        long totalResults = schemas.size();
+        long localCount = 0;
+
         try {
             for (SchemaDetails details : schemas.values()) {
                 String databaseQualifiedName = details.getDatabaseQualifiedName();
@@ -125,7 +128,12 @@ public class SchemaDetails extends AssetDetails {
                         if (!details.getAtlanTags().isEmpty()) {
                             toClassify.put(toUpdate.getQualifiedName(), details.getAtlanTags());
                         }
-                        batch.add(toUpdate);
+                        localCount++;
+                        if (batch.add(toUpdate) != null) {
+                            log.info(
+                                    " ... processed {}/{} ({}%)",
+                                    localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                        }
                         parents.add(databaseQualifiedName);
                     } catch (NotFoundException e) {
                         log.warn("Unable to find existing schema — skipping: {}", qualifiedName, e);
@@ -146,12 +154,21 @@ public class SchemaDetails extends AssetDetails {
                     if (!details.getAtlanTags().isEmpty()) {
                         toClassify.put(schema.getQualifiedName(), details.getAtlanTags());
                     }
-                    batch.add(schema);
+                    localCount++;
+                    if (batch.add(schema) != null) {
+                        log.info(
+                                " ... processed {}/{} ({}%)",
+                                localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+                    }
                     parents.add(databaseQualifiedName);
                 }
             }
             // And don't forget to flush out any that remain
-            batch.flush();
+            if (batch.flush() != null) {
+                log.info(
+                        " ... processed {}/{} ({}%)",
+                        localCount, totalResults, Math.round(((double) localCount / totalResults) * 100));
+            }
         } catch (AtlanException e) {
             log.error("Unable to bulk-upsert schema details.", e);
         }
