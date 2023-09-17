@@ -1046,6 +1046,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/EnrichmentReporter.html#%3Cinit%3E()">EnrichmentReporter()</a></span> - Constructor for class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/EnrichmentReporter.html" title="class in com.atlan.samples.reporters">EnrichmentReporter</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#envVarsAsEvent()">envVarsAsEvent()</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
+<dd>
+<div class="block">Translates environment variables into a pseudo-event, to have a common
+ method (<a href="com/atlan/samples/reporters/AssetReporter.html#handleRequest(java.util.Map,com.amazonaws.services.lambda.runtime.Context)"><code>AssetReporter.handleRequest(Map, Context)</code></a>) across both local workstation runtimes
+ and AWS Lambda execution.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/AccountDetails.html#equals(java.lang.Object)">equals(Object)</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/AccountDetails.html" title="class in com.atlan.samples.loaders.models">AccountDetails</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/AssetDetails.html#equals(java.lang.Object)">equals(Object)</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/AssetDetails.html" title="class in com.atlan.samples.loaders.models">AssetDetails</a></dt>
@@ -1768,11 +1774,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">TBC</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAssetsToExtract()">getAssetsToExtract()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAssetsToExtract(java.util.Map)">getAssetsToExtract(Map&lt;String, String&gt;)</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
 <dd>
 <div class="block">Produce a query that will retrieve all the assets you want to extract.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/ExportAllDataAssets.html#getAssetsToExtract()">getAssetsToExtract()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/ExportAllDataAssets.html" title="class in com.atlan.samples.reporters">ExportAllDataAssets</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/ExportAllDataAssets.html#getAssetsToExtract(java.util.Map)">getAssetsToExtract(Map&lt;String, String&gt;)</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/ExportAllDataAssets.html" title="class in com.atlan.samples.reporters">ExportAllDataAssets</a></dt>
 <dd>
 <div class="block">Produce a query that will retrieve all the assets you want to extract.</div>
 </dd>
@@ -1784,7 +1790,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">TBC</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAssetToValueTranslator()">getAssetToValueTranslator()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAssetToValueTranslator(java.util.Map)">getAssetToValueTranslator(Map&lt;String, String&gt;)</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
 <dd>
 <div class="block">Produces a function that will translate all the attributes from each asset
  to string-encoded results that can be placed into the CSV.</div>
@@ -1808,12 +1814,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Retrieve a comma-separated list of all Atlan tags assigned to the provided asset,
  whether directly or through propagation.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAttributesToExtract()">getAttributesToExtract()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#getAttributesToExtract(java.util.Map)">getAttributesToExtract(Map&lt;String, String&gt;)</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
 <dd>
 <div class="block">Produce a list of all the attributes that should be extracted for each asset,
  in the order they should be produced for each row of the output.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/ExportAllDataAssets.html#getAttributesToExtract()">getAttributesToExtract()</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/ExportAllDataAssets.html" title="class in com.atlan.samples.reporters">ExportAllDataAssets</a></dt>
+<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/ExportAllDataAssets.html#getAttributesToExtract(java.util.Map)">getAttributesToExtract(Map&lt;String, String&gt;)</a></span> - Method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/ExportAllDataAssets.html" title="class in com.atlan.samples.reporters">ExportAllDataAssets</a></dt>
 <dd>
 <div class="block">Produce a list of all the attributes that should be extracted for each asset,
  in the order they should be produced for each row of the output.</div>
@@ -4606,12 +4612,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Translates environment variables into a pseudo-event, to have a common
  method (<a href="com/atlan/samples/loaders/AssetLoader.html#handleRequest(java.util.Map,com.amazonaws.services.lambda.runtime.Context)"><code>AssetLoader.handleRequest(Map, Context)</code></a>) across both local workstation runtimes
- and AWS Lambda execution.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/atlan/samples/reporters/AssetReporter.html#prepEvent()">prepEvent()</a></span> - Static method in class com.atlan.samples.reporters.<a href="com/atlan/samples/reporters/AssetReporter.html" title="class in com.atlan.samples.reporters">AssetReporter</a></dt>
-<dd>
-<div class="block">Translates environment variables into a pseudo-event, to have a common
- method (<a href="com/atlan/samples/reporters/AssetReporter.html#handleRequest(java.util.Map,com.amazonaws.services.lambda.runtime.Context)"><code>AssetReporter.handleRequest(Map, Context)</code></a>) across both local workstation runtimes
  and AWS Lambda execution.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/atlan/samples/loaders/models/ColumnDetails.ColumnDetailsBuilder.html#primaryKey(java.lang.Boolean)">primaryKey(Boolean)</a></span> - Method in class com.atlan.samples.loaders.models.<a href="com/atlan/samples/loaders/models/ColumnDetails.ColumnDetailsBuilder.html" title="class in com.atlan.samples.loaders.models">ColumnDetails.ColumnDetailsBuilder</a></dt>
