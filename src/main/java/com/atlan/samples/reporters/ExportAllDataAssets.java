@@ -7,12 +7,13 @@ import com.atlan.model.assets.*;
 import com.atlan.model.fields.AtlanField;
 import com.atlan.model.search.FluentSearch;
 import java.util.List;
+import java.util.Map;
 
 public class ExportAllDataAssets extends AssetReporter {
 
     /** {@inheritDoc} */
     @Override
-    public FluentSearch.FluentSearchBuilder<?, ?> getAssetsToExtract() {
+    public FluentSearch.FluentSearchBuilder<?, ?> getAssetsToExtract(Map<String, String> event) {
         return Atlan.getDefaultClient()
                 .assets
                 .select()
@@ -24,7 +25,7 @@ public class ExportAllDataAssets extends AssetReporter {
 
     /** {@inheritDoc} */
     @Override
-    public List<AtlanField> getAttributesToExtract() {
+    public List<AtlanField> getAttributesToExtract(Map<String, String> event) {
         /*try {
             // Example: including custom metadata fields (of course, add this 'rating' variable to the list
             // below to include it in the set of attributes to extract.
@@ -58,6 +59,6 @@ public class ExportAllDataAssets extends AssetReporter {
 
     public static void main(String[] args) {
         ExportAllDataAssets eada = new ExportAllDataAssets();
-        eada.handleRequest(prepEvent(), null);
+        eada.handleRequest(envVarsAsEvent(), null);
     }
 }
