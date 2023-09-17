@@ -23,30 +23,35 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
     /**
      * Produce a query that will retrieve all the assets you want to extract.
      *
+     * @param event context passed through the Lambda invocation event (or environment variables)
      * @return a fluent search with all necessary conditions for selecting the set of assets to extract
      */
-    public abstract FluentSearch.FluentSearchBuilder<?, ?> getAssetsToExtract();
+    public abstract FluentSearch.FluentSearchBuilder<?, ?> getAssetsToExtract(Map<String, String> event);
 
     /**
      * Produce a list of all the attributes that should be extracted for each asset,
-     * in the order they should be produced for each row of the output.
+     * in the order they should be produced for each row of the output. The qualifiedName and
+     * type of every asset will automatically be included as the first two columns (as they are
+     * required), so you do not need to specify these.
      *
+     * @param event context passed through the Lambda invocation event (or environment variables)
      * @return list of attributes to include for each asset
      */
-    public abstract List<AtlanField> getAttributesToExtract();
+    public abstract List<AtlanField> getAttributesToExtract(Map<String, String> event);
 
     /**
      * Produces a function that will translate all the attributes from each asset
      * to string-encoded results that can be placed into the CSV.
      *
+     * @param event context passed through the Lambda invocation event (or environment variables)
      * @return a row generator that translates from asset to a row of strings for the CSV
      */
-    public RowGenerator getAssetToValueTranslator() {
+    public RowGenerator getAssetToValueTranslator(Map<String, String> event) {
         return (a) -> {
             List<String> values = new ArrayList<>();
             values.add(getStringValueForField(a, Asset.QUALIFIED_NAME));
             values.add(getStringValueForField(a, Asset.TYPE_NAME));
-            for (AtlanField field : getAttributesToExtract()) {
+            for (AtlanField field : getAttributesToExtract(event)) {
                 if (!field.equals(Asset.QUALIFIED_NAME) && !field.equals(Asset.TYPE_NAME)) {
                     values.add(getStringValueForField(a, field));
                 }
@@ -66,21 +71,21 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
 
         parseParametersFromEvent(event);
 
-        FluentSearch.FluentSearchBuilder<?, ?> assets = getAssetsToExtract()
+        FluentSearch.FluentSearchBuilder<?, ?> assets = getAssetsToExtract(event)
                 .pageSize(getBatchSize())
-                .includesOnResults(getAttributesToExtract())
+                .includesOnResults(getAttributesToExtract(event))
                 .includeOnRelations(Asset.QUALIFIED_NAME);
 
         try (CSVWriter csv = new CSVWriter(getFilename())) {
             List<String> headerNames = Stream.of(Asset.QUALIFIED_NAME, Asset.TYPE_NAME)
                     .map(AtlanField::getAtlanFieldName)
                     .collect(Collectors.toList());
-            headerNames.addAll(getAttributesToExtract().stream()
+            headerNames.addAll(getAttributesToExtract(event).stream()
                     .map(AssetReporter::getHeaderForField)
                     .collect(Collectors.toList()));
             csv.writeHeader(headerNames);
             long start = System.currentTimeMillis();
-            csv.streamAssets(assets.stream(true), getAssetToValueTranslator(), assets.count(), getBatchSize());
+            csv.streamAssets(assets.stream(true), getAssetToValueTranslator(event), assets.count(), getBatchSize());
             long finish = System.currentTimeMillis();
             log.info("Total time taken: {} ms", finish - start);
         } catch (AtlanException e) {
@@ -109,7 +114,7 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
      *
      * @return a map of environment variables as if they are event context from AWS
      */
-    public static Map<String, String> prepEvent() {
+    public static Map<String, String> envVarsAsEvent() {
         Map<String, String> event = new HashMap<>(System.getenv());
         if (!event.containsKey("DELIMITER")) {
             event.put("DELIMITER", "|");
@@ -117,11 +122,12 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
         return event;
     }
 
-    // TODO: probably make this filename something that can be set separately?
     @Override
     protected void parseParametersFromEvent(Map<String, String> event) {
         super.parseParametersFromEvent(event);
         if (event != null) {
+            // Note that this only sets a default prefix of 'asset-report', only
+            // if there is no FILE_PREFIX defined in the event itself
             setFilenameWithPrefix(event, "asset-report", "csv");
         }
     }
