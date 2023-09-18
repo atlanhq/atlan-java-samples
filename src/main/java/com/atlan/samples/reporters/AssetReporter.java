@@ -40,6 +40,19 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
     public abstract List<AtlanField> getAttributesToExtract(Map<String, String> event);
 
     /**
+     * Produce a list of all the attributes that should be extracted for each related asset
+     * that is retrieved through the search. The qualifiedName and type of every related asset
+     * will automatically be included, so you do not need to specify these.
+     * (You only need to override this class if you want any other related attributes.)
+     *
+     * @param event context passed through the Lambda invocation event (or environment variables)
+     * @return list of attributes to include for each related asset
+     */
+    public List<AtlanField> getRelatedAttributesToExtract(Map<String, String> event) {
+        return Collections.emptyList();
+    }
+
+    /**
      * Produces a function that will translate all the attributes from each asset
      * to string-encoded results that can be placed into the CSV.
      *
@@ -74,7 +87,8 @@ public abstract class AssetReporter extends AbstractReporter implements RequestH
         FluentSearch.FluentSearchBuilder<?, ?> assets = getAssetsToExtract(event)
                 .pageSize(getBatchSize())
                 .includesOnResults(getAttributesToExtract(event))
-                .includeOnRelations(Asset.QUALIFIED_NAME);
+                .includeOnRelations(Asset.QUALIFIED_NAME)
+                .includesOnRelations(getRelatedAttributesToExtract(event));
 
         try (CSVWriter csv = new CSVWriter(getFilename())) {
             List<String> headerNames = Stream.of(Asset.QUALIFIED_NAME, Asset.TYPE_NAME)

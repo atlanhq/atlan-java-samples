@@ -202,6 +202,20 @@ public abstract class AbstractReporter {
     }
 
     /**
+     * Retrieve a list of multiple complex values as a single string, basically JSON-structured.
+     *
+     * @param items to combine into a single string
+     * @return a single string of all items
+     */
+    protected String getComplexList(Collection<String> items) {
+        if (items == null) {
+            return "";
+        } else {
+            return "[" + String.join(",", items) + "]";
+        }
+    }
+
+    /**
      * Translates the provided value for the provided field on the provided asset into a string
      * representation that can be encoded into a single cell of Excel / CSV.
      *
@@ -260,12 +274,17 @@ public abstract class AbstractReporter {
                     }
                     return getDelimitedList(directTags);
                 } else if (first instanceof Asset) {
-                    return getDelimitedList(((Collection<Asset>) value)
-                            .stream().map(this::serializeAssetRefToCSV).collect(Collectors.toList()));
+                    if (first instanceof Link) {
+                        return getComplexList(((Collection<Asset>) value)
+                                .stream().map(this::serializeAssetRefToCSV).collect(Collectors.toList()));
+                    } else {
+                        return getDelimitedList(((Collection<Asset>) value)
+                                .stream().map(this::serializeAssetRefToCSV).collect(Collectors.toList()));
+                    }
                 } else if (first instanceof String) {
                     return getDelimitedList((Collection<String>) value);
                 } else if (first instanceof AtlanStruct) {
-                    return getDelimitedList(((Collection<AtlanStruct>) value)
+                    return getComplexList(((Collection<AtlanStruct>) value)
                             .stream().map(this::serializeStructToCSV).collect(Collectors.toList()));
                 } else {
                     log.warn("Unhandled collection of values: {}", first.getClass());
@@ -300,11 +319,25 @@ public abstract class AbstractReporter {
      * @return a String representation of the related asset
      */
     protected String serializeAssetRefToCSV(Asset asset) {
-        String qualifiedName = asset.getQualifiedName();
-        if ((qualifiedName == null || qualifiedName.isEmpty()) && asset.getUniqueAttributes() != null) {
-            qualifiedName = asset.getUniqueAttributes().getQualifiedName();
+        String typeName = asset.getTypeName();
+        // Handle some assets as direct embeds
+        if (typeName.equals("Readme")) {
+            return asset.getDescription();
+        } else if (typeName.equals("Link")) {
+            Link link = (Link) asset;
+            // Transform to a set of useful, non-overlapping info
+            return Link._internal()
+                    .name(link.getName())
+                    .link(link.getLink())
+                    .build()
+                    .toJson(Atlan.getDefaultClient());
+        } else {
+            String qualifiedName = asset.getQualifiedName();
+            if ((qualifiedName == null || qualifiedName.isEmpty()) && asset.getUniqueAttributes() != null) {
+                qualifiedName = asset.getUniqueAttributes().getQualifiedName();
+            }
+            return typeName + "@" + qualifiedName;
         }
-        return asset.getTypeName() + "@" + qualifiedName;
     }
 
     /**
@@ -315,8 +348,7 @@ public abstract class AbstractReporter {
      * @return a String representation of the struct instance
      */
     protected String serializeStructToCSV(AtlanStruct struct) {
-        // TODO: probably some format that's better than this...
-        return struct.toString();
+        return struct.toJson(Atlan.getDefaultClient());
     }
 
     public void setFilename(String _filename) {
