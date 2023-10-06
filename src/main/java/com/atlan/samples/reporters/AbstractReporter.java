@@ -56,13 +56,13 @@ public abstract class AbstractReporter {
             _bucket = event.getOrDefault("BUCKET", null);
             Atlan.setBaseUrl(event.getOrDefault("ATLAN_BASE_URL", null));
             Atlan.setApiToken(event.getOrDefault("ATLAN_API_KEY", null));
-            String maxRetries = event.getOrDefault("MAX_RETRIES", "20");
-            int _maxRetries = 20;
+            String maxRetries = event.getOrDefault("MAX_RETRIES", "3");
+            int _maxRetries = 3;
             try {
                 _maxRetries = Integer.parseInt(maxRetries);
             } catch (NumberFormatException e) {
                 log.warn(
-                        "Unable to determine a number from the MAX_RETRIES value of '{}', falling back to a default of 20.",
+                        "Unable to determine a number from the MAX_RETRIES value of '{}', falling back to a default of 3.",
                         maxRetries);
             }
             Atlan.setMaxNetworkRetries(_maxRetries);
