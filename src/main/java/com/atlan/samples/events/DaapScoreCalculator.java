@@ -177,7 +177,7 @@ public class DaapScoreCalculator implements AtlanEventHandler {
                                         .toBuilder()
                                         .description("Data as a Product completeness score for this asset")
                                         .build())
-                        .options(CustomMetadataOptions.withLogoAsEmoji("\uD83D\uDD16"))
+                        .options(CustomMetadataOptions.withEmoji("\uD83D\uDD16"))
                         .build();
                 customMetadataDef.create();
                 log.info("Created DaaP custom metadata structure.");
