@@ -9,15 +9,19 @@
 
 # Atlan Java Samples
 
-This repository houses samples of using the [Atlan Java SDK](https://developer.atlan.com/sdks/java/).
+⚠️ This repository is now deprecated ⚠️
 
-Currently, these cover:
+All content has moved to: https://github.com/atlanhq/atlan-java
 
-- [Loaders](https://developer.atlan.com/samples/loaders) — import metadata into Atlan, both net-new and by enriching existing assets
-- [Reporters](https://developer.atlan.com/samples/reporters) — extract or report on metadata in Atlan
+~~This repository houses samples of using the [Atlan Java SDK](https://developer.atlan.com/sdks/java/).~~
 
-These are based on common functionality to read and write from Excel files (based on [Apache POI](https://poi.apache.org/)),
-and to integrate with AWS S3 to enable them to run as Lambda functions.
+~~Currently, these cover:~~
+
+~~- [Loaders](https://developer.atlan.com/samples/loaders) — import metadata into Atlan, both net-new and by enriching existing assets~~
+~~- [Reporters](https://developer.atlan.com/samples/reporters) — extract or report on metadata in Atlan~~
+
+~~These are based on common functionality to read and write from Excel files (based on [Apache POI](https://poi.apache.org/)),
+and to integrate with AWS S3 to enable them to run as Lambda functions.~~
 
 ----
 License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
